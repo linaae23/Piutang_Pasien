@@ -7,15 +7,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 p-4 md:p-8">
+<body class="bg-slate-100 p-4 md:p-6">
 
-  <div class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-md">
+  <div class="max-w-[1400px] mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold text-slate-800 mb-6">Aplikasi Piutang Pasien RS</h1>
 
-    <!-- FORM INPUT DATA LENGKAP -->
-    <form id="formPiutang" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-slate-50 p-5 rounded-lg border">
+    <!-- FORM INPUT DENGAN GRID 5 KOLOM MENDATAR (5 BARIS) -->
+    <form id="formPiutang" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-8 bg-slate-50 p-5 rounded-lg border">
       
-      <!-- Identitas Pasien -->
+      <!-- BARIS 1: IDENTITAS & TRANSAKSI -->
       <div>
         <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
         <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
@@ -32,8 +32,12 @@
         <label class="block text-xs font-semibold mb-1">No. Transaksi</label>
         <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-sm">
       </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
+        <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
+      </div>
 
-      <!-- Rawat & Tanggal -->
+      <!-- BARIS 2: PERAWATAN & LOKASI -->
       <div>
         <label class="block text-xs font-semibold mb-1">Tgl Masuk RS</label>
         <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-sm">
@@ -46,8 +50,6 @@
         <label class="block text-xs font-semibold mb-1">Bangsal</label>
         <input type="text" id="bangsal" class="w-full border p-2 rounded text-sm">
       </div>
-
-      <!-- DROPDOWN KELAS -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kelas</label>
         <select id="kelas" class="w-full border p-2 rounded text-sm">
@@ -59,46 +61,16 @@
           <option value="VVIP">VVIP</option>
         </select>
       </div>
-
-      <!-- DROPDOWN JENIS PERAWATAN -->
       <div>
         <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
         <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
-          <option value="">-- Pilih Jenis Perawatan --</option>
+          <option value="">-- Pilih Jenis --</option>
           <option value="Rawat Jalan">Rawat Jalan</option>
           <option value="Rawat Inap">Rawat Inap</option>
         </select>
       </div>
 
-      <!-- DROPDOWN KATEGORI -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Kategori</label>
-        <select id="kategori" class="w-full border p-2 rounded text-sm">
-          <option value="">-- Pilih Kategori --</option>
-          <option value="Non Paviliun">Non Paviliun</option>
-          <option value="Paviliun">Paviliun</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
-        <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
-      </div>
-
-      <!-- OPSI KPKNL & TANGGAL KIRIM -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
-        <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
-          <option value="Belum">Belum</option>
-          <option value="Sudah">Sudah</option>
-        </select>
-      </div>
-      <div id="container_tgl_kpknl" class="hidden">
-        <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
-        <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
-      </div>
-
-      <!-- Biaya & Keuangan -->
+      <!-- BARIS 3: BIAYA & PERHITUNGAN -->
       <div>
         <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
         <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
@@ -115,13 +87,12 @@
         <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
         <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
       </div>
-
-      <!-- KOLOM BELUM TERBAYAR (HITUNG OTOMATIS) -->
       <div>
         <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Otomatis)</label>
         <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
       </div>
 
+      <!-- BARIS 4: TAGIHAN & AKSI -->
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
         <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
@@ -134,14 +105,33 @@
         <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
         <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
       </div>
-
-      <!-- Link Dokumen & Tombol Submit -->
-      <div class="md:col-span-3">
+      
+      <!-- BARIS 5: KATEGORI, KPKNL & DOKUMEN -->
+      <div>
+        <label class="block text-xs font-semibold mb-1">Kategori</label>
+        <select id="kategori" class="w-full border p-2 rounded text-sm">
+          <option value="">-- Pilih Kategori --</option>
+          <option value="Non Paviliun">Non Paviliun</option>
+          <option value="Paviliun">Paviliun</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
+        <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
+          <option value="Belum">Belum</option>
+          <option value="Sudah">Sudah</option>
+        </select>
+      </div>
+      <div id="container_tgl_kpknl" class="hidden">
+        <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
+        <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
+      </div>
+      <div class="lg:col-span-2">
         <label class="block text-xs font-semibold mb-1">Link Dokumen (Drive/URL)</label>
         <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-sm">
       </div>
-      <div class="flex items-end">
-        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition">
+      <div class="lg:col-span-2 flex items-end">
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
           + Simpan Data
         </button>
       </div>
@@ -178,7 +168,7 @@
   <script>
     // MASUKKAN CREDENTIAL SUPABASE ANDA
     const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
+    const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_ANDA';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
