@@ -13,30 +13,32 @@
 
     <!-- ================= SIDEBAR ================= -->
     <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
+      <!-- Header Sidebar -->
       <div class="p-5 border-b border-slate-800 flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">
           RS
         </div>
         <div>
-          <h2 class="font-bold text-white text-sm leading-tight">Sistem Keuangan</h2>
-          <p class="text-[10px] text-slate-400">Integrated RS Dashboard</p>
+          <h2 class="font-bold text-white text-sm leading-tight">Sistem Keuangan RS</h2>
+          <p class="text-[10px] text-slate-400">Pencatatan & Laporan</p>
         </div>
       </div>
 
+      <!-- Menu Navigasi -->
       <nav class="flex-1 p-4 space-y-4 overflow-y-auto text-xs">
         
         <!-- KELOMPOK INPUT DATA -->
         <div>
           <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">INPUT DATA</p>
           <div class="space-y-1">
-            <button onclick="bukaView('input-pendapatan')" id="btn-input-pendapatan" class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>💰</span> Input Pendapatan
-            </button>
-            <button onclick="bukaView('input-kerjasama')" id="btn-input-kerjasama" class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>🏢</span> Input Piutang Kerjasama
-            </button>
-            <button onclick="bukaView('input-pasien')" id="btn-input-pasien" class="w-full text-left px-3 py-2 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2">
+            <button onclick="bukaView('input-pasien')" id="btn-input-pasien" class="w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2">
               <span>👤</span> Input Piutang Pasien
+            </button>
+            <button onclick="bukaView('input-pendapatan')" id="btn-input-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+              <span>💰</span> Input Pendapatan Direct
+            </button>
+            <button onclick="bukaView('input-kerjasama')" id="btn-input-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+              <span>🏢</span> Input Piutang Kerjasama
             </button>
           </div>
         </div>
@@ -47,16 +49,16 @@
         <div>
           <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">LAPORAN & REKAP</p>
           <div class="space-y-1">
-            <button onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>📊</span> Laporan Pendapatan
-            </button>
-            <button onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>🤝</span> Laporan Piutang Kerjasama
-            </button>
-            <button onclick="bukaView('laporan-pasien')" id="btn-laporan-pasien" class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+            <button onclick="bukaView('laporan-pasien')" id="btn-laporan-pasien" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
               <span>📋</span> Laporan Piutang Pasien
             </button>
-            <button onclick="bukaView('laporan-gabungan')" id="btn-laporan-gabungan" class="w-full text-left px-3 py-2 rounded-lg text-amber-400 hover:bg-amber-950/40 font-semibold transition flex items-center gap-2">
+            <button onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+              <span>📊</span> Laporan Pendapatan
+            </button>
+            <button onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+              <span>🤝</span> Laporan Piutang Kerjasama
+            </button>
+            <button onclick="bukaView('laporan-gabungan')" id="btn-laporan-gabungan" class="w-full text-left px-3 py-2.5 rounded-lg text-amber-400 hover:bg-amber-950/40 font-semibold transition flex items-center gap-2">
               <span>🌐</span> Laporan Gabungan (Konsolidasi)
             </button>
           </div>
@@ -64,6 +66,7 @@
 
       </nav>
 
+      <!-- Footer Sidebar -->
       <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
         &copy; 2026 RS Integrated System
       </div>
@@ -72,12 +75,152 @@
     <!-- ================= AREA KONTEN UTAMA ================= -->
     <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
 
-      <!-- 1. FORM INPUT PENDAPATAN -->
+      <!-- ================= 1. FORM INPUT PIUTANG PASIEN (LENGKAP SEPERTI AWAL) ================= -->
+      <section id="view-input-pasien" class="modul-view">
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-slate-800">Form Input & Edit Data Piutang Pasien</h1>
+          <p class="text-xs text-slate-500">Masukkan rincian pelayanan, kelas, jenis perawatan, serta data keuangan pasien secara lengkap.</p>
+        </div>
+
+        <form id="formPiutangPasien" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-xs">
+          <input type="hidden" id="edit_id" value="">
+
+          <!-- BARIS 1: IDENTITAS PASIEN -->
+          <div>
+            <label class="block font-semibold mb-1">Nama Pasien</label>
+            <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-xs" required>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Alamat Pasien</label>
+            <input type="text" id="alamat_pasien" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">No. RM</label>
+            <input type="text" id="no_rm" class="w-full border p-2 rounded text-xs" required>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">No. Transaksi</label>
+            <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Tahun Piutang</label>
+            <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-xs">
+          </div>
+
+          <!-- BARIS 2: DATA PERAWATAN -->
+          <div>
+            <label class="block font-semibold mb-1">Tgl Masuk RS</label>
+            <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Tgl Keluar RS</label>
+            <input type="date" id="tgl_keluar_rs" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Bangsal</label>
+            <input type="text" id="bangsal" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Kelas</label>
+            <select id="kelas" class="w-full border p-2 rounded text-xs">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="VIP">VIP</option>
+              <option value="VVIP">VVIP</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Jenis Perawatan</label>
+            <select id="jenis_perawatan" class="w-full border p-2 rounded text-xs">
+              <option value="">-- Pilih Jenis --</option>
+              <option value="Rawat Jalan">Rawat Jalan</option>
+              <option value="Rawat Inap">Rawat Inap</option>
+            </select>
+          </div>
+
+          <!-- BARIS 3: KATEGORI & DOKUMEN -->
+          <div>
+            <label class="block font-semibold mb-1">Kategori</label>
+            <select id="kategori" class="w-full border p-2 rounded text-xs">
+              <option value="">-- Pilih Kategori --</option>
+              <option value="Non Paviliun">Non Paviliun</option>
+              <option value="Paviliun">Paviliun</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Kirim KPKNL</label>
+            <select id="kirim_kpknl" class="w-full border p-2 rounded text-xs">
+              <option value="Belum">Belum</option>
+              <option value="Sudah">Sudah</option>
+            </select>
+          </div>
+          <div id="container_tgl_kpknl" class="hidden">
+            <label class="block font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
+            <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-xs border-blue-400 bg-blue-50">
+          </div>
+          <div class="lg:col-span-2">
+            <label class="block font-semibold mb-1">Link Dokumen (Drive/URL)</label>
+            <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-xs">
+          </div>
+
+          <!-- BARIS 4: PERHITUNGAN KEUANGAN PASIEN -->
+          <div>
+            <label class="block font-semibold mb-1">Jumlah Biaya / Pendapatan (Rp)</label>
+            <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-xs" value="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Potongan (Rp)</label>
+            <input type="number" id="potongan" class="w-full border p-2 rounded text-xs" value="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Pembayaran Awal (Rp)</label>
+            <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-xs" value="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Jumlah Angsuran (Rp)</label>
+            <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-xs" value="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-red-600">Belum Terbayar / Piutang (Otomatis)</label>
+            <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-xs bg-slate-100 font-bold text-red-600" value="0" readonly>
+          </div>
+
+          <!-- BARIS 5: JADWAL TAGIHAN & AKSI -->
+          <div>
+            <label class="block font-semibold mb-1">Tgl Tagihan 1</label>
+            <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Tgl Tagihan 2</label>
+            <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Tgl Tagihan 3</label>
+            <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-xs">
+          </div>
+          <div class="lg:col-span-2 flex items-end gap-2">
+            <button type="submit" id="btnSubmitPasien" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
+              + Simpan Data Pasien
+            </button>
+            <button type="button" id="btnBatalPasien" onclick="batalEditPasien()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
+              Batal
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ================= 2. FORM INPUT PENDAPATAN DIRECT ================= -->
       <section id="view-input-pendapatan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">Input Data Pendapatan & Item Service</h1>
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-slate-800">Input Data Pendapatan & Item Service</h1>
+          <p class="text-xs text-slate-500">Pencatatan pendapatan langsung per item/pelayanan medis.</p>
+        </div>
+
         <form id="formPendapatan" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
           <div>
-            <label class="block font-semibold mb-1">Tanggal</label>
+            <label class="block font-semibold mb-1">Tanggal Transaksi</label>
             <input type="date" id="p_tanggal" class="w-full border p-2 rounded" required>
           </div>
           <div>
@@ -99,7 +242,7 @@
             <input type="text" id="p_nama_item" placeholder="Contoh: Pemeriksaan USG 4D" class="w-full border p-2 rounded" required>
           </div>
           <div>
-            <label class="block font-semibold mb-1">Jumlah Item</label>
+            <label class="block font-semibold mb-1">Jumlah Item (Qty)</label>
             <input type="number" id="p_jumlah" value="1" min="1" class="w-full border p-2 rounded" required>
           </div>
           <div>
@@ -122,9 +265,13 @@
         </form>
       </section>
 
-      <!-- 2. FORM INPUT PIUTANG KERJASAMA -->
+      <!-- ================= 3. FORM INPUT PIUTANG KERJASAMA ================= -->
       <section id="view-input-kerjasama" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">Input Piutang Kerjasama (Instansi / Asuransi)</h1>
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-slate-800">Input Piutang Kerjasama Instansi / Asuransi</h1>
+          <p class="text-xs text-slate-500">Pencatatan klaim piutang kepada perusahaan mitra atau asuransi.</p>
+        </div>
+
         <form id="formKerjasama" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
           <div>
             <label class="block font-semibold mb-1">Tanggal Tagihan</label>
@@ -135,7 +282,7 @@
             <input type="text" id="k_no_trx" class="w-full border p-2 rounded">
           </div>
           <div>
-            <label class="block font-semibold mb-1">Nama Instansi / Perusahaan</label>
+            <label class="block font-semibold mb-1">Nama Instansi / Perusahaan Mitra</label>
             <input type="text" id="k_instansi" placeholder="PT / Asuransi X" class="w-full border p-2 rounded" required>
           </div>
           <div>
@@ -143,7 +290,7 @@
             <input type="number" id="k_jumlah" value="0" class="w-full border p-2 rounded" required>
           </div>
           <div>
-            <label class="block font-semibold mb-1">Pembayaran (Rp)</label>
+            <label class="block font-semibold mb-1">Pembayaran / Angsuran (Rp)</label>
             <input type="number" id="k_bayar" value="0" class="w-full border p-2 rounded">
           </div>
           <div>
@@ -158,158 +305,252 @@
         </form>
       </section>
 
-      <!-- 3. FORM INPUT PIUTANG PASIEN (AKTIF PERTAMA) -->
-      <section id="view-input-pasien" class="modul-view">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">Form Input Data Piutang Pasien</h1>
-        <form id="formPiutangPasien" class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
+      <!-- ================= 4. LAPORAN PIUTANG PASIEN (LENGKAP) ================= -->
+      <section id="view-laporan-pasien" class="modul-view hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <label class="block font-semibold mb-1">Nama Pasien</label>
-            <input type="text" id="pasien_nama" class="w-full border p-2 rounded" required>
+            <h1 class="text-xl font-bold text-slate-800">📋 Laporan Piutang Pasien Perorangan</h1>
+            <p class="text-xs text-slate-500">Analisis statistik keuangan pasien, filter periode, dan cetak laporan.</p>
           </div>
-          <div>
-            <label class="block font-semibold mb-1">No. RM</label>
-            <input type="text" id="pasien_rm" class="w-full border p-2 rounded" required>
+          <button onclick="downloadCSVPasien()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+            📥 Export Laporan Pasien (CSV)
+          </button>
+        </div>
+
+        <!-- STATISTIK PIUTANG PASIEN -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Gross Pendapatan Pasien</p>
+            <p id="stat-total-biaya" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
           </div>
-          <div>
-            <label class="block font-semibold mb-1">Jumlah Biaya (Rp)</label>
-            <input type="number" id="pasien_biaya" value="0" class="w-full border p-2 rounded">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Pendapatan Terbayar (Masuk)</p>
+            <p id="stat-total-masuk" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
           </div>
-          <div>
-            <label class="block font-semibold mb-1">Pembayaran Awal (Rp)</label>
-            <input type="number" id="pasien_dp" value="0" class="w-full border p-2 rounded">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Sisa Piutang Pasien</p>
+            <p id="stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
           </div>
-          <div class="md:col-span-4">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-              + Simpan Data Pasien
-            </button>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Pasien Terdata</p>
+            <p id="stat-total-pasien" class="text-lg font-bold text-blue-600 mt-1">0 Pasien</p>
           </div>
-        </form>
+        </div>
+
+        <!-- FILTER LAPORAN PASIEN -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">🔍 Filter Laporan Pasien</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Mulai</label>
+              <input type="date" id="filter_tgl_mulai" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Selesai</label>
+              <input type="date" id="filter_tgl_selesai" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tahun Piutang</label>
+              <select id="filter_tahun" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Tahun</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis Perawatan</label>
+              <select id="filter_jenis" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Jenis</option>
+                <option value="Rawat Jalan">Rawat Jalan</option>
+                <option value="Rawat Inap">Rawat Inap</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Pembayaran</label>
+              <select id="filter_status_piutang" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Status</option>
+                <option value="lunas">Lunas (Rp 0)</option>
+                <option value="piutang">Masih Ada Piutang</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pencarian Umum</label>
+              <input type="text" id="inputCariPasien" onkeyup="terapkanFilterPasien()" placeholder="Nama / RM / TRX..." class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+          </div>
+        </div>
+
+        <!-- TABEL LAPORAN PASIEN -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                  <th class="p-2.5 border-r">No. RM</th>
+                  <th class="p-2.5 border-r">Nama Pasien</th>
+                  <th class="p-2.5 border-r">No. TRX</th>
+                  <th class="p-2.5 border-r">Bangsal / Kelas</th>
+                  <th class="p-2.5 border-r">Jenis / Kategori</th>
+                  <th class="p-2.5 border-r">Total Biaya</th>
+                  <th class="p-2.5 border-r">Sisa Piutang</th>
+                  <th class="p-2.5 border-r">Status KPKNL</th>
+                  <th class="p-2.5 border-r text-center">Dokumen</th>
+                  <th class="p-2.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelPasien" class="divide-y">
+                <tr><td colspan="10" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
-      <!-- 4. LAPORAN PENDAPATAN -->
+      <!-- ================= 5. LAPORAN PENDAPATAN DIRECT ================= -->
       <section id="view-laporan-pendapatan" class="modul-view hidden">
         <h1 class="text-xl font-bold text-slate-800 mb-4">📊 Laporan Pendapatan Service & Item</h1>
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 font-bold border-b">
-                <th class="p-2">Tanggal</th>
-                <th class="p-2">No Trx</th>
-                <th class="p-2">Kategori</th>
-                <th class="p-2">Nama Item</th>
-                <th class="p-2">Qty</th>
-                <th class="p-2">Harga Satuan</th>
-                <th class="p-2">Total Pendapatan</th>
+                <th class="p-2.5">Tanggal</th>
+                <th class="p-2.5">No Trx</th>
+                <th class="p-2.5">Kategori</th>
+                <th class="p-2.5">Nama Item</th>
+                <th class="p-2.5">Qty</th>
+                <th class="p-2.5">Harga Satuan</th>
+                <th class="p-2.5">Total Pendapatan</th>
               </tr>
             </thead>
             <tbody id="tabelPendapatan" class="divide-y">
-              <tr><td colspan="7" class="p-4 text-center">Memuat data...</td></tr>
+              <tr><td colspan="7" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- 5. LAPORAN PIUTANG KERJASAMA -->
+      <!-- ================= 6. LAPORAN PIUTANG KERJASAMA ================= -->
       <section id="view-laporan-kerjasama" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">🤝 Laporan Piutang Kerjasama</h1>
+        <h1 class="text-xl font-bold text-slate-800 mb-4">🤝 Laporan Piutang Kerjasama Instansi</h1>
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 font-bold border-b">
-                <th class="p-2">Tgl Tagihan</th>
-                <th class="p-2">No Trx</th>
-                <th class="p-2">Instansi</th>
-                <th class="p-2">Jumlah Piutang</th>
-                <th class="p-2">Terbayar</th>
-                <th class="p-2">Sisa Piutang</th>
+                <th class="p-2.5">Tgl Tagihan</th>
+                <th class="p-2.5">No Trx</th>
+                <th class="p-2.5">Nama Instansi</th>
+                <th class="p-2.5">Jumlah Piutang</th>
+                <th class="p-2.5">Terbayar</th>
+                <th class="p-2.5">Sisa Piutang</th>
+                <th class="p-2.5">Status</th>
               </tr>
             </thead>
             <tbody id="tabelKerjasama" class="divide-y">
-              <tr><td colspan="6" class="p-4 text-center">Memuat data...</td></tr>
+              <tr><td colspan="7" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- 6. LAPORAN PIUTANG PASIEN -->
-      <section id="view-laporan-pasien" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">📋 Laporan Piutang Pasien Perorangan</h1>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-100 font-bold border-b">
-                <th class="p-2">No RM</th>
-                <th class="p-2">Nama Pasien</th>
-                <th class="p-2">Total Biaya</th>
-                <th class="p-2">Pembayaran</th>
-                <th class="p-2">Sisa Piutang</th>
-              </tr>
-            </thead>
-            <tbody id="tabelPasien" class="divide-y">
-              <tr><td colspan="5" class="p-4 text-center">Memuat data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- 7. LAPORAN GABUNGAN / KONSOLIDASI KEUANGAN -->
+      <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
       <section id="view-laporan-gabungan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-2">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
-        <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh menggabungkan Pendapatan Direct, Piutang Kerjasama, dan Piutang Pasien.</p>
+        <h1 class="text-xl font-bold text-slate-800 mb-1">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
+        <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh gabungan Pendapatan Direct, Piutang Kerjasama, dan Piutang Pasien Perorangan.</p>
 
-        <!-- KARTU KONSOLIDASI -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-xs">
-          <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+          <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl shadow-sm">
             <p class="font-semibold text-emerald-800">Total Pendapatan Direct</p>
             <p id="sum-pendapatan" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
           </div>
-          <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+          <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl shadow-sm">
             <p class="font-semibold text-blue-800">Total Sisa Piutang Kerjasama</p>
             <p id="sum-piutang-kerjasama" class="text-xl font-bold text-blue-600 mt-1">Rp 0</p>
           </div>
-          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl">
+          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl shadow-sm">
             <p class="font-semibold text-purple-800">Total Sisa Piutang Pasien</p>
             <p id="sum-piutang-pasien" class="text-xl font-bold text-purple-600 mt-1">Rp 0</p>
           </div>
         </div>
 
-        <div class="bg-slate-900 text-white p-5 rounded-xl shadow-md">
-          <p class="text-xs text-slate-400 font-medium">TOTAL ASSET KEUANGAN & POTENSI PIUTANG RS</p>
-          <h2 id="sum-total-keseluruhan" class="text-2xl font-black text-amber-400 mt-1">Rp 0</h2>
+        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md border border-slate-800">
+          <p class="text-xs text-slate-400 font-medium tracking-wider uppercase">Total Asset Keuangan & Potensi Piutang RS</p>
+          <h2 id="sum-total-keseluruhan" class="text-3xl font-black text-amber-400 mt-2">Rp 0</h2>
         </div>
       </section>
 
     </main>
   </div>
 
+  <!-- MODAL DETAIL PASIEN -->
+  <div id="modalDetail" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+      <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Rincian Detail Pasien</h2>
+      <div id="kontenDetail" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="tutupModal()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1.5 px-4 rounded text-xs">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // CREDENTIAL SUPABASE
     const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
+    const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_ANDA';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // SWITCH TAMPILAN SIDEBAR
+    let listDataPasienMaster = [];
+    let listDataPasienFiltered = [];
+
+    // NAVIGASI VIEW
     function bukaView(viewId) {
       document.querySelectorAll('.modul-view').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${viewId}`).classList.remove('hidden');
 
       document.querySelectorAll('nav button').forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white', 'font-semibold');
-        btn.classList.add('text-slate-400');
+        btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2";
       });
 
       const activeBtn = document.getElementById(`btn-${viewId}`);
       if (activeBtn) {
-        activeBtn.classList.add('bg-blue-600', 'text-white', 'font-semibold');
-        activeBtn.classList.remove('text-slate-400');
+        activeBtn.className = "w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2";
       }
 
-      if(viewId.startsWith('laporan')) {
-        loadSemuaLaporan();
-      }
+      loadSemuaLaporan();
     }
 
-    // HITUNG OTOMATIS FORM PENDAPATAN
+    // ---------------- PERHITUNGAN PASIEN ----------------
+    function hitungBelumTerbayarPasien() {
+      const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya').value) || 0;
+      const potongan = parseFloat(document.getElementById('potongan').value) || 0;
+      const pembayaranAwal = parseFloat(document.getElementById('pembayaran_awal').value) || 0;
+      const jumlahAngsuran = parseFloat(document.getElementById('jumlah_angsuran').value) || 0;
+
+      const sisa = jumlahBiaya - potongan - pembayaranAwal - jumlahAngsuran;
+      document.getElementById('belum_terbayar').value = sisa;
+    }
+
+    ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
+      document.getElementById(id).addEventListener('input', hitungBelumTerbayarPasien);
+    });
+
+    const selectKpknl = document.getElementById('kirim_kpknl');
+    const containerTglKpknl = document.getElementById('container_tgl_kpknl');
+    const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
+
+    selectKpknl.addEventListener('change', (e) => {
+      if (e.target.value === 'Sudah') {
+        containerTglKpknl.classList.remove('hidden');
+      } else {
+        containerTglKpknl.classList.add('hidden');
+        inputTglKpknl.value = '';
+      }
+    });
+
+    // ---------------- PERHITUNGAN PENDAPATAN DIRECT ----------------
     function hitungPendapatan() {
       const qty = parseFloat(document.getElementById('p_jumlah').value) || 0;
       const harga = parseFloat(document.getElementById('p_harga').value) || 0;
@@ -318,7 +559,7 @@
     document.getElementById('p_jumlah').addEventListener('input', hitungPendapatan);
     document.getElementById('p_harga').addEventListener('input', hitungPendapatan);
 
-    // HITUNG OTOMATIS FORM KERJASAMA
+    // ---------------- PERHITUNGAN PIUTANG KERJASAMA ----------------
     function hitungKerjasama() {
       const piutang = parseFloat(document.getElementById('k_jumlah').value) || 0;
       const bayar = parseFloat(document.getElementById('k_bayar').value) || 0;
@@ -327,7 +568,58 @@
     document.getElementById('k_jumlah').addEventListener('input', hitungKerjasama);
     document.getElementById('k_bayar').addEventListener('input', hitungKerjasama);
 
-    // SUBMIT PENDAPATAN
+    // ---------------- SUBMIT HANDLER: PASIEN ----------------
+    document.getElementById('formPiutangPasien').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const editId = document.getElementById('edit_id').value;
+      const statusKpknl = selectKpknl.value;
+      const tglKpknl = inputTglKpknl.value;
+      const valKpknl = (statusKpknl === 'Sudah' && tglKpknl) ? `Sudah (${tglKpknl})` : statusKpknl;
+
+      const payload = {
+        nama_pasien: document.getElementById('nama_pasien').value,
+        alamat_pasien: document.getElementById('alamat_pasien').value,
+        no_rm: document.getElementById('no_rm').value,
+        no_transaksi: document.getElementById('no_transaksi').value,
+        tgl_masuk_rs: document.getElementById('tgl_masuk_rs').value || null,
+        tgl_keluar_rs: document.getElementById('tgl_keluar_rs').value || null,
+        bangsal: document.getElementById('bangsal').value,
+        kelas: document.getElementById('kelas').value,
+        jenis_perawatan: document.getElementById('jenis_perawatan').value,
+        kategori: document.getElementById('kategori').value,
+        tahun_piutang: parseInt(document.getElementById('tahun_piutang').value) || null,
+        kirim_kpknl: valKpknl,
+        jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value) || 0,
+        potongan: parseFloat(document.getElementById('potongan').value) || 0,
+        pembayaran_awal: parseFloat(document.getElementById('pembayaran_awal').value) || 0,
+        jumlah_angsuran: parseFloat(document.getElementById('jumlah_angsuran').value) || 0,
+        belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value) || 0,
+        tagihan_1: document.getElementById('tagihan_1').value || null,
+        tagihan_2: document.getElementById('tagihan_2').value || null,
+        tagihan_3: document.getElementById('tagihan_3').value || null,
+        link_dokumen: document.getElementById('link_dokumen').value
+      };
+
+      let error;
+      if (editId) {
+        const res = await supabaseClient.from('piutang_pasien').update(payload).eq('id', editId);
+        error = res.error;
+      } else {
+        const res = await supabaseClient.from('piutang_pasien').insert([payload]);
+        error = res.error;
+      }
+
+      if (error) {
+        alert('Gagal menyimpan data pasien: ' + error.message);
+      } else {
+        alert(editId ? 'Data pasien berhasil diperbarui!' : 'Data pasien berhasil disimpan!');
+        batalEditPasien();
+        loadSemuaLaporan();
+      }
+    });
+
+    // ---------------- SUBMIT HANDLER: PENDAPATAN ----------------
     document.getElementById('formPendapatan').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
@@ -342,14 +634,15 @@
       };
 
       const { error } = await supabaseClient.from('pendapatan').insert([payload]);
-      if(error) alert('Gagal simpan: ' + error.message);
+      if (error) alert('Gagal menyimpan pendapatan: ' + error.message);
       else {
-        alert('Data Pendapatan berhasil disimpan!');
+        alert('Data pendapatan berhasil disimpan!');
         document.getElementById('formPendapatan').reset();
+        loadSemuaLaporan();
       }
     });
 
-    // SUBMIT KERJASAMA
+    // ---------------- SUBMIT HANDLER: KERJASAMA ----------------
     document.getElementById('formKerjasama').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
@@ -363,72 +656,290 @@
       };
 
       const { error } = await supabaseClient.from('piutang_kerjasama').insert([payload]);
-      if(error) alert('Gagal simpan: ' + error.message);
+      if (error) alert('Gagal menyimpan piutang kerjasama: ' + error.message);
       else {
-        alert('Data Piutang Kerjasama berhasil disimpan!');
+        alert('Data piutang kerjasama berhasil disimpan!');
         document.getElementById('formKerjasama').reset();
+        loadSemuaLaporan();
       }
     });
 
-    // LOAD ALL REPORTS
+    // ---------------- FETCH SEMUA DATA LAPORAN ----------------
     async function loadSemuaLaporan() {
-      // 1. Fetch Pendapatan
-      const { data: dataP } = await supabaseClient.from('pendapatan').select('*');
+      // 1. Load Data Pasien
+      const { data: dataPasien, error: errPasien } = await supabaseClient.from('piutang_pasien').select('*').order('id', { ascending: false });
+      if (!errPasien && dataPasien) {
+        listDataPasienMaster = dataPasien;
+        terapkanFilterPasien();
+      }
+
+      // 2. Load Data Pendapatan
+      const { data: dataP } = await supabaseClient.from('pendapatan').select('*').order('id', { ascending: false });
       let totalP = 0;
       if (dataP) {
         totalP = dataP.reduce((acc, curr) => acc + Number(curr.total_pendapatan || 0), 0);
         document.getElementById('tabelPendapatan').innerHTML = dataP.map(i => `
-          <tr>
-            <td class="p-2">${i.tanggal || '-'}</td>
-            <td class="p-2">${i.no_transaksi || '-'}</td>
-            <td class="p-2">${i.kategori_pendapatan || '-'}</td>
-            <td class="p-2 font-semibold">${i.nama_item || '-'}</td>
-            <td class="p-2">${i.jumlah_item}</td>
-            <td class="p-2">Rp ${Number(i.harga_satuan).toLocaleString('id-ID')}</td>
-            <td class="p-2 font-bold text-emerald-600">Rp ${Number(i.total_pendapatan).toLocaleString('id-ID')}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono">${i.tanggal || '-'}</td>
+            <td class="p-2.5 font-mono">${i.no_transaksi || '-'}</td>
+            <td class="p-2.5">${i.kategori_pendapatan || '-'}</td>
+            <td class="p-2.5 font-semibold text-slate-800">${i.nama_item || '-'}</td>
+            <td class="p-2.5">${i.jumlah_item}</td>
+            <td class="p-2.5">Rp ${Number(i.harga_satuan).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 font-bold text-emerald-600">Rp ${Number(i.total_pendapatan).toLocaleString('id-ID')}</td>
           </tr>
         `).join('');
       }
 
-      // 2. Fetch Piutang Kerjasama
-      const { data: dataK } = await supabaseClient.from('piutang_kerjasama').select('*');
+      // 3. Load Data Kerjasama
+      const { data: dataK } = await supabaseClient.from('piutang_kerjasama').select('*').order('id', { ascending: false });
       let totalK = 0;
       if (dataK) {
         totalK = dataK.reduce((acc, curr) => acc + Number(curr.sisa_piutang || 0), 0);
         document.getElementById('tabelKerjasama').innerHTML = dataK.map(i => `
-          <tr>
-            <td class="p-2">${i.tanggal_tagihan || '-'}</td>
-            <td class="p-2">${i.no_transaksi || '-'}</td>
-            <td class="p-2 font-semibold">${i.nama_instansi || '-'}</td>
-            <td class="p-2">Rp ${Number(i.jumlah_piutang).toLocaleString('id-ID')}</td>
-            <td class="p-2">Rp ${Number(i.pembayaran).toLocaleString('id-ID')}</td>
-            <td class="p-2 font-bold text-red-600">Rp ${Number(i.sisa_piutang).toLocaleString('id-ID')}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono">${i.tanggal_tagihan || '-'}</td>
+            <td class="p-2.5 font-mono">${i.no_transaksi || '-'}</td>
+            <td class="p-2.5 font-semibold text-slate-800">${i.nama_instansi || '-'}</td>
+            <td class="p-2.5">Rp ${Number(i.jumlah_piutang).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 text-emerald-600 font-medium">Rp ${Number(i.pembayaran).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 font-bold text-red-600">Rp ${Number(i.sisa_piutang).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 font-semibold">${i.status || 'Belum Lunas'}</td>
           </tr>
         `).join('');
       }
 
-      // 3. Fetch Piutang Pasien
-      const { data: dataPasien } = await supabaseClient.from('piutang_pasien').select('*');
-      let totalPasien = 0;
-      if (dataPasien) {
-        totalPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
-        document.getElementById('tabelPasien').innerHTML = dataPasien.map(i => `
-          <tr>
-            <td class="p-2">${i.no_rm || '-'}</td>
-            <td class="p-2 font-semibold">${i.nama_pasien || '-'}</td>
-            <td class="p-2">Rp ${Number(i.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
-            <td class="p-2">Rp ${Number(i.pembayaran_awal || 0).toLocaleString('id-ID')}</td>
-            <td class="p-2 font-bold text-purple-600">Rp ${Number(i.belum_terbayar || 0).toLocaleString('id-ID')}</td>
-          </tr>
-        `).join('');
-      }
-
-      // 4. Update Ringkasan Laporan Gabungan
+      // 4. Update Laporan Konsolidasi
+      const totalSisaPasien = listDataPasienMaster.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
       document.getElementById('sum-pendapatan').innerText = `Rp ${totalP.toLocaleString('id-ID')}`;
       document.getElementById('sum-piutang-kerjasama').innerText = `Rp ${totalK.toLocaleString('id-ID')}`;
-      document.getElementById('sum-piutang-pasien').innerText = `Rp ${totalPasien.toLocaleString('id-ID')}`;
-      document.getElementById('sum-total-keseluruhan').innerText = `Rp ${(totalP + totalK + totalPasien).toLocaleString('id-ID')}`;
+      document.getElementById('sum-piutang-pasien').innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
+      document.getElementById('sum-total-keseluruhan').innerText = `Rp ${(totalP + totalK + totalSisaPasien).toLocaleString('id-ID')}`;
     }
+
+    // ---------------- FILTER & RENDER LAPORAN PASIEN ----------------
+    function terapkanFilterPasien() {
+      const tglMulai = document.getElementById('filter_tgl_mulai').value;
+      const tglSelesai = document.getElementById('filter_tgl_selesai').value;
+      const tahun = document.getElementById('filter_tahun').value;
+      const jenis = document.getElementById('filter_jenis').value;
+      const statusPiutang = document.getElementById('filter_status_piutang').value;
+      const keyword = document.getElementById('inputCariPasien').value.toLowerCase();
+
+      listDataPasienFiltered = listDataPasienMaster.filter(item => {
+        if (tglMulai && item.tgl_masuk_rs && item.tgl_masuk_rs < tglMulai) return false;
+        if (tglSelesai && item.tgl_masuk_rs && item.tgl_masuk_rs > tglSelesai) return false;
+        if (tahun && String(item.tahun_piutang) !== tahun) return false;
+        if (jenis && item.jenis_perawatan !== jenis) return false;
+
+        if (statusPiutang === 'lunas' && (item.belum_terbayar || 0) > 0) return false;
+        if (statusPiutang === 'piutang' && (item.belum_terbayar || 0) <= 0) return false;
+
+        if (keyword) {
+          const matchNama = item.nama_pasien && item.nama_pasien.toLowerCase().includes(keyword);
+          const matchRM = item.no_rm && item.no_rm.toLowerCase().includes(keyword);
+          const matchTrx = item.no_transaksi && item.no_transaksi.toLowerCase().includes(keyword);
+          if (!matchNama && !matchRM && !matchTrx) return false;
+        }
+
+        return true;
+      });
+
+      updateStatistikPasien(listDataPasienFiltered);
+      renderTabelPasien(listDataPasienFiltered);
+    }
+
+    function updateStatistikPasien(data) {
+      let totalBiaya = 0;
+      let totalSisa = 0;
+      let totalMasuk = 0;
+
+      data.forEach(i => {
+        const biaya = parseFloat(i.jumlah_biaya) || 0;
+        const sisa = parseFloat(i.belum_terbayar) || 0;
+        const awal = parseFloat(i.pembayaran_awal) || 0;
+        const angsuran = parseFloat(i.jumlah_angsuran) || 0;
+
+        totalBiaya += biaya;
+        totalSisa += sisa;
+        totalMasuk += (awal + angsuran);
+      });
+
+      document.getElementById('stat-total-biaya').innerText = `Rp ${totalBiaya.toLocaleString('id-ID')}`;
+      document.getElementById('stat-total-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+      document.getElementById('stat-sisa-piutang').innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
+      document.getElementById('stat-total-pasien').innerText = `${data.length} Pasien`;
+    }
+
+    function renderTabelPasien(data) {
+      const tbody = document.getElementById('tabelPasien');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data sesuai kriteria filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-2.5 border-r font-mono">${item.no_rm || '-'}</td>
+          <td class="p-2.5 border-r font-semibold text-slate-800">${item.nama_pasien || '-'}</td>
+          <td class="p-2.5 border-r font-mono text-slate-600">${item.no_transaksi || '-'}</td>
+          <td class="p-2.5 border-r">${item.bangsal || '-'} (${item.kelas || '-'})</td>
+          <td class="p-2.5 border-r">${item.jenis_perawatan || '-'} - ${item.kategori || '-'}</td>
+          <td class="p-2.5 border-r font-medium">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2.5 border-r text-red-600 font-bold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2.5 border-r font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
+          <td class="p-2.5 border-r text-center">
+            ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
+          </td>
+          <td class="p-2.5 text-center">
+            <div class="flex justify-center gap-1">
+              <button onclick="bukaDetailPasien(${item.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold text-[10px]">Detail</button>
+              <button onclick="editDataPasien(${item.id})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 font-semibold text-[10px]">Edit</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ---------------- MODAL DETAIL & EDIT PASIEN ----------------
+    function bukaDetailPasien(id) {
+      const item = listDataPasienMaster.find(d => d.id === id);
+      if (!item) return;
+
+      const konten = `
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Nama Pasien:</span> ${item.nama_pasien || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. RM:</span> ${item.no_rm || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Alamat:</span> ${item.alamat_pasien || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. Transaksi:</span> ${item.no_transaksi || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Masuk RS:</span> ${item.tgl_masuk_rs || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Keluar RS:</span> ${item.tgl_keluar_rs || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Bangsal / Kelas:</span> ${item.bangsal || '-'} / ${item.kelas || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jenis / Kategori:</span> ${item.jenis_perawatan || '-'} / ${item.kategori || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tahun Piutang:</span> ${item.tahun_piutang || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Status KPKNL:</span> ${item.kirim_kpknl || 'Belum'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Biaya:</span> Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Potongan:</span> Rp ${Number(item.potongan || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Pembayaran Awal:</span> Rp ${Number(item.pembayaran_awal || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Angsuran:</span> Rp ${Number(item.jumlah_angsuran || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-red-50 text-red-700 p-2 rounded border font-bold col-span-1 md:col-span-2">Belum Terbayar: Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 1:</span> ${item.tagihan_1 || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 2:</span> ${item.tagihan_2 || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 3:</span> ${item.tagihan_3 || '-'}</div>
+      `;
+
+      document.getElementById('kontenDetail').innerHTML = konten;
+      document.getElementById('modalDetail').classList.remove('hidden');
+      document.getElementById('modalDetail').classList.add('flex');
+    }
+
+    function tutupModal() {
+      document.getElementById('modalDetail').classList.add('hidden');
+      document.getElementById('modalDetail').classList.remove('flex');
+    }
+
+    function editDataPasien(id) {
+      const item = listDataPasienMaster.find(d => d.id === id);
+      if (!item) return;
+
+      bukaView('input-pasien');
+
+      document.getElementById('edit_id').value = item.id;
+      document.getElementById('nama_pasien').value = item.nama_pasien || '';
+      document.getElementById('alamat_pasien').value = item.alamat_pasien || '';
+      document.getElementById('no_rm').value = item.no_rm || '';
+      document.getElementById('no_transaksi').value = item.no_transaksi || '';
+      document.getElementById('tahun_piutang').value = item.tahun_piutang || '';
+      document.getElementById('tgl_masuk_rs').value = item.tgl_masuk_rs || '';
+      document.getElementById('tgl_keluar_rs').value = item.tgl_keluar_rs || '';
+      document.getElementById('bangsal').value = item.bangsal || '';
+      document.getElementById('kelas').value = item.kelas || '';
+      document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
+      document.getElementById('kategori').value = item.kategori || '';
+
+      if (item.kirim_kpknl && item.kirim_kpknl.startsWith('Sudah')) {
+        selectKpknl.value = 'Sudah';
+        containerTglKpknl.classList.remove('hidden');
+        const match = item.kirim_kpknl.match(/\((.*?)\)/);
+        inputTglKpknl.value = match ? match[1] : '';
+      } else {
+        selectKpknl.value = 'Belum';
+        containerTglKpknl.classList.add('hidden');
+        inputTglKpknl.value = '';
+      }
+
+      document.getElementById('jumlah_biaya').value = item.jumlah_biaya || 0;
+      document.getElementById('potongan').value = item.potongan || 0;
+      document.getElementById('pembayaran_awal').value = item.pembayaran_awal || 0;
+      document.getElementById('jumlah_angsuran').value = item.jumlah_angsuran || 0;
+      document.getElementById('belum_terbayar').value = item.belum_terbayar || 0;
+
+      document.getElementById('tagihan_1').value = item.tagihan_1 || '';
+      document.getElementById('tagihan_2').value = item.tagihan_2 || '';
+      document.getElementById('tagihan_3').value = item.tagihan_3 || '';
+      document.getElementById('link_dokumen').value = item.link_dokumen || '';
+
+      document.getElementById('btnSubmitPasien').innerText = '💾 Update Data Pasien';
+      document.getElementById('btnSubmitPasien').className = 'w-full bg-amber-600 text-white font-semibold py-2 px-4 rounded hover:bg-amber-700 transition h-[38px]';
+      document.getElementById('btnBatalPasien').classList.remove('hidden');
+    }
+
+    function batalEditPasien() {
+      document.getElementById('edit_id').value = '';
+      document.getElementById('formPiutangPasien').reset();
+      containerTglKpknl.classList.add('hidden');
+      hitungBelumTerbayarPasien();
+
+      document.getElementById('btnSubmitPasien').innerText = '+ Simpan Data Pasien';
+      document.getElementById('btnSubmitPasien').className = 'w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]';
+      document.getElementById('btnBatalPasien').classList.add('hidden');
+    }
+
+    // ---------------- EXPORT CSV PASIEN ----------------
+    function downloadCSVPasien() {
+      if (listDataPasienFiltered.length === 0) {
+        alert('Tidak ada data laporan pasien untuk diunduh.');
+        return;
+      }
+
+      const headers = ["No. RM", "Nama Pasien", "Alamat", "No TRX", "Tgl Masuk", "Tgl Keluar", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Tahun", "Status KPKNL", "Jumlah Biaya", "Potongan", "Pembayaran Awal", "Jumlah Angsuran", "Sisa Piutang", "Tagihan 1", "Tagihan 2", "Tagihan 3", "Link Dokumen"];
+      
+      const rows = listDataPasienFiltered.map(item => [
+        `"${item.no_rm || ''}"`,
+        `"${item.nama_pasien || ''}"`,
+        `"${item.alamat_pasien || ''}"`,
+        `"${item.no_transaksi || ''}"`,
+        `"${item.tgl_masuk_rs || ''}"`,
+        `"${item.tgl_keluar_rs || ''}"`,
+        `"${item.bangsal || ''}"`,
+        `"${item.kelas || ''}"`,
+        `"${item.jenis_perawatan || ''}"`,
+        `"${item.kategori || ''}"`,
+        `"${item.tahun_piutang || ''}"`,
+        `"${item.kirim_kpknl || ''}"`,
+        item.jumlah_biaya || 0,
+        item.potongan || 0,
+        item.pembayaran_awal || 0,
+        item.jumlah_angsuran || 0,
+        item.belum_terbayar || 0,
+        `"${item.tagihan_1 || ''}"`,
+        `"${item.tagihan_2 || ''}"`,
+        `"${item.tagihan_3 || ''}"`,
+        `"${item.link_dokumen || ''}"`
+      ]);
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Inisialisasi awal saat pertama kali dibuka
+    loadSemuaLaporan();
   </script>
 </body>
 </html>
