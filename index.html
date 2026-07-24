@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Piutang Pasien</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-4 md:p-8">
+
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md">
+    <h1 class="text-2xl font-bold text-slate-800 mb-6">Aplikasi Piutang Pasien RS</h1>
+
+    <!-- Form Input Data -->
+    <form id="formPiutang" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-slate-50 p-4 rounded-lg border">
+      <div>
+        <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
+        <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">No. RM</label>
+        <input type="text" id="no_rm" class="w-full border p-2 rounded text-sm" required>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">No. Transaksi</label>
+        <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
+        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0" required>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Belum Terbayar (Rp)</label>
+        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm" value="0" required>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition">
+          + Simpan Data
+        </button>
+      </div>
+    </form>
+
+    <!-- Tabel Data -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="bg-slate-200 text-slate-700">
+            <th class="p-3 border">No. RM</th>
+            <th class="p-3 border">Nama Pasien</th>
+            <th class="p-3 border">No. Transaksi</th>
+            <th class="p-3 border">Jumlah Biaya</th>
+            <th class="p-3 border">Belum Terbayar</th>
+          </tr>
+        </thead>
+        <tbody id="tabelData" class="divide-y">
+          <tr><td colspan="5" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // MASUKKAN CREDENTIAL SUPABASE ANDA DI SINI
+    const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Fungsi Ambil Data
+    async function loadData() {
+      const { data, error } = await supabaseClient
+        .from('piutang_pasien')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const tbody = document.getElementById('tabelData');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Belum ada data.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 border font-mono text-xs">${item.no_rm || '-'}</td>
+          <td class="p-3 border font-semibold">${item.nama_pasien || '-'}</td>
+          <td class="p-3 border">${item.no_transaksi || '-'}</td>
+          <td class="p-3 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
+          <td class="p-3 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Fungsi Simpan Data
+    document.getElementById('formPiutang').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        nama_pasien: document.getElementById('nama_pasien').value,
+        no_rm: document.getElementById('no_rm').value,
+        no_transaksi: document.getElementById('no_transaksi').value,
+        jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value),
+        belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value)
+      };
+
+      const { error } = await supabaseClient.from('piutang_pasien').insert([payload]);
+
+      if (error) {
+        alert('Gagal menyimpan data: ' + error.message);
+      } else {
+        alert('Data berhasil disimpan!');
+        e.target.reset();
+        loadData();
+      }
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
