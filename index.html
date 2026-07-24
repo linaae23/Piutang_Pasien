@@ -9,14 +9,20 @@
 </head>
 <body class="bg-slate-100 p-4 md:p-8">
 
-  <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md">
+  <div class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold text-slate-800 mb-6">Aplikasi Piutang Pasien RS</h1>
 
-    <!-- Form Input Data -->
-    <form id="formPiutang" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-slate-50 p-4 rounded-lg border">
+    <!-- FORM INPUT DATA LENGKAP -->
+    <form id="formPiutang" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-slate-50 p-5 rounded-lg border">
+      
+      <!-- Data Identitas Pasien -->
       <div>
         <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
         <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Alamat Pasien</label>
+        <input type="text" id="alamat_pasien" class="w-full border p-2 rounded text-sm">
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">No. RM</label>
@@ -26,48 +32,128 @@
         <label class="block text-xs font-semibold mb-1">No. Transaksi</label>
         <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-sm">
       </div>
+
+      <!-- Rawat & Tanggal -->
       <div>
-        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
-        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0" required>
+        <label class="block text-xs font-semibold mb-1">Tgl Masuk RS</label>
+        <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-sm">
       </div>
       <div>
-        <label class="block text-xs font-semibold mb-1">Belum Terbayar (Rp)</label>
-        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm" value="0" required>
+        <label class="block text-xs font-semibold mb-1">Tgl Keluar RS</label>
+        <input type="date" id="tgl_keluar_rs" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Bangsal</label>
+        <input type="text" id="bangsal" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Kelas</label>
+        <input type="text" id="kelas" class="w-full border p-2 rounded text-sm">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
+        <input type="text" id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Kategori</label>
+        <input type="text" id="kategori" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
+        <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
+        <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
+          <option value="Belum">Belum</option>
+          <option value="Sudah">Sudah</option>
+        </select>
+      </div>
+
+      <!-- Biaya & Keuangan -->
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
+        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Potongan (Rp)</label>
+        <input type="number" id="potongan" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Pembayaran Awal (Rp)</label>
+        <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
+        <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Rp)</label>
+        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
+        <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
+        <input type="number" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
+        <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+
+      <!-- Link Dokumen & Tombol Submit -->
+      <div class="md:col-span-3">
+        <label class="block text-xs font-semibold mb-1">Link Dokumen (Drive/URL)</label>
+        <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-sm">
       </div>
       <div class="flex items-end">
         <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition">
           + Simpan Data
         </button>
       </div>
+
     </form>
 
-    <!-- Tabel Data -->
+    <!-- TABEL DATA LENGKAP -->
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse text-sm">
+      <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="bg-slate-200 text-slate-700">
-            <th class="p-3 border">No. RM</th>
-            <th class="p-3 border">Nama Pasien</th>
-            <th class="p-3 border">No. Transaksi</th>
-            <th class="p-3 border">Jumlah Biaya</th>
-            <th class="p-3 border">Belum Terbayar</th>
+            <th class="p-2 border">No. RM</th>
+            <th class="p-2 border">Nama Pasien</th>
+            <th class="p-2 border">Alamat</th>
+            <th class="p-2 border">No. TRX</th>
+            <th class="p-2 border">Tgl Masuk/Keluar</th>
+            <th class="p-2 border">Bangsal/Kelas</th>
+            <th class="p-2 border">Jenis/Kategori</th>
+            <th class="p-2 border">Jumlah Biaya</th>
+            <th class="p-2 border">Sisa Piutang</th>
+            <th class="p-2 border">Tahun</th>
+            <th class="p-2 border">KPKNL</th>
+            <th class="p-2 border">Dokumen</th>
           </tr>
         </thead>
         <tbody id="tabelData" class="divide-y">
-          <tr><td colspan="5" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+          <tr><td colspan="12" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
         </tbody>
       </table>
     </div>
+
   </div>
 
   <script>
-    // MASUKKAN CREDENTIAL SUPABASE ANDA DI SINI
+    // MASUKKAN CREDENTIAL SUPABASE ANDA
     const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Fungsi Ambil Data
+    // Fungsi Load Data
     async function loadData() {
       const { data, error } = await supabaseClient
         .from('piutang_pasien')
@@ -81,17 +167,26 @@
 
       const tbody = document.getElementById('tabelData');
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Belum ada data.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-500">Belum ada data.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(item => `
         <tr class="hover:bg-slate-50">
-          <td class="p-3 border font-mono text-xs">${item.no_rm || '-'}</td>
-          <td class="p-3 border font-semibold">${item.nama_pasien || '-'}</td>
-          <td class="p-3 border">${item.no_transaksi || '-'}</td>
-          <td class="p-3 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
-          <td class="p-3 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2 border font-mono">${item.no_rm || '-'}</td>
+          <td class="p-2 border font-semibold">${item.nama_pasien || '-'}</td>
+          <td class="p-2 border">${item.alamat_pasien || '-'}</td>
+          <td class="p-2 border font-mono">${item.no_transaksi || '-'}</td>
+          <td class="p-2 border">${item.tgl_masuk_rs || '-'} s/d ${item.tgl_keluar_rs || '-'}</td>
+          <td class="p-2 border">${item.bangsal || '-'} / ${item.kelas || '-'}</td>
+          <td class="p-2 border">${item.jenis_perawatan || '-'} (${item.kategori || '-'})</td>
+          <td class="p-2 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2 border">${item.tahun_piutang || '-'}</td>
+          <td class="p-2 border">${item.kirim_kpknl || 'Belum'}</td>
+          <td class="p-2 border text-center">
+            ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
+          </td>
         </tr>
       `).join('');
     }
@@ -99,13 +194,29 @@
     // Fungsi Simpan Data
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const payload = {
         nama_pasien: document.getElementById('nama_pasien').value,
+        alamat_pasien: document.getElementById('alamat_pasien').value,
         no_rm: document.getElementById('no_rm').value,
         no_transaksi: document.getElementById('no_transaksi').value,
-        jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value),
-        belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value)
+        tgl_masuk_rs: document.getElementById('tgl_masuk_rs').value || null,
+        tgl_keluar_rs: document.getElementById('tgl_keluar_rs').value || null,
+        bangsal: document.getElementById('bangsal').value,
+        kelas: document.getElementById('kelas').value,
+        jenis_perawatan: document.getElementById('jenis_perawatan').value,
+        kategori: document.getElementById('kategori').value,
+        tahun_piutang: parseInt(document.getElementById('tahun_piutang').value) || null,
+        kirim_kpknl: document.getElementById('kirim_kpknl').value,
+        jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value) || 0,
+        potongan: parseFloat(document.getElementById('potongan').value) || 0,
+        pembayaran_awal: parseFloat(document.getElementById('pembayaran_awal').value) || 0,
+        jumlah_angsuran: parseFloat(document.getElementById('jumlah_angsuran').value) || 0,
+        belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value) || 0,
+        tagihan_1: parseFloat(document.getElementById('tagihan_1').value) || 0,
+        tagihan_2: parseFloat(document.getElementById('tagihan_2').value) || 0,
+        tagihan_3: parseFloat(document.getElementById('tagihan_3').value) || 0,
+        link_dokumen: document.getElementById('link_dokumen').value
       };
 
       const { error } = await supabaseClient.from('piutang_pasien').insert([payload]);
