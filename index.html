@@ -3,193 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Piutang Pasien</title>
+  <title>Sistem Keuangan & Piutang Pasien RS</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 p-4 md:p-6">
+<body class="bg-slate-100 font-sans antialiased">
 
-  <div class="max-w-[1400px] mx-auto bg-white p-6 rounded-xl shadow-md">
-    <h1 class="text-2xl font-bold text-slate-800 mb-6">Aplikasi Piutang Pasien RS</h1>
+  <div class="flex h-screen overflow-hidden">
 
-    <!-- FORM INPUT DENGAN GRID 5 KOLOM MENDATAR -->
-    <form id="formPiutang" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-8 bg-slate-50 p-5 rounded-lg border">
-      
-      <!-- Field Hidden untuk Mode Edit -->
-      <input type="hidden" id="edit_id" value="">
-
-      <!-- BARIS 1: IDENTITAS & TRANSAKSI -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
-        <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Alamat Pasien</label>
-        <input type="text" id="alamat_pasien" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">No. RM</label>
-        <input type="text" id="no_rm" class="w-full border p-2 rounded text-sm" required>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">No. Transaksi</label>
-        <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
-        <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
+      <!-- Logo / Header Sidebar -->
+      <div class="p-5 border-b border-slate-800 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">
+          RS
+        </div>
+        <div>
+          <h2 class="font-bold text-white text-sm leading-tight">Keuangan & Piutang</h2>
+          <p class="text-[10px] text-slate-400">Sistem Pencatatan RS</p>
+        </div>
       </div>
 
-      <!-- BARIS 2: PERAWATAN & LOKASI -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tgl Masuk RS</label>
-        <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tgl Keluar RS</label>
-        <input type="date" id="tgl_keluar_rs" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Bangsal</label>
-        <input type="text" id="bangsal" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Kelas</label>
-        <select id="kelas" class="w-full border p-2 rounded text-sm">
-          <option value="">-- Pilih Kelas --</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="VIP">VIP</option>
-          <option value="VVIP">VVIP</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
-        <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
-          <option value="">-- Pilih Jenis --</option>
-          <option value="Rawat Jalan">Rawat Jalan</option>
-          <option value="Rawat Inap">Rawat Inap</option>
-        </select>
-      </div>
-
-      <!-- BARIS 3: KATEGORI, KPKNL & DOKUMEN -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Kategori</label>
-        <select id="kategori" class="w-full border p-2 rounded text-sm">
-          <option value="">-- Pilih Kategori --</option>
-          <option value="Non Paviliun">Non Paviliun</option>
-          <option value="Paviliun">Paviliun</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
-        <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
-          <option value="Belum">Belum</option>
-          <option value="Sudah">Sudah</option>
-        </select>
-      </div>
-      <div id="container_tgl_kpknl" class="hidden">
-        <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
-        <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
-      </div>
-      <div class="lg:col-span-2">
-        <label class="block text-xs font-semibold mb-1">Link Dokumen (Drive/URL)</label>
-        <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-sm">
-      </div>
-
-      <!-- BARIS 4: BIAYA & PERHITUNGAN -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
-        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Potongan (Rp)</label>
-        <input type="number" id="potongan" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Pembayaran Awal (Rp)</label>
-        <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
-        <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Otomatis)</label>
-        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
-      </div>
-
-      <!-- BARIS 5: TANGGAL TAGIHAN & AKSI TOMBOL -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 1</label>
-        <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 2</label>
-        <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 3</label>
-        <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm">
-      </div>
-      <div class="lg:col-span-2 flex items-end gap-2">
-        <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
-          + Simpan Data
+      <!-- Menu Navigasi -->
+      <nav class="flex-1 p-4 space-y-1">
+        <button onclick="bukaMenu('input')" id="nav-input" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          Input Data Transaksi
         </button>
-        <button type="button" id="btnBatal" onclick="batalEdit()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
-          Batal
+
+        <button onclick="bukaMenu('laporan')" id="nav-laporan" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold hover:bg-slate-800 hover:text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Laporan & Rekapitulasi
         </button>
+      </nav>
+
+      <!-- Footer Sidebar -->
+      <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
+        &copy; 2026 Sistem RS
       </div>
+    </aside>
 
-    </form>
+    <!-- ================= AREA KONTEN UTAMA ================= -->
+    <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
 
-    <!-- KONTROL PENCARIAN & DOWNLOAD LAPORAN -->
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-      <div class="w-full md:w-1/3">
-        <input type="text" id="inputCari" onkeyup="filterTabel()" placeholder="🔍 Cari Nama, RM, TRX, Bangsal..." class="w-full border p-2 rounded text-sm bg-slate-50 focus:bg-white border-slate-300">
-      </div>
-      <div>
-        <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition">
-          📥 Download Laporan (CSV / Excel)
-        </button>
-      </div>
-    </div>
+      <!-- ================= 1. MENU INPUT DATA ================= -->
+      <section id="menu-input">
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-slate-800">Form Input & Edit Data Transaksi Pasien</h1>
+          <p class="text-xs text-slate-500">Masukkan rincian pelayanan, kelas, jenis perawatan, serta data keuangan pasien.</p>
+        </div>
 
-    <!-- TABEL DATA PASIEN -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse text-xs">
-        <thead>
-          <tr class="bg-slate-200 text-slate-700">
-            <th class="p-2 border">No. RM</th>
-            <th class="p-2 border">Nama Pasien</th>
-            <th class="p-2 border">No. TRX</th>
-            <th class="p-2 border">Bangsal / Kelas</th>
-            <th class="p-2 border">Jenis / Kategori</th>
-            <th class="p-2 border">Jumlah Biaya</th>
-            <th class="p-2 border">Sisa Piutang</th>
-            <th class="p-2 border">KPKNL</th>
-            <th class="p-2 border text-center">Dokumen</th>
-            <th class="p-2 border text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="tabelData" class="divide-y">
-          <tr><td colspan="10" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </div>
+        <form id="formPiutang" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <input type="hidden" id="edit_id" value="">
 
+          <!-- BARIS 1: IDENTITAS -->
+          <div>
+            <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
+            <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Alamat Pasien</label>
+            <input type="text" id="alamat_pasien" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">No. RM</label>
+            <input type="text" id="no_rm" class="w-full border p-2 rounded text-sm" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">No. Transaksi</label>
+            <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
+            <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
+          </div>
+
+          <!-- BARIS 2: PERAWATAN -->
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tgl Masuk RS</label>
+            <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tgl Keluar RS</label>
+            <input type="date" id="tgl_keluar_rs" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Bangsal</label>
+            <input type="text" id="bangsal" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Kelas</label>
+            <select id="kelas" class="w-full border p-2 rounded text-sm">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="VIP">VIP</option>
+              <option value="VVIP">VVIP</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
+            <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
+              <option value="">-- Pilih Jenis --</option>
+              <option value="Rawat Jalan">Rawat Jalan</option>
+              <option value="Rawat Inap">Rawat Inap</option>
+            </select>
+          </div>
+
+          <!-- BARIS 3: KATEGORI & DOKUMEN -->
+          <div>
+            <label class="block text-xs font-semibold mb-1">Kategori</label>
+            <select id="kategori" class="w-full border p-2 rounded text-sm">
+              <option value="">-- Pilih Kategori --</option>
+              <option value="Non Paviliun">Non Paviliun</option>
+              <option value="Paviliun">Paviliun</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
+            <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
+              <option value="Belum">Belum</option>
+              <option value="Sudah">Sudah</option>
+            </select>
+          </div>
+          <div id="container_tgl_kpknl" class="hidden">
+            <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
+            <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
+          </div>
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-semibold mb-1">Link Dokumen (Drive/URL)</label>
+            <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-sm">
+          </div>
+
+          <!-- BARIS 4: KEUANGAN -->
+          <div>
+            <label class="block text-xs font-semibold mb-1">Jumlah Biaya / Pendapatan (Rp)</label>
+            <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Potongan (Rp)</label>
+            <input type="number" id="potongan" class="w-full border p-2 rounded text-sm" value="0">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Pembayaran Awal (Rp)</label>
+            <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-sm" value="0">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
+            <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar / Piutang (Otomatis)</label>
+            <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
+          </div>
+
+          <!-- BARIS 5: TAGIHAN & SUBMIT -->
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tgl Tagihan 1</label>
+            <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tgl Tagihan 2</label>
+            <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Tgl Tagihan 3</label>
+            <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div class="lg:col-span-2 flex items-end gap-2">
+            <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
+              + Simpan Data
+            </button>
+            <button type="button" id="btnBatal" onclick="batalEdit()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
+              Batal
+            </button>
+          </div>
+        </form>
+      </section>
+
+
+      <!-- ================= 2. MENU LAPORAN & DASHBOARD ================= -->
+      <section id="menu-laporan" class="hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div>
+            <h1 class="text-xl font-bold text-slate-800">Laporan Pendapatan & Rekap Piutang</h1>
+            <p class="text-xs text-slate-500">Analisis statistik keuangan, filter periode, dan cetak laporan.</p>
+          </div>
+          <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+            📥 Export Laporan (CSV / Excel)
+          </button>
+        </div>
+
+        <!-- KARTU RINGKASAN KEUANGAN (STATISTIK) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Gross Pendapatan</p>
+            <p id="stat-total-biaya" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Pendapatan Terbayar (Masuk)</p>
+            <p id="stat-total-masuk" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Sisa Piutang Pasien</p>
+            <p id="stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium">Total Pasien Terdata</p>
+            <p id="stat-total-pasien" class="text-lg font-bold text-blue-600 mt-1">0 Pasien</p>
+          </div>
+        </div>
+
+        <!-- PANEL FILTER LAPORAN SANGAT LENGKAP -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">🔍 Filter Laporan Lanjutan</h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Mulai</label>
+              <input type="date" id="filter_tgl_mulai" onchange="terapkanFilter()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Selesai</label>
+              <input type="date" id="filter_tgl_selesai" onchange="terapkanFilter()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tahun Piutang</label>
+              <select id="filter_tahun" onchange="terapkanFilter()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Tahun</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis Perawatan</label>
+              <select id="filter_jenis" onchange="terapkanFilter()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Jenis</option>
+                <option value="Rawat Jalan">Rawat Jalan</option>
+                <option value="Rawat Inap">Rawat Inap</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Pembayaran</label>
+              <select id="filter_status_piutang" onchange="terapkanFilter()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                <option value="">Semua Status</option>
+                <option value="lunas">Lunas (Rp 0)</option>
+                <option value="piutang">Masih Ada Piutang</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pencarian Umum</label>
+              <input type="text" id="inputCari" onkeyup="terapkanFilter()" placeholder="Nama / RM / Transaksi..." class="w-full border p-1.5 rounded text-xs bg-slate-50">
+            </div>
+          </div>
+        </div>
+
+        <!-- TABEL HASIL LAPORAN -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                  <th class="p-2.5 border-r">No. RM</th>
+                  <th class="p-2.5 border-r">Nama Pasien</th>
+                  <th class="p-2.5 border-r">No. TRX</th>
+                  <th class="p-2.5 border-r">Bangsal / Kelas</th>
+                  <th class="p-2.5 border-r">Jenis / Kategori</th>
+                  <th class="p-2.5 border-r">Total Biaya</th>
+                  <th class="p-2.5 border-r">Sisa Piutang</th>
+                  <th class="p-2.5 border-r">Status KPKNL</th>
+                  <th class="p-2.5 border-r text-center">Dokumen</th>
+                  <th class="p-2.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelData" class="divide-y">
+                <tr><td colspan="10" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
   <!-- MODAL DETAIL PASIEN -->
   <div id="modalDetail" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
-      <h2 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Rincian Detail Pasien</h2>
-      
-      <div id="kontenDetail" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
-        <!-- Content Diisi via JS -->
-      </div>
-
+      <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Rincian Detail Pasien</h2>
+      <div id="kontenDetail" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
       <div class="mt-6 flex justify-end">
         <button onclick="tutupModal()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1.5 px-4 rounded text-xs">
           Tutup
@@ -205,9 +309,27 @@
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let listData = []; // Menyimpan data master untuk pencarian & edit
+    let listData Master = []; 
+    let listDataFiltered = [];
 
-    // 1. HITUNG OTOMATIS BELUM TERBAYAR
+    // NAVIGASI SIDEBAR
+    function bukaMenu(menu) {
+      document.getElementById('menu-input').classList.add('hidden');
+      document.getElementById('menu-laporan').classList.add('hidden');
+
+      document.getElementById('nav-input').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition";
+      document.getElementById('nav-laporan').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition";
+
+      if (menu === 'input') {
+        document.getElementById('menu-input').classList.remove('hidden');
+        document.getElementById('nav-input').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition";
+      } else {
+        document.getElementById('menu-laporan').classList.remove('hidden');
+        document.getElementById('nav-laporan').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition";
+      }
+    }
+
+    // PERHITUNGAN OTOMATIS
     function hitungBelumTerbayar() {
       const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya').value) || 0;
       const potongan = parseFloat(document.getElementById('potongan').value) || 0;
@@ -222,7 +344,7 @@
       document.getElementById(id).addEventListener('input', hitungBelumTerbayar);
     });
 
-    // 2. TOGGLE KPKNL TANGGAL
+    // KPKNL TOGGLE
     const selectKpknl = document.getElementById('kirim_kpknl');
     const containerTglKpknl = document.getElementById('container_tgl_kpknl');
     const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
@@ -236,7 +358,7 @@
       }
     });
 
-    // 3. LOAD DATA & TAMPILKAN DI TABEL
+    // FETCH DATA
     async function loadData() {
       const { data, error } = await supabaseClient
         .from('piutang_pasien')
@@ -248,62 +370,105 @@
         return;
       }
 
-      listData = data || [];
-      renderTabel(listData);
+      listDataMaster = data || [];
+      terapkanFilter();
+    }
+
+    // HITUNG STATISTIK KEUANGAN & FILTER
+    function terapkanFilter() {
+      const tglMulai = document.getElementById('filter_tgl_mulai').value;
+      const tglSelesai = document.getElementById('filter_tgl_selesai').value;
+      const tahun = document.getElementById('filter_tahun').value;
+      const jenis = document.getElementById('filter_jenis').value;
+      const statusPiutang = document.getElementById('filter_status_piutang').value;
+      const keyword = document.getElementById('inputCari').value.toLowerCase();
+
+      listDataFiltered = listDataMaster.filter(item => {
+        // Filter Tanggal Masuk RS
+        if (tglMulai && item.tgl_masuk_rs && item.tgl_masuk_rs < tglMulai) return false;
+        if (tglSelesai && item.tgl_masuk_rs && item.tgl_masuk_rs > tglSelesai) return false;
+
+        // Filter Tahun
+        if (tahun && String(item.tahun_piutang) !== tahun) return false;
+
+        // Filter Jenis
+        if (jenis && item.jenis_perawatan !== jenis) return false;
+
+        // Filter Status Piutang
+        if (statusPiutang === 'lunas' && (item.belum_terbayar || 0) > 0) return false;
+        if (statusPiutang === 'piutang' && (item.belum_terbayar || 0) <= 0) return false;
+
+        // Filter Text Search
+        if (keyword) {
+          const matchNama = item.nama_pasien && item.nama_pasien.toLowerCase().includes(keyword);
+          const matchRM = item.no_rm && item.no_rm.toLowerCase().includes(keyword);
+          const matchTrx = item.no_transaksi && item.no_transaksi.toLowerCase().includes(keyword);
+          if (!matchNama && !matchRM && !matchTrx) return false;
+        }
+
+        return true;
+      });
+
+      updateStatistik(listDataFiltered);
+      renderTabel(listDataFiltered);
+    }
+
+    function updateStatistik(data) {
+      let totalBiaya = 0;
+      let totalSisa = 0;
+      let totalMasuk = 0;
+
+      data.forEach(i => {
+        const biaya = parseFloat(i.jumlah_biaya) || 0;
+        const sisa = parseFloat(i.belum_terbayar) || 0;
+        const potongan = parseFloat(i.potongan) || 0;
+        const awal = parseFloat(i.pembayaran_awal) || 0;
+        const angsuran = parseFloat(i.jumlah_angsuran) || 0;
+
+        totalBiaya += biaya;
+        totalSisa += sisa;
+        totalMasuk += (awal + angsuran);
+      });
+
+      document.getElementById('stat-total-biaya').innerText = `Rp ${totalBiaya.toLocaleString('id-ID')}`;
+      document.getElementById('stat-total-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+      document.getElementById('stat-sisa-piutang').innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
+      document.getElementById('stat-total-pasien').innerText = `${data.length} Pasien`;
     }
 
     function renderTabel(data) {
       const tbody = document.getElementById('tabelData');
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data sesuai kriteria filter.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(item => `
         <tr class="hover:bg-slate-50">
-          <td class="p-2 border font-mono">${item.no_rm || '-'}</td>
-          <td class="p-2 border font-semibold">${item.nama_pasien || '-'}</td>
-          <td class="p-2 border font-mono">${item.no_transaksi || '-'}</td>
-          <td class="p-2 border">${item.bangsal || '-'} (${item.kelas || '-'})</td>
-          <td class="p-2 border">${item.jenis_perawatan || '-'} - ${item.kategori || '-'}</td>
-          <td class="p-2 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
-          <td class="p-2 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
-          <td class="p-2 border font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
-          <td class="p-2 border text-center">
+          <td class="p-2.5 border-r font-mono">${item.no_rm || '-'}</td>
+          <td class="p-2.5 border-r font-semibold text-slate-800">${item.nama_pasien || '-'}</td>
+          <td class="p-2.5 border-r font-mono text-slate-600">${item.no_transaksi || '-'}</td>
+          <td class="p-2.5 border-r">${item.bangsal || '-'} (${item.kelas || '-'})</td>
+          <td class="p-2.5 border-r">${item.jenis_perawatan || '-'} - ${item.kategori || '-'}</td>
+          <td class="p-2.5 border-r font-medium">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2.5 border-r text-red-600 font-bold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
+          <td class="p-2.5 border-r font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
+          <td class="p-2.5 border-r text-center">
             ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
           </td>
-          <td class="p-2 border text-center">
+          <td class="p-2.5 text-center">
             <div class="flex justify-center gap-1">
-              <button onclick="bukaDetail(${item.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold text-[10px]">
-                Detail
-              </button>
-              <button onclick="editData(${item.id})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 font-semibold text-[10px]">
-                Edit
-              </button>
+              <button onclick="bukaDetail(${item.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold text-[10px]">Detail</button>
+              <button onclick="editData(${item.id})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 font-semibold text-[10px]">Edit</button>
             </div>
           </td>
         </tr>
       `).join('');
     }
 
-    // 4. FILTER / PENCARIAN DATA
-    function filterTabel() {
-      const keyword = document.getElementById('inputCari').value.toLowerCase();
-      const filtered = listData.filter(item => {
-        return (
-          (item.nama_pasien && item.nama_pasien.toLowerCase().includes(keyword)) ||
-          (item.no_rm && item.no_rm.toLowerCase().includes(keyword)) ||
-          (item.no_transaksi && item.no_transaksi.toLowerCase().includes(keyword)) ||
-          (item.bangsal && item.bangsal.toLowerCase().includes(keyword)) ||
-          (item.kirim_kpknl && item.kirim_kpknl.toLowerCase().includes(keyword))
-        );
-      });
-      renderTabel(filtered);
-    }
-
-    // 5. MODAL DETAIL PASIEN
+    // MODAL DETAIL & EDIT
     function bukaDetail(id) {
-      const item = listData.find(d => d.id === id);
+      const item = listDataMaster.find(d => d.id === id);
       if (!item) return;
 
       const konten = `
@@ -325,7 +490,6 @@
         <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 1:</span> ${item.tagihan_1 || '-'}</div>
         <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 2:</span> ${item.tagihan_2 || '-'}</div>
         <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 3:</span> ${item.tagihan_3 || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border col-span-1 md:col-span-2"><span class="font-bold">Link Dokumen:</span> ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka Berkas</a>` : '-'}</div>
       `;
 
       document.getElementById('kontenDetail').innerHTML = konten;
@@ -338,10 +502,11 @@
       document.getElementById('modalDetail').classList.remove('flex');
     }
 
-    // 6. EDIT DATA PASIEN
     function editData(id) {
-      const item = listData.find(d => d.id === id);
+      const item = listDataMaster.find(d => d.id === id);
       if (!item) return;
+
+      bukaMenu('input');
 
       document.getElementById('edit_id').value = item.id;
       document.getElementById('nama_pasien').value = item.nama_pasien || '';
@@ -356,7 +521,6 @@
       document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
       document.getElementById('kategori').value = item.kategori || '';
 
-      // Tgl KPKNL & Status
       if (item.kirim_kpknl && item.kirim_kpknl.startsWith('Sudah')) {
         selectKpknl.value = 'Sudah';
         containerTglKpknl.classList.remove('hidden');
@@ -379,12 +543,9 @@
       document.getElementById('tagihan_3').value = item.tagihan_3 || '';
       document.getElementById('link_dokumen').value = item.link_dokumen || '';
 
-      // Tampilan Tombol
       document.getElementById('btnSubmit').innerText = '💾 Update Data';
       document.getElementById('btnSubmit').className = 'w-full bg-amber-600 text-white font-semibold py-2 px-4 rounded hover:bg-amber-700 transition h-[38px]';
       document.getElementById('btnBatal').classList.remove('hidden');
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function batalEdit() {
@@ -398,7 +559,7 @@
       document.getElementById('btnBatal').classList.add('hidden');
     }
 
-    // 7. SIMPAN / UPDATE DATA KE SUPABASE
+    // FORM SUBMIT
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -433,17 +594,15 @@
 
       let error;
       if (editId) {
-        // Mode Update
-        const response = await supabaseClient.from('piutang_pasien').update(payload).eq('id', editId);
-        error = response.error;
+        const res = await supabaseClient.from('piutang_pasien').update(payload).eq('id', editId);
+        error = res.error;
       } else {
-        // Mode Insert baru
-        const response = await supabaseClient.from('piutang_pasien').insert([payload]);
-        error = response.error;
+        const res = await supabaseClient.from('piutang_pasien').insert([payload]);
+        error = res.error;
       }
 
       if (error) {
-        alert('Gagal menyimpan data: ' + error.message);
+        alert('Gagal menyimpan: ' + error.message);
       } else {
         alert(editId ? 'Data berhasil diperbarui!' : 'Data berhasil disimpan!');
         batalEdit();
@@ -451,16 +610,16 @@
       }
     });
 
-    // 8. DOWNLOAD LAPORAN KE EXCEL / CSV
+    // EXPORT CSV
     function downloadCSV() {
-      if (listData.length === 0) {
-        alert('Tidak ada data untuk diunduh.');
+      if (listDataFiltered.length === 0) {
+        alert('Tidak ada data laporan untuk diunduh.');
         return;
       }
 
       const headers = ["No. RM", "Nama Pasien", "Alamat", "No TRX", "Tgl Masuk", "Tgl Keluar", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Tahun", "Status KPKNL", "Jumlah Biaya", "Potongan", "Pembayaran Awal", "Jumlah Angsuran", "Sisa Piutang", "Tagihan 1", "Tagihan 2", "Tagihan 3", "Link Dokumen"];
       
-      const rows = listData.map(item => [
+      const rows = listDataFiltered.map(item => [
         `"${item.no_rm || ''}"`,
         `"${item.nama_pasien || ''}"`,
         `"${item.alamat_pasien || ''}"`,
@@ -489,7 +648,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `Laporan_Keuangan_Piutang_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
