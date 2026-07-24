@@ -12,9 +12,12 @@
   <div class="max-w-[1400px] mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold text-slate-800 mb-6">Aplikasi Piutang Pasien RS</h1>
 
-    <!-- FORM INPUT DENGAN GRID 5 KOLOM MENDATAR (5 BARIS) -->
+    <!-- FORM INPUT DENGAN GRID 5 KOLOM MENDATAR -->
     <form id="formPiutang" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-8 bg-slate-50 p-5 rounded-lg border">
       
+      <!-- Field Hidden untuk Mode Edit -->
+      <input type="hidden" id="edit_id" value="">
+
       <!-- BARIS 1: IDENTITAS & TRANSAKSI -->
       <div>
         <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
@@ -117,7 +120,7 @@
         <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
       </div>
 
-      <!-- BARIS 5: TANGGAL TAGIHAN & AKSI -->
+      <!-- BARIS 5: TANGGAL TAGIHAN & AKSI TOMBOL -->
       <div>
         <label class="block text-xs font-semibold mb-1">Tgl Tagihan 1</label>
         <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm">
@@ -130,49 +133,81 @@
         <label class="block text-xs font-semibold mb-1">Tgl Tagihan 3</label>
         <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm">
       </div>
-      <div class="lg:col-span-2 flex items-end">
-        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
+      <div class="lg:col-span-2 flex items-end gap-2">
+        <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
           + Simpan Data
+        </button>
+        <button type="button" id="btnBatal" onclick="batalEdit()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
+          Batal
         </button>
       </div>
 
     </form>
 
-    <!-- TABEL DATA LENGKAP -->
+    <!-- KONTROL PENCARIAN & DOWNLOAD LAPORAN -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+      <div class="w-full md:w-1/3">
+        <input type="text" id="inputCari" onkeyup="filterTabel()" placeholder="🔍 Cari Nama, RM, TRX, Bangsal..." class="w-full border p-2 rounded text-sm bg-slate-50 focus:bg-white border-slate-300">
+      </div>
+      <div>
+        <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition">
+          📥 Download Laporan (CSV / Excel)
+        </button>
+      </div>
+    </div>
+
+    <!-- TABEL DATA PASIEN -->
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="bg-slate-200 text-slate-700">
             <th class="p-2 border">No. RM</th>
             <th class="p-2 border">Nama Pasien</th>
-            <th class="p-2 border">Alamat</th>
             <th class="p-2 border">No. TRX</th>
-            <th class="p-2 border">Tgl Masuk/Keluar</th>
-            <th class="p-2 border">Bangsal/Kelas</th>
-            <th class="p-2 border">Jenis/Kategori</th>
+            <th class="p-2 border">Bangsal / Kelas</th>
+            <th class="p-2 border">Jenis / Kategori</th>
             <th class="p-2 border">Jumlah Biaya</th>
             <th class="p-2 border">Sisa Piutang</th>
-            <th class="p-2 border">Tahun</th>
             <th class="p-2 border">KPKNL</th>
-            <th class="p-2 border">Dokumen</th>
+            <th class="p-2 border text-center">Dokumen</th>
+            <th class="p-2 border text-center">Aksi</th>
           </tr>
         </thead>
         <tbody id="tabelData" class="divide-y">
-          <tr><td colspan="12" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+          <tr><td colspan="10" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
         </tbody>
       </table>
     </div>
 
   </div>
 
+  <!-- MODAL DETAIL PASIEN -->
+  <div id="modalDetail" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+      <h2 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Rincian Detail Pasien</h2>
+      
+      <div id="kontenDetail" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+        <!-- Content Diisi via JS -->
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="tutupModal()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1.5 px-4 rounded text-xs">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // MASUKKAN CREDENTIAL SUPABASE ANDA
+    // CREDENTIAL SUPABASE
     const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
     const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_ANDA';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. FUNGSI PERHITUNGAN OTOMATIS BELUM TERBAYAR
+    let listData = []; // Menyimpan data master untuk pencarian & edit
+
+    // 1. HITUNG OTOMATIS BELUM TERBAYAR
     function hitungBelumTerbayar() {
       const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya').value) || 0;
       const potongan = parseFloat(document.getElementById('potongan').value) || 0;
@@ -183,12 +218,11 @@
       document.getElementById('belum_terbayar').value = sisa;
     }
 
-    // Pasang Event Listener 'input' ke keempat kolom biaya
     ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
       document.getElementById(id).addEventListener('input', hitungBelumTerbayar);
     });
 
-    // 2. EVENT LISTENER KPKNL (TAMPIL/SEMBUNYI TANGGAL)
+    // 2. TOGGLE KPKNL TANGGAL
     const selectKpknl = document.getElementById('kirim_kpknl');
     const containerTglKpknl = document.getElementById('container_tgl_kpknl');
     const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
@@ -202,7 +236,7 @@
       }
     });
 
-    // 3. FUNGSI LOAD DATA DARI SUPABASE
+    // 3. LOAD DATA & TAMPILKAN DI TABEL
     async function loadData() {
       const { data, error } = await supabaseClient
         .from('piutang_pasien')
@@ -214,9 +248,14 @@
         return;
       }
 
+      listData = data || [];
+      renderTabel(listData);
+    }
+
+    function renderTabel(data) {
       const tbody = document.getElementById('tabelData');
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-500">Belum ada data.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data ditemukan.</td></tr>`;
         return;
       }
 
@@ -224,26 +263,146 @@
         <tr class="hover:bg-slate-50">
           <td class="p-2 border font-mono">${item.no_rm || '-'}</td>
           <td class="p-2 border font-semibold">${item.nama_pasien || '-'}</td>
-          <td class="p-2 border">${item.alamat_pasien || '-'}</td>
           <td class="p-2 border font-mono">${item.no_transaksi || '-'}</td>
-          <td class="p-2 border">${item.tgl_masuk_rs || '-'} s/d ${item.tgl_keluar_rs || '-'}</td>
-          <td class="p-2 border">${item.bangsal || '-'} / ${item.kelas || '-'}</td>
-          <td class="p-2 border">${item.jenis_perawatan || '-'} (${item.kategori || '-'})</td>
+          <td class="p-2 border">${item.bangsal || '-'} (${item.kelas || '-'})</td>
+          <td class="p-2 border">${item.jenis_perawatan || '-'} - ${item.kategori || '-'}</td>
           <td class="p-2 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
           <td class="p-2 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
-          <td class="p-2 border">${item.tahun_piutang || '-'}</td>
           <td class="p-2 border font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
           <td class="p-2 border text-center">
             ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
+          </td>
+          <td class="p-2 border text-center">
+            <div class="flex justify-center gap-1">
+              <button onclick="bukaDetail(${item.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold text-[10px]">
+                Detail
+              </button>
+              <button onclick="editData(${item.id})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 font-semibold text-[10px]">
+                Edit
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
     }
 
-    // 4. FUNGSI SIMPAN DATA KE SUPABASE
+    // 4. FILTER / PENCARIAN DATA
+    function filterTabel() {
+      const keyword = document.getElementById('inputCari').value.toLowerCase();
+      const filtered = listData.filter(item => {
+        return (
+          (item.nama_pasien && item.nama_pasien.toLowerCase().includes(keyword)) ||
+          (item.no_rm && item.no_rm.toLowerCase().includes(keyword)) ||
+          (item.no_transaksi && item.no_transaksi.toLowerCase().includes(keyword)) ||
+          (item.bangsal && item.bangsal.toLowerCase().includes(keyword)) ||
+          (item.kirim_kpknl && item.kirim_kpknl.toLowerCase().includes(keyword))
+        );
+      });
+      renderTabel(filtered);
+    }
+
+    // 5. MODAL DETAIL PASIEN
+    function bukaDetail(id) {
+      const item = listData.find(d => d.id === id);
+      if (!item) return;
+
+      const konten = `
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Nama Pasien:</span> ${item.nama_pasien || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. RM:</span> ${item.no_rm || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Alamat:</span> ${item.alamat_pasien || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. Transaksi:</span> ${item.no_transaksi || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Masuk RS:</span> ${item.tgl_masuk_rs || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Keluar RS:</span> ${item.tgl_keluar_rs || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Bangsal / Kelas:</span> ${item.bangsal || '-'} / ${item.kelas || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jenis / Kategori:</span> ${item.jenis_perawatan || '-'} / ${item.kategori || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tahun Piutang:</span> ${item.tahun_piutang || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Status KPKNL:</span> ${item.kirim_kpknl || 'Belum'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Biaya:</span> Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Potongan:</span> Rp ${Number(item.potongan || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Pembayaran Awal:</span> Rp ${Number(item.pembayaran_awal || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Angsuran:</span> Rp ${Number(item.jumlah_angsuran || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-red-50 text-red-700 p-2 rounded border font-bold col-span-1 md:col-span-2">Belum Terbayar: Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 1:</span> ${item.tagihan_1 || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 2:</span> ${item.tagihan_2 || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 3:</span> ${item.tagihan_3 || '-'}</div>
+        <div class="bg-slate-50 p-2 rounded border col-span-1 md:col-span-2"><span class="font-bold">Link Dokumen:</span> ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka Berkas</a>` : '-'}</div>
+      `;
+
+      document.getElementById('kontenDetail').innerHTML = konten;
+      document.getElementById('modalDetail').classList.remove('hidden');
+      document.getElementById('modalDetail').classList.add('flex');
+    }
+
+    function tutupModal() {
+      document.getElementById('modalDetail').classList.add('hidden');
+      document.getElementById('modalDetail').classList.remove('flex');
+    }
+
+    // 6. EDIT DATA PASIEN
+    function editData(id) {
+      const item = listData.find(d => d.id === id);
+      if (!item) return;
+
+      document.getElementById('edit_id').value = item.id;
+      document.getElementById('nama_pasien').value = item.nama_pasien || '';
+      document.getElementById('alamat_pasien').value = item.alamat_pasien || '';
+      document.getElementById('no_rm').value = item.no_rm || '';
+      document.getElementById('no_transaksi').value = item.no_transaksi || '';
+      document.getElementById('tahun_piutang').value = item.tahun_piutang || '';
+      document.getElementById('tgl_masuk_rs').value = item.tgl_masuk_rs || '';
+      document.getElementById('tgl_keluar_rs').value = item.tgl_keluar_rs || '';
+      document.getElementById('bangsal').value = item.bangsal || '';
+      document.getElementById('kelas').value = item.kelas || '';
+      document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
+      document.getElementById('kategori').value = item.kategori || '';
+
+      // Tgl KPKNL & Status
+      if (item.kirim_kpknl && item.kirim_kpknl.startsWith('Sudah')) {
+        selectKpknl.value = 'Sudah';
+        containerTglKpknl.classList.remove('hidden');
+        const match = item.kirim_kpknl.match(/\((.*?)\)/);
+        inputTglKpknl.value = match ? match[1] : '';
+      } else {
+        selectKpknl.value = 'Belum';
+        containerTglKpknl.classList.add('hidden');
+        inputTglKpknl.value = '';
+      }
+
+      document.getElementById('jumlah_biaya').value = item.jumlah_biaya || 0;
+      document.getElementById('potongan').value = item.potongan || 0;
+      document.getElementById('pembayaran_awal').value = item.pembayaran_awal || 0;
+      document.getElementById('jumlah_angsuran').value = item.jumlah_angsuran || 0;
+      document.getElementById('belum_terbayar').value = item.belum_terbayar || 0;
+
+      document.getElementById('tagihan_1').value = item.tagihan_1 || '';
+      document.getElementById('tagihan_2').value = item.tagihan_2 || '';
+      document.getElementById('tagihan_3').value = item.tagihan_3 || '';
+      document.getElementById('link_dokumen').value = item.link_dokumen || '';
+
+      // Tampilan Tombol
+      document.getElementById('btnSubmit').innerText = '💾 Update Data';
+      document.getElementById('btnSubmit').className = 'w-full bg-amber-600 text-white font-semibold py-2 px-4 rounded hover:bg-amber-700 transition h-[38px]';
+      document.getElementById('btnBatal').classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function batalEdit() {
+      document.getElementById('edit_id').value = '';
+      document.getElementById('formPiutang').reset();
+      containerTglKpknl.classList.add('hidden');
+      hitungBelumTerbayar();
+
+      document.getElementById('btnSubmit').innerText = '+ Simpan Data';
+      document.getElementById('btnSubmit').className = 'w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]';
+      document.getElementById('btnBatal').classList.add('hidden');
+    }
+
+    // 7. SIMPAN / UPDATE DATA KE SUPABASE
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const editId = document.getElementById('edit_id').value;
       const statusKpknl = selectKpknl.value;
       const tglKpknl = inputTglKpknl.value;
       const valKpknl = (statusKpknl === 'Sudah' && tglKpknl) ? `Sudah (${tglKpknl})` : statusKpknl;
@@ -272,18 +431,69 @@
         link_dokumen: document.getElementById('link_dokumen').value
       };
 
-      const { error } = await supabaseClient.from('piutang_pasien').insert([payload]);
+      let error;
+      if (editId) {
+        // Mode Update
+        const response = await supabaseClient.from('piutang_pasien').update(payload).eq('id', editId);
+        error = response.error;
+      } else {
+        // Mode Insert baru
+        const response = await supabaseClient.from('piutang_pasien').insert([payload]);
+        error = response.error;
+      }
 
       if (error) {
         alert('Gagal menyimpan data: ' + error.message);
       } else {
-        alert('Data berhasil disimpan!');
-        e.target.reset();
-        containerTglKpknl.classList.add('hidden');
-        hitungBelumTerbayar();
+        alert(editId ? 'Data berhasil diperbarui!' : 'Data berhasil disimpan!');
+        batalEdit();
         loadData();
       }
     });
+
+    // 8. DOWNLOAD LAPORAN KE EXCEL / CSV
+    function downloadCSV() {
+      if (listData.length === 0) {
+        alert('Tidak ada data untuk diunduh.');
+        return;
+      }
+
+      const headers = ["No. RM", "Nama Pasien", "Alamat", "No TRX", "Tgl Masuk", "Tgl Keluar", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Tahun", "Status KPKNL", "Jumlah Biaya", "Potongan", "Pembayaran Awal", "Jumlah Angsuran", "Sisa Piutang", "Tagihan 1", "Tagihan 2", "Tagihan 3", "Link Dokumen"];
+      
+      const rows = listData.map(item => [
+        `"${item.no_rm || ''}"`,
+        `"${item.nama_pasien || ''}"`,
+        `"${item.alamat_pasien || ''}"`,
+        `"${item.no_transaksi || ''}"`,
+        `"${item.tgl_masuk_rs || ''}"`,
+        `"${item.tgl_keluar_rs || ''}"`,
+        `"${item.bangsal || ''}"`,
+        `"${item.kelas || ''}"`,
+        `"${item.jenis_perawatan || ''}"`,
+        `"${item.kategori || ''}"`,
+        `"${item.tahun_piutang || ''}"`,
+        `"${item.kirim_kpknl || ''}"`,
+        item.jumlah_biaya || 0,
+        item.potongan || 0,
+        item.pembayaran_awal || 0,
+        item.jumlah_angsuran || 0,
+        item.belum_terbayar || 0,
+        `"${item.tagihan_1 || ''}"`,
+        `"${item.tagihan_2 || ''}"`,
+        `"${item.tagihan_3 || ''}"`,
+        `"${item.link_dokumen || ''}"`
+      ]);
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
     loadData();
   </script>
