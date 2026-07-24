@@ -15,7 +15,7 @@
     <!-- FORM INPUT DATA LENGKAP -->
     <form id="formPiutang" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-slate-50 p-5 rounded-lg border">
       
-      <!-- Data Identitas Pasien -->
+      <!-- Identitas Pasien -->
       <div>
         <label class="block text-xs font-semibold mb-1">Nama Pasien</label>
         <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-sm" required>
@@ -46,9 +46,12 @@
         <label class="block text-xs font-semibold mb-1">Bangsal</label>
         <input type="text" id="bangsal" class="w-full border p-2 rounded text-sm">
       </div>
+
+      <!-- DROPDOWN KELAS -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kelas</label>
         <select id="kelas" class="w-full border p-2 rounded text-sm">
+          <option value="">-- Pilih Kelas --</option>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -57,25 +60,32 @@
         </select>
       </div>
 
+      <!-- DROPDOWN JENIS PERAWATAN -->
       <div>
         <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
         <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
-          <option value="Rawat Inap">Rawat Inap</option>
+          <option value="">-- Pilih Jenis Perawatan --</option>
           <option value="Rawat Jalan">Rawat Jalan</option>
-      </select>
+          <option value="Rawat Inap">Rawat Inap</option>
+        </select>
+      </div>
+
+      <!-- DROPDOWN KATEGORI -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kategori</label>
         <select id="kategori" class="w-full border p-2 rounded text-sm">
+          <option value="">-- Pilih Kategori --</option>
           <option value="Non Paviliun">Non Paviliun</option>
           <option value="Paviliun">Paviliun</option>
-      </select>
+        </select>
       </div>
+
       <div>
         <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
         <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
       </div>
-        
-        <!-- OPSI KPKNL & TANGGAL KIRIM -->
+
+      <!-- OPSI KPKNL & TANGGAL KIRIM -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
         <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
@@ -87,7 +97,7 @@
         <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
         <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
       </div>
-        
+
       <!-- Biaya & Keuangan -->
       <div>
         <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
@@ -105,23 +115,24 @@
         <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
         <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
       </div>
-        
+
       <!-- KOLOM BELUM TERBAYAR (HITUNG OTOMATIS) -->
       <div>
-        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Rp)</label>
+        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Otomatis)</label>
         <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
       </div>
+
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
-        <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
-        <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="number" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
-        <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
       </div>
 
       <!-- Link Dokumen & Tombol Submit -->
@@ -182,7 +193,7 @@
       document.getElementById('belum_terbayar').value = sisa;
     }
 
-    // Pasang Event Listener 'input' ke keempat kolom tersebut
+    // Pasang Event Listener 'input' ke keempat kolom biaya
     ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
       document.getElementById(id).addEventListener('input', hitungBelumTerbayar);
     });
@@ -231,7 +242,7 @@
           <td class="p-2 border">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
           <td class="p-2 border text-red-600 font-semibold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
           <td class="p-2 border">${item.tahun_piutang || '-'}</td>
-          <td class="p-2 border">${item.kirim_kpknl || 'Belum'}</td>
+          <td class="p-2 border font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
           <td class="p-2 border text-center">
             ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
           </td>
@@ -243,11 +254,10 @@
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Olah string KPKNL (misal: "Sudah (2026-07-24)" atau "Belum")
       const statusKpknl = selectKpknl.value;
       const tglKpknl = inputTglKpknl.value;
       const valKpknl = (statusKpknl === 'Sudah' && tglKpknl) ? `Sudah (${tglKpknl})` : statusKpknl;
-      
+
       const payload = {
         nama_pasien: document.getElementById('nama_pasien').value,
         alamat_pasien: document.getElementById('alamat_pasien').value,
@@ -260,7 +270,7 @@
         jenis_perawatan: document.getElementById('jenis_perawatan').value,
         kategori: document.getElementById('kategori').value,
         tahun_piutang: parseInt(document.getElementById('tahun_piutang').value) || null,
-        kirim_kpknl: document.getElementById('kirim_kpknl').value,
+        kirim_kpknl: valKpknl,
         jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value) || 0,
         potongan: parseFloat(document.getElementById('potongan').value) || 0,
         pembayaran_awal: parseFloat(document.getElementById('pembayaran_awal').value) || 0,
@@ -279,7 +289,8 @@
       } else {
         alert('Data berhasil disimpan!');
         e.target.reset();
-        containerTglKpknl.classList.add('hidden'); // Sembunyikan form tanggal kembali
+        containerTglKpknl.classList.add('hidden');
+        hitungBelumTerbayar();
         loadData();
       }
     });
