@@ -48,13 +48,21 @@
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Kelas</label>
-        <input type="text" id="kelas" class="w-full border p-2 rounded text-sm">
+        <select id="kelas" class="w-full border p-2 rounded text-sm">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="VIP">VIP</option>
+          <option value="VVIP">VVIP</option>
+        </select>
       </div>
 
       <div>
         <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
-        <input type="text" id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
-      </div>
+        <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
+          <option value="Non Paviliun">Non Paviliun</option>
+          <option value="Paviliun">Paviliun</option>
+      </select>
       <div>
         <label class="block text-xs font-semibold mb-1">Kategori</label>
         <input type="text" id="kategori" class="w-full border p-2 rounded text-sm">
@@ -95,15 +103,15 @@
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
-        <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
-        <input type="number" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
-        <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
       </div>
 
       <!-- Link Dokumen & Tombol Submit -->
@@ -195,6 +203,11 @@
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Olah string KPKNL (misal: "Sudah (2026-07-24)" atau "Belum")
+      const statusKpknl = selectKpknl.value;
+      const tglKpknl = inputTglKpknl.value;
+      const valKpknl = (statusKpknl === 'Sudah' && tglKpknl) ? `Sudah (${tglKpknl})` : statusKpknl;
+      
       const payload = {
         nama_pasien: document.getElementById('nama_pasien').value,
         alamat_pasien: document.getElementById('alamat_pasien').value,
@@ -226,6 +239,7 @@
       } else {
         alert('Data berhasil disimpan!');
         e.target.reset();
+        containerTglKpknl.classList.add('hidden'); // Sembunyikan form tanggal kembali
         loadData();
       }
     });
