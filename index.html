@@ -60,17 +60,22 @@
       <div>
         <label class="block text-xs font-semibold mb-1">Jenis Perawatan</label>
         <select id="jenis_perawatan" class="w-full border p-2 rounded text-sm">
-          <option value="Non Paviliun">Non Paviliun</option>
-          <option value="Paviliun">Paviliun</option>
+          <option value="Rawat Inap">Rawat Inap</option>
+          <option value="Rawat Jalan">Rawat Jalan</option>
       </select>
       <div>
         <label class="block text-xs font-semibold mb-1">Kategori</label>
-        <input type="text" id="kategori" class="w-full border p-2 rounded text-sm">
+        <select id="kategori" class="w-full border p-2 rounded text-sm">
+          <option value="Non Paviliun">Non Paviliun</option>
+          <option value="Paviliun">Paviliun</option>
+      </select>
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tahun Piutang</label>
         <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-sm">
       </div>
+        
+        <!-- OPSI KPKNL & TANGGAL KIRIM -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kirim KPKNL</label>
         <select id="kirim_kpknl" class="w-full border p-2 rounded text-sm">
@@ -78,7 +83,11 @@
           <option value="Sudah">Sudah</option>
         </select>
       </div>
-
+      <div id="container_tgl_kpknl" class="hidden">
+        <label class="block text-xs font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
+        <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-sm border-blue-400 bg-blue-50">
+      </div>
+        
       <!-- Biaya & Keuangan -->
       <div>
         <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
@@ -96,10 +105,11 @@
         <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
         <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
       </div>
-
+        
+      <!-- KOLOM BELUM TERBAYAR (HITUNG OTOMATIS) -->
       <div>
         <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Rp)</label>
-        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm" value="0">
+        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
       </div>
       <div>
         <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
@@ -161,7 +171,37 @@
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Fungsi Load Data
+    // 1. FUNGSI PERHITUNGAN OTOMATIS BELUM TERBAYAR
+    function hitungBelumTerbayar() {
+      const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya').value) || 0;
+      const potongan = parseFloat(document.getElementById('potongan').value) || 0;
+      const pembayaranAwal = parseFloat(document.getElementById('pembayaran_awal').value) || 0;
+      const jumlahAngsuran = parseFloat(document.getElementById('jumlah_angsuran').value) || 0;
+
+      const sisa = jumlahBiaya - potongan - pembayaranAwal - jumlahAngsuran;
+      document.getElementById('belum_terbayar').value = sisa;
+    }
+
+    // Pasang Event Listener 'input' ke keempat kolom tersebut
+    ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
+      document.getElementById(id).addEventListener('input', hitungBelumTerbayar);
+    });
+
+    // 2. EVENT LISTENER KPKNL (TAMPIL/SEMBUNYI TANGGAL)
+    const selectKpknl = document.getElementById('kirim_kpknl');
+    const containerTglKpknl = document.getElementById('container_tgl_kpknl');
+    const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
+
+    selectKpknl.addEventListener('change', (e) => {
+      if (e.target.value === 'Sudah') {
+        containerTglKpknl.classList.remove('hidden');
+      } else {
+        containerTglKpknl.classList.add('hidden');
+        inputTglKpknl.value = '';
+      }
+    });
+
+    // 3. FUNGSI LOAD DATA DARI SUPABASE
     async function loadData() {
       const { data, error } = await supabaseClient
         .from('piutang_pasien')
@@ -199,7 +239,7 @@
       `).join('');
     }
 
-    // Fungsi Simpan Data
+    // 4. FUNGSI SIMPAN DATA KE SUPABASE
     document.getElementById('formPiutang').addEventListener('submit', async (e) => {
       e.preventDefault();
 
