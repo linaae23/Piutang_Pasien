@@ -70,43 +70,7 @@
         </select>
       </div>
 
-      <!-- BARIS 3: BIAYA & PERHITUNGAN -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
-        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Potongan (Rp)</label>
-        <input type="number" id="potongan" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Pembayaran Awal (Rp)</label>
-        <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
-        <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Otomatis)</label>
-        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
-      </div>
-
-      <!-- BARIS 4: TAGIHAN & AKSI -->
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
-        <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
-        <input type="number" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
-        <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
-      </div>
-      
-      <!-- BARIS 5: KATEGORI, KPKNL & DOKUMEN -->
+      <!-- BARIS 3: KATEGORI, KPKNL & DOKUMEN -->
       <div>
         <label class="block text-xs font-semibold mb-1">Kategori</label>
         <select id="kategori" class="w-full border p-2 rounded text-sm">
@@ -129,6 +93,42 @@
       <div class="lg:col-span-2">
         <label class="block text-xs font-semibold mb-1">Link Dokumen (Drive/URL)</label>
         <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-sm">
+      </div>
+
+      <!-- BARIS 4: BIAYA & PERHITUNGAN -->
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jumlah Biaya (Rp)</label>
+        <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Potongan (Rp)</label>
+        <input type="number" id="potongan" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Pembayaran Awal (Rp)</label>
+        <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Jumlah Angsuran (Rp)</label>
+        <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-red-600">Belum Terbayar (Otomatis)</label>
+        <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
+      </div>
+
+      <!-- BARIS 5: TAGIHAN & AKSI -->
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
+        <input type="number" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
+        <input type="number" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
+        <input type="number" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
       </div>
       <div class="lg:col-span-2 flex items-end">
         <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
