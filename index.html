@@ -6,9 +6,6 @@
   <title>Sistem Piutang Pasien</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Flatpickr CSS & JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body class="bg-slate-100 p-4 md:p-6">
 
@@ -120,18 +117,18 @@
         <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-sm bg-slate-100 font-bold text-red-600" value="0" readonly>
       </div>
 
-      <!-- BARIS 5: TAGIHAN & AKSI -->
+      <!-- BARIS 5: TANGGAL TAGIHAN & AKSI -->
       <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 1 (Rp)</label>
-        <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm" value="0">
+        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 1</label>
+        <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-sm">
       </div>
       <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 2 (Rp)</label>
-        <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm" value="0">
+        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 2</label>
+        <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-sm">
       </div>
       <div>
-        <label class="block text-xs font-semibold mb-1">Tagihan 3 (Rp)</label>
-        <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm" value="0">
+        <label class="block text-xs font-semibold mb-1">Tgl Tagihan 3</label>
+        <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-sm">
       </div>
       <div class="lg:col-span-2 flex items-end">
         <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
@@ -171,7 +168,7 @@
   <script>
     // MASUKKAN CREDENTIAL SUPABASE ANDA
     const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
+    const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_ANDA';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -269,9 +266,9 @@
         pembayaran_awal: parseFloat(document.getElementById('pembayaran_awal').value) || 0,
         jumlah_angsuran: parseFloat(document.getElementById('jumlah_angsuran').value) || 0,
         belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value) || 0,
-        tagihan_1: parseFloat(document.getElementById('tagihan_1').value) || 0,
-        tagihan_2: parseFloat(document.getElementById('tagihan_2').value) || 0,
-        tagihan_3: parseFloat(document.getElementById('tagihan_3').value) || 0,
+        tagihan_1: document.getElementById('tagihan_1').value || null,
+        tagihan_2: document.getElementById('tagihan_2').value || null,
+        tagihan_3: document.getElementById('tagihan_3').value || null,
         link_dokumen: document.getElementById('link_dokumen').value
       };
 
