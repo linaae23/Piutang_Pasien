@@ -35,7 +35,7 @@
               <span>👤</span> Input Piutang Pasien
             </button>
             <button onclick="bukaView('input-pendapatan')" id="btn-input-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>💰</span> Input Pendapatan Direct
+              <span>💰</span> Input Rekap Pendapatan
             </button>
             <button onclick="bukaView('input-kerjasama')" id="btn-input-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
               <span>🏢</span> Input Piutang Kerjasama
@@ -53,7 +53,7 @@
               <span>📋</span> Laporan Piutang Pasien
             </button>
             <button onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>📊</span> Laporan Pendapatan
+              <span>📊</span> Laporan Rekap Pendapatan
             </button>
             <button onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
               <span>🤝</span> Laporan Piutang Kerjasama
@@ -75,7 +75,7 @@
     <!-- ================= AREA KONTEN UTAMA ================= -->
     <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
 
-      <!-- ================= 1. FORM INPUT PIUTANG PASIEN (LENGKAP SEPERTI AWAL) ================= -->
+      <!-- ================= 1. FORM INPUT PIUTANG PASIEN ================= -->
       <section id="view-input-pasien" class="modul-view">
         <div class="mb-6">
           <h1 class="text-xl font-bold text-slate-800">Form Input & Edit Data Piutang Pasien</h1>
@@ -211,55 +211,65 @@
         </form>
       </section>
 
-      <!-- ================= 2. FORM INPUT PENDAPATAN DIRECT ================= -->
+      <!-- ================= 2. FORM INPUT REKAP PENDAPATAN (TABEL BARU) ================= -->
       <section id="view-input-pendapatan" class="modul-view hidden">
         <div class="mb-6">
-          <h1 class="text-xl font-bold text-slate-800">Input Data Pendapatan & Item Service</h1>
-          <p class="text-xs text-slate-500">Pencatatan pendapatan langsung per item/pelayanan medis.</p>
+          <h1 class="text-xl font-bold text-slate-800">Input & Rekap Pendapatan Kerjasama</h1>
+          <p class="text-xs text-slate-500">Pencatatan target anggaran dan realisasi bulanan berdasarkan kode rekening.</p>
         </div>
 
-        <form id="formPendapatan" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
+        <form id="formPendapatan" class="space-y-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
+          
+          <!-- Informasi Rekening & Induk -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+              <label class="block font-semibold mb-1">Kode Rekening</label>
+              <input type="text" id="p_kode_rekening" placeholder="Misal: 4.1.1.01" class="w-full border p-2 rounded" required>
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Uraian Rekening</label>
+              <input type="text" id="p_uraian" placeholder="Nama Uraian Rekening" class="w-full border p-2 rounded" required>
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Parent Kode (Induk)</label>
+              <input type="text" id="p_parent_kode" placeholder="Misal: 4.1.1 (Kosongkan jika Root)" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Jenis Baris</label>
+              <select id="p_is_header" class="w-full border p-2 rounded">
+                <option value="false">Baris Detail (Diisi Realisasinya)</option>
+                <option value="true">Baris Total / Header (Penjumlahan Auto)</option>
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label class="block font-semibold mb-1">Tanggal Transaksi</label>
-            <input type="date" id="p_tanggal" class="w-full border p-2 rounded" required>
+            <label class="block font-semibold mb-1">Target Anggaran (Rp)</label>
+            <input type="number" id="p_anggaran" value="0" class="w-full md:w-1/3 border p-2 rounded" required>
           </div>
+
+          <!-- Realisasi Bulanan (Jan - Des) -->
+          <div class="border-t pt-3">
+            <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Januari s/d Desember)</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+              <div><label class="block text-[10px] text-slate-500">Januari</label><input type="number" id="p_jan" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Februari</label><input type="number" id="p_feb" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Maret</label><input type="number" id="p_mar" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">April</label><input type="number" id="p_apr" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Mei</label><input type="number" id="p_mei" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Juni</label><input type="number" id="p_jun" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Juli</label><input type="number" id="p_jul" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Agustus</label><input type="number" id="p_agu" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">September</label><input type="number" id="p_sep" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Oktober</label><input type="number" id="p_okt" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">November</label><input type="number" id="p_nov" value="0" class="w-full border p-1.5 rounded"></div>
+              <div><label class="block text-[10px] text-slate-500">Desember</label><input type="number" id="p_des" value="0" class="w-full border p-1.5 rounded"></div>
+            </div>
+          </div>
+
           <div>
-            <label class="block font-semibold mb-1">No. Transaksi / Kwitansi</label>
-            <input type="text" id="p_no_trx" class="w-full border p-2 rounded">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Kategori Pendapatan</label>
-            <select id="p_kategori" class="w-full border p-2 rounded">
-              <option value="Layanan Medis">Layanan Medis</option>
-              <option value="Farmasi / Obat">Farmasi / Obat</option>
-              <option value="Laboratorium">Laboratorium</option>
-              <option value="Radiologi">Radiologi</option>
-              <option value="Lainnya">Lainnya</option>
-            </select>
-          </div>
-          <div class="md:col-span-2">
-            <label class="block font-semibold mb-1">Nama Item / Layanan</label>
-            <input type="text" id="p_nama_item" placeholder="Contoh: Pemeriksaan USG 4D" class="w-full border p-2 rounded" required>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Jumlah Item (Qty)</label>
-            <input type="number" id="p_jumlah" value="1" min="1" class="w-full border p-2 rounded" required>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Harga Satuan (Rp)</label>
-            <input type="number" id="p_harga" value="0" class="w-full border p-2 rounded" required>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1 text-emerald-600">Total Pendapatan (Otomatis)</label>
-            <input type="number" id="p_total" value="0" class="w-full border p-2 rounded bg-slate-100 font-bold text-emerald-600" readonly>
-          </div>
-          <div class="md:col-span-3">
-            <label class="block font-semibold mb-1">Keterangan / Catatan</label>
-            <input type="text" id="p_keterangan" class="w-full border p-2 rounded">
-          </div>
-          <div class="md:col-span-3">
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">
-              + Simpan Pendapatan
+              + Simpan Rekap Pendapatan
             </button>
           </div>
         </form>
@@ -305,7 +315,7 @@
         </form>
       </section>
 
-      <!-- ================= 4. LAPORAN PIUTANG PASIEN (LENGKAP) ================= -->
+      <!-- ================= 4. LAPORAN PIUTANG PASIEN ================= -->
       <section id="view-laporan-pasien" class="modul-view hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
@@ -407,24 +417,23 @@
         </div>
       </section>
 
-      <!-- ================= 5. LAPORAN PENDAPATAN DIRECT ================= -->
+      <!-- ================= 5. LAPORAN REKAP PENDAPATAN (VIEW SQL BARU) ================= -->
       <section id="view-laporan-pendapatan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">📊 Laporan Pendapatan Service & Item</h1>
+        <h1 class="text-xl font-bold text-slate-800 mb-4">📊 Laporan Rekapitulasi Pendapatan Kerjasama</h1>
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100 font-bold border-b">
-                <th class="p-2.5">Tanggal</th>
-                <th class="p-2.5">No Trx</th>
-                <th class="p-2.5">Kategori</th>
-                <th class="p-2.5">Nama Item</th>
-                <th class="p-2.5">Qty</th>
-                <th class="p-2.5">Harga Satuan</th>
-                <th class="p-2.5">Total Pendapatan</th>
+              <tr class="bg-slate-100 font-bold border-b border-slate-300">
+                <th class="p-2.5 border-r">Kode Rekening</th>
+                <th class="p-2.5 border-r">Uraian</th>
+                <th class="p-2.5 border-r text-right">Anggaran</th>
+                <th class="p-2.5 border-r text-right">Realisasi (Jan-Des)</th>
+                <th class="p-2.5 border-r text-center">Pencapaian (%)</th>
+                <th class="p-2.5 text-right">Sisa Anggaran</th>
               </tr>
             </thead>
             <tbody id="tabelPendapatan" class="divide-y">
-              <tr><td colspan="7" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+              <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data rekapitulasi...</td></tr>
             </tbody>
           </table>
         </div>
@@ -456,11 +465,11 @@
       <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
       <section id="view-laporan-gabungan" class="modul-view hidden">
         <h1 class="text-xl font-bold text-slate-800 mb-1">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
-        <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh gabungan Pendapatan Direct, Piutang Kerjasama, dan Piutang Pasien Perorangan.</p>
+        <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh gabungan Rekap Pendapatan Kerjasama, Piutang Kerjasama, dan Piutang Pasien Perorangan.</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-xs">
           <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl shadow-sm">
-            <p class="font-semibold text-emerald-800">Total Pendapatan Direct</p>
+            <p class="font-semibold text-emerald-800">Total Realisasi Pendapatan</p>
             <p id="sum-pendapatan" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
           </div>
           <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl shadow-sm">
@@ -550,15 +559,6 @@
       }
     });
 
-    // ---------------- PERHITUNGAN PENDAPATAN DIRECT ----------------
-    function hitungPendapatan() {
-      const qty = parseFloat(document.getElementById('p_jumlah').value) || 0;
-      const harga = parseFloat(document.getElementById('p_harga').value) || 0;
-      document.getElementById('p_total').value = qty * harga;
-    }
-    document.getElementById('p_jumlah').addEventListener('input', hitungPendapatan);
-    document.getElementById('p_harga').addEventListener('input', hitungPendapatan);
-
     // ---------------- PERHITUNGAN PIUTANG KERJASAMA ----------------
     function hitungKerjasama() {
       const piutang = parseFloat(document.getElementById('k_jumlah').value) || 0;
@@ -619,24 +619,36 @@
       }
     });
 
-    // ---------------- SUBMIT HANDLER: PENDAPATAN ----------------
+    // ---------------- SUBMIT HANDLER: REKAP PENDAPATAN (TABEL BARU) ----------------
     document.getElementById('formPendapatan').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      const isHeaderVal = document.getElementById('p_is_header').value === 'true';
+
       const payload = {
-        tanggal: document.getElementById('p_tanggal').value,
-        no_transaksi: document.getElementById('p_no_trx').value,
-        kategori_pendapatan: document.getElementById('p_kategori').value,
-        nama_item: document.getElementById('p_nama_item').value,
-        jumlah_item: parseInt(document.getElementById('p_jumlah').value) || 1,
-        harga_satuan: parseFloat(document.getElementById('p_harga').value) || 0,
-        total_pendapatan: parseFloat(document.getElementById('p_total').value) || 0,
-        keterangan: document.getElementById('p_keterangan').value
+        kode_rekening: document.getElementById('p_kode_rekening').value,
+        uraian: document.getElementById('p_uraian').value,
+        parent_kode: document.getElementById('p_parent_kode').value || null,
+        is_header: isHeaderVal,
+        anggaran: parseFloat(document.getElementById('p_anggaran').value) || 0,
+        realisasi_jan: parseFloat(document.getElementById('p_jan').value) || 0,
+        realisasi_feb: parseFloat(document.getElementById('p_feb').value) || 0,
+        realisasi_mar: parseFloat(document.getElementById('p_mar').value) || 0,
+        realisasi_apr: parseFloat(document.getElementById('p_apr').value) || 0,
+        realisasi_mei: parseFloat(document.getElementById('p_mei').value) || 0,
+        realisasi_jun: parseFloat(document.getElementById('p_jun').value) || 0,
+        realisasi_jul: parseFloat(document.getElementById('p_jul').value) || 0,
+        realisasi_agu: parseFloat(document.getElementById('p_agu').value) || 0,
+        realisasi_sep: parseFloat(document.getElementById('p_sep').value) || 0,
+        realisasi_okt: parseFloat(document.getElementById('p_okt').value) || 0,
+        realisasi_nov: parseFloat(document.getElementById('p_nov').value) || 0,
+        realisasi_des: parseFloat(document.getElementById('p_des').value) || 0
       };
 
-      const { error } = await supabaseClient.from('pendapatan').insert([payload]);
-      if (error) alert('Gagal menyimpan pendapatan: ' + error.message);
+      const { error } = await supabaseClient.from('rekap_pendapatan').insert([payload]);
+      if (error) alert('Gagal menyimpan rekap pendapatan: ' + error.message);
       else {
-        alert('Data pendapatan berhasil disimpan!');
+        alert('Data rekap pendapatan berhasil disimpan!');
         document.getElementById('formPendapatan').reset();
         loadSemuaLaporan();
       }
@@ -673,22 +685,25 @@
         terapkanFilterPasien();
       }
 
-      // 2. Load Data Pendapatan
-      const { data: dataP } = await supabaseClient.from('pendapatan').select('*').order('id', { ascending: false });
+      // 2. Load Data Rekap Pendapatan dari View (v_laporan_pendapatan)
+      const { data: dataP } = await supabaseClient.from('v_laporan_pendapatan').select('*');
       let totalP = 0;
-      if (dataP) {
-        totalP = dataP.reduce((acc, curr) => acc + Number(curr.total_pendapatan || 0), 0);
+      if (dataP && dataP.length > 0) {
+        // Hanya jumlahkan dari baris non-header/root untuk konsolidasi
+        totalP = dataP.reduce((acc, curr) => acc + Number(curr.total_realisasi || 0), 0);
+        
         document.getElementById('tabelPendapatan').innerHTML = dataP.map(i => `
-          <tr class="hover:bg-slate-50">
-            <td class="p-2.5 font-mono">${i.tanggal || '-'}</td>
-            <td class="p-2.5 font-mono">${i.no_transaksi || '-'}</td>
-            <td class="p-2.5">${i.kategori_pendapatan || '-'}</td>
-            <td class="p-2.5 font-semibold text-slate-800">${i.nama_item || '-'}</td>
-            <td class="p-2.5">${i.jumlah_item}</td>
-            <td class="p-2.5">Rp ${Number(i.harga_satuan).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 font-bold text-emerald-600">Rp ${Number(i.total_pendapatan).toLocaleString('id-ID')}</td>
+          <tr class="hover:bg-slate-50 font-mono">
+            <td class="p-2.5 border-r font-bold text-slate-800">${i.kode_rekening || '-'}</td>
+            <td class="p-2.5 border-r font-sans font-medium text-slate-800">${i.uraian || '-'}</td>
+            <td class="p-2.5 border-r text-right">Rp ${Number(i.anggaran || 0).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${Number(i.total_realisasi || 0).toLocaleString('id-ID')}</td>
+            <td class="p-2.5 border-r text-center font-bold text-blue-600">${i.persentase_pencapaian || 0}%</td>
+            <td class="p-2.5 text-right font-semibold ${Number(i.sisa_anggaran) < 0 ? 'text-red-600' : 'text-slate-700'}">Rp ${Number(i.sisa_anggaran || 0).toLocaleString('id-ID')}</td>
           </tr>
         `).join('');
+      } else {
+        document.getElementById('tabelPendapatan').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada data rekap pendapatan.</td></tr>`;
       }
 
       // 3. Load Data Kerjasama
