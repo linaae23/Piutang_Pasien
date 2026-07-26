@@ -418,26 +418,126 @@
       </section>
 
       <!-- ================= 5. LAPORAN REKAP PENDAPATAN (VIEW SQL BARU) ================= -->
-      <section id="view-laporan-pendapatan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-4">📊 Laporan Rekapitulasi Pendapatan Kerjasama</h1>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-100 font-bold border-b border-slate-300">
-                <th class="p-2.5 border-r">Kode Rekening</th>
-                <th class="p-2.5 border-r">Uraian</th>
-                <th class="p-2.5 border-r text-right">Anggaran</th>
-                <th class="p-2.5 border-r text-right">Realisasi (Jan-Des)</th>
-                <th class="p-2.5 border-r text-center">Pencapaian (%)</th>
-                <th class="p-2.5 text-right">Sisa Anggaran</th>
-              </tr>
-            </thead>
-            <tbody id="tabelPendapatan" class="divide-y">
-              <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data rekapitulasi...</td></tr>
-            </tbody>
-          </table>
+      <!-- ================= 5. LAPORAN REKAP PENDAPATAN (DASHBOARD & FILTER) ================= -->
+<section id="view-laporan-pendapatan" class="modul-view hidden">
+  
+  <!-- Header & Tombol Export -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">📊 Laporan & Dashboard Rekapitulasi Pendapatan</h1>
+      <p class="text-xs text-slate-500">Monitoring realisasi pendapatan, pencapaian target anggaran, dan ekspor laporan.</p>
+    </div>
+    <button onclick="downloadCSVPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+      📥 Export Laporan Pendapatan (CSV)
+    </button>
+  </div>
+
+  <!-- DASHBOARD RINGKASAN SPREADSHEET / KEUANGAN -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Target Anggaran</p>
+      <p id="dash-target" class="text-xl font-bold text-slate-800 mt-1">Rp 0</p>
+      <span class="text-[10px] text-slate-400" id="dash-info-target">Target Keseluruhan</span>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Realisasi Pendapatan</p>
+      <p id="dash-realisasi" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
+      <span class="text-[10px] text-emerald-500" id="dash-info-periode">Periode: Jan - Des</span>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Persentase Pencapaian</p>
+      <p id="dash-pencapaian" class="text-xl font-bold text-blue-600 mt-1">0.00%</p>
+      <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+        <div id="dash-bar-pencapaian" class="bg-blue-600 h-1.5 rounded-full" style="width: 0%"></div>
+      </div>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Belum Tercapai (Sisa Target)</p>
+      <p id="dash-sisa" class="text-xl font-bold text-amber-600 mt-1">Rp 0</p>
+      <span class="text-[10px] text-amber-500">Kekurangan Realisasi</span>
+    </div>
+  </div>
+
+  <!-- PANEL FILTER LAPORAN -->
+  <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 text-xs">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold text-slate-700 uppercase tracking-wider">🔍 Filter Laporan Pendapatan</h3>
+      <button onclick="resetFilterPendapatan()" class="text-blue-600 hover:underline font-semibold text-[11px]">
+        🔄 Reset Filter
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- Filter Dari Bulan -->
+      <div>
+        <label class="block font-semibold text-slate-600 mb-1">Dari Bulan</label>
+        <select id="p_filter_bulan_mulai" onchange="terapkanFilterPendapatan()" class="w-full border p-2 rounded bg-slate-50">
+          <option value="0">Januari</option>
+          <option value="1">Februari</option>
+          <option value="2">Maret</option>
+          <option value="3">April</option>
+          <option value="4">Mei</option>
+          <option value="5">Juni</option>
+          <option value="6">Juli</option>
+          <option value="7">Agustus</option>
+          <option value="8">September</option>
+          <option value="9">Oktober</option>
+          <option value="10">November</option>
+          <option value="11">Desember</option>
+        </select>
+      </div>
+
+      <!-- Filter Sampai Bulan -->
+      <div>
+        <label class="block font-semibold text-slate-600 mb-1">Sampai Bulan</label>
+        <select id="p_filter_bulan_selesai" onchange="terapkanFilterPendapatan()" class="w-full border p-2 rounded bg-slate-50">
+          <option value="0">Januari</option>
+          <option value="1">Februari</option>
+          <option value="2">Maret</option>
+          <option value="3">April</option>
+          <option value="4">Mei</option>
+          <option value="5">Juni</option>
+          <option value="6">Juli</option>
+          <option value="7">Agustus</option>
+          <option value="8">September</option>
+          <option value="9">Oktober</option>
+          <option value="10">November</option>
+          <option value="11">Desember</option>
+        </select>
+      </div>
+
+      <!-- Filter Multiple Uraian (Checkbox List) -->
+      <div>
+        <label class="block font-semibold text-slate-600 mb-1">Pilih Jenis Uraian / Rekening</label>
+        <div id="container-check-uraian" class="border rounded p-2 bg-slate-50 max-h-28 overflow-y-auto space-y-1 text-[11px]">
+          <!-- Checkbox Uraian di-generate via JavaScript -->
+          <span class="text-slate-400">Memuat uraian...</span>
         </div>
-      </section>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TABEL LAPORAN PENDAPATAN -->
+  <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-slate-100 font-bold border-b border-slate-300 text-slate-700">
+          <th class="p-2.5 border-r">Kode Rekening</th>
+          <th class="p-2.5 border-r">Uraian</th>
+          <th class="p-2.5 border-r text-right">Target Anggaran</th>
+          <th class="p-2.5 border-r text-right" id="th-header-realisasi">Realisasi Periode</th>
+          <th class="p-2.5 border-r text-center">Pencapaian (%)</th>
+          <th class="p-2.5 text-right">Sisa Target (Rp)</th>
+        </tr>
+      </thead>
+      <tbody id="tabelPendapatan" class="divide-y">
+        <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data rekapitulasi...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
 
       <!-- ================= 6. LAPORAN PIUTANG KERJASAMA ================= -->
       <section id="view-laporan-kerjasama" class="modul-view hidden">
@@ -559,6 +659,256 @@
       }
     });
 
+    // Variable Global Rekap Pendapatan
+let listMasterPendapatan = [];
+let listFilteredPendapatan = [];
+
+const NAMA_BULAN = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+
+const KEY_BULAN = [
+  'realisasi_jan', 'realisasi_feb', 'realisasi_mar', 'realisasi_apr',
+  'realisasi_mei', 'realisasi_jun', 'realisasi_jul', 'realisasi_agu',
+  'realisasi_sep', 'realisasi_okt', 'realisasi_nov', 'realisasi_des'
+];
+
+// Set default dropdown bulan selesai = Desember (Index 11)
+document.addEventListener("DOMContentLoaded", () => {
+  const elSelesai = document.getElementById('p_filter_bulan_selesai');
+  if (elSelesai) elSelesai.value = "11";
+});
+
+// ---------------- 1. LOAD DATA MASTER DARI TABEL ----------------
+async function loadDataPendapatan() {
+  const { data, error } = await supabaseClient
+    .from('rekap_pendapatan')
+    .select('*')
+    .order('kode_rekening', { ascending: true });
+
+  if (error) {
+    console.error('Gagal mengambil data rekap_pendapatan:', error.message);
+    return;
+  }
+
+  listMasterPendapatan = data || [];
+  renderCheckboxUraian(listMasterPendapatan);
+  terapkanFilterPendapatan();
+}
+
+// ---------------- 2. GENERATE FILTER CHECKBOX URAIAN ----------------
+function renderCheckboxUraian(data) {
+  const container = document.getElementById('container-check-uraian');
+  if (!container) return;
+
+  if (data.length === 0) {
+    container.innerHTML = `<span class="text-slate-400">Belum ada data.</span>`;
+    return;
+  }
+
+  // Ambil Uraian unik
+  const uniqueUraian = [...new Set(data.map(i => i.uraian))];
+
+  container.innerHTML = `
+    <label class="flex items-center gap-1.5 font-bold text-blue-700 border-b pb-1 mb-1 cursor-pointer">
+      <input type="checkbox" id="check_uraian_all" checked onchange="toggleSelectAllUraian(this)">
+      <span>Pilih Semua</span>
+    </label>
+  ` + uniqueUraian.map((u, idx) => `
+    <label class="flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 p-0.5 rounded">
+      <input type="checkbox" value="${u}" class="item-check-uraian" checked onchange="terapkanFilterPendapatan()">
+      <span class="truncate">${u}</span>
+    </label>
+  `).join('');
+}
+
+function toggleSelectAllUraian(master) {
+  const checkboxes = document.querySelectorAll('.item-check-uraian');
+  checkboxes.forEach(cb => cb.checked = master.checked);
+  terapkanFilterPendapatan();
+}
+
+// ---------------- 3. TERAJPAN FILTER & HITUNG PERIODE ----------------
+function terapkanFilterPendapatan() {
+  const bulanMulaiIdx = parseInt(document.getElementById('p_filter_bulan_mulai').value) || 0;
+  let bulanSelesaiIdx = parseInt(document.getElementById('p_filter_bulan_selesai').value);
+  if (isNaN(bulanSelesaiIdx)) bulanSelesaiIdx = 11;
+
+  // Koreksi jika bulan mulai > bulan selesai
+  if (bulanMulaiIdx > bulanSelesaiIdx) {
+    document.getElementById('p_filter_bulan_selesai').value = bulanMulaiIdx;
+    bulanSelesaiIdx = bulanMulaiIdx;
+  }
+
+  // Ambil daftar Uraian yang dicentang
+  const selectedUraian = Array.from(document.querySelectorAll('.item-check-uraian:checked')).map(cb => cb.value);
+
+  // Filter Data
+  listFilteredPendapatan = listMasterPendapatan.filter(item => {
+    return selectedUraian.includes(item.uraian);
+  });
+
+  // Render Dashboard & Tabel berdasarkan rentang bulan
+  renderDashboardPendapatan(listFilteredPendapatan, bulanMulaiIdx, bulanSelesaiIdx);
+  renderTabelPendapatan(listFilteredPendapatan, bulanMulaiIdx, bulanSelesaiIdx);
+}
+
+// ---------------- 4. HITUNG REALISASI RENTANG BULAN ----------------
+function hitungRealisasiRentang(item, startIdx, endIdx) {
+  let total = 0;
+  for (let i = startIdx; i <= endIdx; i++) {
+    const key = KEY_BULAN[i];
+    total += Number(item[key] || 0);
+  }
+  return total;
+}
+
+// ---------------- 5. RENDER DASHBOARD DINAMIS ----------------
+function renderDashboardPendapatan(data, startIdx, endIdx) {
+  // Hanya hitung baris non-header (detail) untuk menghindari penghitungan ganda (double counting)
+  // Jika semua baris di-set header/non-header, gunakan seluruh baris yang ada
+  const dataDetail = data.filter(i => i.is_header === false);
+  const targetData = dataDetail.length > 0 ? dataDetail : data;
+
+  let totalTarget = 0;
+  let totalRealisasi = 0;
+
+  targetData.forEach(item => {
+    totalTarget += Number(item.anggaran || 0);
+    totalRealisasi += hitungRealisasiRentang(item, startIdx, endIdx);
+  });
+
+  const persentase = totalTarget > 0 ? ((totalRealisasi / totalTarget) * 100) : 0;
+  const sisaTarget = totalTarget - totalRealisasi;
+
+  // Update UI Dashboard
+  document.getElementById('dash-target').innerText = `Rp ${totalTarget.toLocaleString('id-ID')}`;
+  document.getElementById('dash-realisasi').innerText = `Rp ${totalRealisasi.toLocaleString('id-ID')}`;
+  document.getElementById('dash-pencapaian').innerText = `${persentase.toFixed(2)}%`;
+  document.getElementById('dash-bar-pencapaian').style.width = `${Math.min(persentase, 100)}%`;
+  
+  const elSisa = document.getElementById('dash-sisa');
+  if (sisaTarget < 0) {
+    elSisa.innerText = `+ Rp ${Math.abs(sisaTarget).toLocaleString('id-ID')} (Surplus)`;
+    elSisa.className = "text-xl font-bold text-emerald-600 mt-1";
+  } else {
+    elSisa.innerText = `Rp ${sisaTarget.toLocaleString('id-ID')}`;
+    elSisa.className = "text-xl font-bold text-amber-600 mt-1";
+  }
+
+  // Update teks keterangan periode
+  const txtPeriode = (startIdx === endIdx) 
+    ? `Bulan: ${NAMA_BULAN[startIdx]}`
+    : `Periode: ${NAMA_BULAN[startIdx]} - ${NAMA_BULAN[endIdx]}`;
+  document.getElementById('dash-info-periode').innerText = txtPeriode;
+}
+
+// ---------------- 6. RENDER TABEL PENDAPATAN ----------------
+function renderTabelPendapatan(data, startIdx, endIdx) {
+  const tbody = document.getElementById('tabelPendapatan');
+  const headerRealisasi = document.getElementById('th-header-realisasi');
+
+  // Update Header Kolom Tabel
+  if (headerRealisasi) {
+    headerRealisasi.innerText = (startIdx === endIdx) 
+      ? `Realisasi (${NAMA_BULAN[startIdx]})`
+      : `Realisasi (${NAMA_BULAN[startIdx].slice(0,3)} - ${NAMA_BULAN[endIdx].slice(0,3)})`;
+  }
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Tidak ada data rekap pendapatan yang cocok dengan filter.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(i => {
+    const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
+    const anggaran = Number(i.anggaran || 0);
+    const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
+    const sisa = anggaran - realisasiPeriode;
+    
+    // Styling jika baris adalah Header / Total
+    const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
+
+    return `
+      <tr class="${isHeaderClass} font-mono">
+        <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
+        <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
+        <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
+        <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
+        <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
+        <td class="p-2.5 text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
+          Rp ${sisa.toLocaleString('id-ID')}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ---------------- 7. RESET FILTER PENDAPATAN ----------------
+function resetFilterPendapatan() {
+  document.getElementById('p_filter_bulan_mulai').value = "0";
+  document.getElementById('p_filter_bulan_selesai').value = "11";
+  
+  const cbAll = document.getElementById('check_uraian_all');
+  if (cbAll) {
+    cbAll.checked = true;
+    toggleSelectAllUraian(cbAll);
+  } else {
+    terapkanFilterPendapatan();
+  }
+}
+
+// ---------------- 8. DOWNLOAD / EXPORT LAPORAN CSV ----------------
+function downloadCSVPendapatan() {
+  if (listFilteredPendapatan.length === 0) {
+    alert('Tidak ada data laporan pendapatan untuk diunduh.');
+    return;
+  }
+
+  const startIdx = parseInt(document.getElementById('p_filter_bulan_mulai').value) || 0;
+  const endIdx = parseInt(document.getElementById('p_filter_bulan_selesai').value) || 11;
+  const labelPeriode = `${NAMA_BULAN[startIdx]}_s.d_${NAMA_BULAN[endIdx]}`;
+
+  const headers = ["Kode Rekening", "Uraian", "Is Header", "Target Anggaran", `Realisasi (${labelPeriode})`, "Pencapaian (%)", "Sisa Target (Rp)"];
+
+  const rows = listFilteredPendapatan.map(i => {
+    const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
+    const anggaran = Number(i.anggaran || 0);
+    const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
+    const sisa = anggaran - realisasiPeriode;
+
+    return [
+      `"${i.kode_rekening || ''}"`,
+      `"${i.uraian || ''}"`,
+      i.is_header ? 'Ya' : 'Tidak',
+      anggaran,
+      realisasiPeriode,
+      persentase,
+      sisa
+    ];
+  });
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Laporan_Rekap_Pendapatan_${labelPeriode}_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Pemanggilan otomatis saat membuka view laporan
+const originalBukaView = window.bukaView;
+window.bukaView = function(viewId) {
+  if (typeof originalBukaView === 'function') originalBukaView(viewId);
+  if (viewId === 'laporan-pendapatan') {
+    loadDataPendapatan();
+  }
+};
+    
     // ---------------- PERHITUNGAN PIUTANG KERJASAMA ----------------
     function hitungKerjasama() {
       const piutang = parseFloat(document.getElementById('k_jumlah').value) || 0;
