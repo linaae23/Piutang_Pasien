@@ -275,83 +275,6 @@
         </form>
       </section>
 
-<!-- MODAL EDIT PENDAPATAN -->
-<div id="modal-edit-pendapatan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-    
-    <!-- Modal Header -->
-    <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-      <h3 class="font-bold text-sm">✏️ Edit Data Rekap Pendapatan</h3>
-      <button onclick="tutupModalEditPendapatan()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
-    </div>
-
-    <!-- Modal Body / Form -->
-    <form id="formEditPendapatan" onsubmit="simpanPerubahanPendapatan(event)" class="p-4 overflow-y-auto space-y-4 text-xs">
-      <input type="hidden" id="edit_id">
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Kode Rekening</label>
-          <input type="text" id="edit_kode_rekening" required class="w-full border p-2 rounded bg-slate-100 font-mono" readonly>
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Parent Kode (Induk)</label>
-          <input type="text" id="edit_parent_kode" class="w-full border p-2 rounded font-mono">
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Uraian / Nama Rekening</label>
-          <input type="text" id="edit_uraian" required class="w-full border p-2 rounded">
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Tipe Rekening</label>
-          <select id="edit_is_header" class="w-full border p-2 rounded bg-white">
-            <option value="false">Detail / Non-Header</option>
-            <option value="true">Header / Induk</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label class="block font-semibold text-slate-700 mb-1">Target Anggaran (Rp)</label>
-        <input type="number" id="edit_anggaran" step="any" required class="w-full border p-2 rounded font-mono">
-      </div>
-
-      <!-- Input Realisasi 12 Bulan -->
-      <div class="border-t pt-3">
-        <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Rp):</p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 font-mono">
-          <div><label>Jan:</label><input type="number" id="edit_jan" class="w-full border p-1.5 rounded"></div>
-          <div><label>Feb:</label><input type="number" id="edit_feb" class="w-full border p-1.5 rounded"></div>
-          <div><label>Mar:</label><input type="number" id="edit_mar" class="w-full border p-1.5 rounded"></div>
-          <div><label>Apr:</label><input type="number" id="edit_apr" class="w-full border p-1.5 rounded"></div>
-          <div><label>Mei:</label><input type="number" id="edit_mei" class="w-full border p-1.5 rounded"></div>
-          <div><label>Jun:</label><input type="number" id="edit_jun" class="w-full border p-1.5 rounded"></div>
-          <div><label>Jul:</label><input type="number" id="edit_jul" class="w-full border p-1.5 rounded"></div>
-          <div><label>Agu:</label><input type="number" id="edit_agu" class="w-full border p-1.5 rounded"></div>
-          <div><label>Sep:</label><input type="number" id="edit_sep" class="w-full border p-1.5 rounded"></div>
-          <div><label>Okt:</label><input type="number" id="edit_okt" class="w-full border p-1.5 rounded"></div>
-          <div><label>Nov:</label><input type="number" id="edit_nov" class="w-full border p-1.5 rounded"></div>
-          <div><label>Des:</label><input type="number" id="edit_des" class="w-full border p-1.5 rounded"></div>
-        </div>
-      </div>
-
-      <!-- Modal Footer Buttons -->
-      <div class="flex justify-end gap-2 border-t pt-3">
-        <button type="button" onclick="tutupModalEditPendapatan()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded">
-          Batal
-        </button>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
-          💾 Simpan Perubahan
-        </button>
-      </div>
-    </form>
-
-  </div>
-</div>
-
       
       <!-- ================= 3. FORM INPUT PIUTANG KERJASAMA ================= -->
       <section id="view-input-kerjasama" class="modul-view hidden">
@@ -669,6 +592,83 @@
     </main>
   </div>
 
+<!-- MODAL EDIT PENDAPATAN -->
+<div id="modal-edit-pendapatan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    
+    <!-- Modal Header -->
+    <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+      <h3 class="font-bold text-sm">✏️ Edit Data Rekap Pendapatan</h3>
+      <button onclick="tutupModalEditPendapatan()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+    </div>
+
+    <!-- Modal Body / Form -->
+    <form id="formEditPendapatan" onsubmit="simpanPerubahanPendapatan(event)" class="p-4 overflow-y-auto space-y-4 text-xs">
+      <input type="hidden" id="edit_id">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Kode Rekening</label>
+          <input type="text" id="edit_kode_rekening" required class="w-full border p-2 rounded bg-slate-100 font-mono" readonly>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Parent Kode (Induk)</label>
+          <input type="text" id="edit_parent_kode" class="w-full border p-2 rounded font-mono">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Uraian / Nama Rekening</label>
+          <input type="text" id="edit_uraian" required class="w-full border p-2 rounded">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Tipe Rekening</label>
+          <select id="edit_is_header" class="w-full border p-2 rounded bg-white">
+            <option value="false">Detail / Non-Header</option>
+            <option value="true">Header / Induk</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-700 mb-1">Target Anggaran (Rp)</label>
+        <input type="number" id="edit_anggaran" step="any" required class="w-full border p-2 rounded font-mono">
+      </div>
+
+      <!-- Input Realisasi 12 Bulan -->
+      <div class="border-t pt-3">
+        <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Rp):</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 font-mono">
+          <div><label>Jan:</label><input type="number" id="edit_jan" class="w-full border p-1.5 rounded"></div>
+          <div><label>Feb:</label><input type="number" id="edit_feb" class="w-full border p-1.5 rounded"></div>
+          <div><label>Mar:</label><input type="number" id="edit_mar" class="w-full border p-1.5 rounded"></div>
+          <div><label>Apr:</label><input type="number" id="edit_apr" class="w-full border p-1.5 rounded"></div>
+          <div><label>Mei:</label><input type="number" id="edit_mei" class="w-full border p-1.5 rounded"></div>
+          <div><label>Jun:</label><input type="number" id="edit_jun" class="w-full border p-1.5 rounded"></div>
+          <div><label>Jul:</label><input type="number" id="edit_jul" class="w-full border p-1.5 rounded"></div>
+          <div><label>Agu:</label><input type="number" id="edit_agu" class="w-full border p-1.5 rounded"></div>
+          <div><label>Sep:</label><input type="number" id="edit_sep" class="w-full border p-1.5 rounded"></div>
+          <div><label>Okt:</label><input type="number" id="edit_okt" class="w-full border p-1.5 rounded"></div>
+          <div><label>Nov:</label><input type="number" id="edit_nov" class="w-full border p-1.5 rounded"></div>
+          <div><label>Des:</label><input type="number" id="edit_des" class="w-full border p-1.5 rounded"></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Buttons -->
+      <div class="flex justify-end gap-2 border-t pt-3">
+        <button type="button" onclick="tutupModalEditPendapatan()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded">
+          Batal
+        </button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
+          💾 Simpan Perubahan
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+  
   <!-- MODAL DETAIL PASIEN -->
   <div id="modalDetail" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
