@@ -522,14 +522,15 @@
   <!-- TABEL LAPORAN PENDAPATAN -->
   <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
     <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-slate-100 font-bold border-b border-slate-300 text-slate-700">
+      <thead class="bg-slate-100 font-bold border-b border-slate-300 text-slate-700">
+        <tr>
           <th class="p-2.5 border-r">Kode Rekening</th>
           <th class="p-2.5 border-r">Uraian</th>
           <th class="p-2.5 border-r text-right">Target Anggaran</th>
           <th class="p-2.5 border-r text-right" id="th-header-realisasi">Realisasi Periode</th>
           <th class="p-2.5 border-r text-center">Pencapaian (%)</th>
           <th class="p-2.5 text-right">Sisa Target (Rp)</th>
+          <th class="p-2.5 text-center">Aksi</th>
         </tr>
       </thead>
       <tbody id="tabelPendapatan" class="divide-y">
@@ -888,47 +889,42 @@ function renderTabelPendapatan(data, startIdx, endIdx) {
   const tbody = document.getElementById('tabelPendapatan');
   const headerRealisasi = document.getElementById('th-header-realisasi');
 
-  // Update Header Kolom Tabel
   if (headerRealisasi) {
     headerRealisasi.innerText = (startIdx === endIdx) 
       ? `Realisasi (${NAMA_BULAN[startIdx]})`
       : `Realisasi (${NAMA_BULAN[startIdx].slice(0,3)} - ${NAMA_BULAN[endIdx].slice(0,3)})`;
   }
 
-  if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Tidak ada data rekap pendapatan yang cocok dengan filter.</td></tr>`;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Tidak ada data rekap pendapatan yang cocok dengan filter.</td></tr>`;
     return;
   }
-// Tambahkan header <th class="p-2.5 text-center">Aksi</th> pada <thead> tabel HTML Anda 
-  // Pada fungsi renderTabelPendapatan, tambahkan kolom tombol Edit di setiap <tr>:
-tbody.innerHTML = data.map(i => {
-  const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
-  const anggaran = Number(i.anggaran || 0);
-  const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
-  const sisa = anggaran - realisasiPeriode;
-  const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
 
-  // Encode JSON item agar aman dimasukkan ke event onclick
-  const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
+  tbody.innerHTML = data.map(i => {
+    const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
+    const anggaran = Number(i.anggaran || 0);
+    const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
+    const sisa = anggaran - realisasiPeriode;
+    const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
 
-  return `
-    <tr class="${isHeaderClass} font-mono">
-      <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
-      <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
-      <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
-      <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
-      <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
-      <td class="p-2.5 border-r text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
-        Rp ${sisa.toLocaleString('id-ID')}
-      </td>
-      <td class="p-2.5 text-center">
-        <button onclick="bukaModalEditPendapatan(${itemJson})" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
-          ✏️ Edit
-        </button>
-      </td>
-    </tr>
-  `;
-}).join('');
+    return `
+      <tr class="${isHeaderClass} font-mono">
+        <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
+        <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
+        <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
+        <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
+        <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
+        <td class="p-2.5 border-r text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
+          Rp ${sisa.toLocaleString('id-ID')}
+        </td>
+        <td class="p-2.5 text-center font-sans">
+          <button type="button" onclick="bukaModalEditPendapatanByKode('${i.kode_rekening}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
+            ✏️ Edit
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // ---------------- 7. RESET FILTER PENDAPATAN ----------------
@@ -994,6 +990,45 @@ window.bukaView = function(viewId) {
     loadDataPendapatan();
   }
 };
+
+
+function bukaModalEditPendapatanByKode(kode) {
+  // Cari item dari array global listMasterPendapatan
+  const item = listMasterPendapatan.find(x => String(x.kode_rekening) === String(kode));
+  
+  if (!item) {
+    alert('Data pendapatan tidak ditemukan!');
+    return;
+  }
+
+  // Isi data ke Form Modal Edit
+  document.getElementById('edit_id').value = item.id || '';
+  document.getElementById('edit_kode_rekening').value = item.kode_rekening || '';
+  document.getElementById('edit_parent_kode').value = item.parent_kode || '';
+  document.getElementById('edit_uraian').value = item.uraian || '';
+  document.getElementById('edit_is_header').value = item.is_header ? 'true' : 'false';
+  document.getElementById('edit_anggaran').value = item.anggaran || 0;
+
+  // Realisasi bulanan
+  document.getElementById('edit_jan').value = item.realisasi_jan || 0;
+  document.getElementById('edit_feb').value = item.realisasi_feb || 0;
+  document.getElementById('edit_mar').value = item.realisasi_mar || 0;
+  document.getElementById('edit_apr').value = item.realisasi_apr || 0;
+  document.getElementById('edit_mei').value = item.realisasi_mei || 0;
+  document.getElementById('edit_jun').value = item.realisasi_jun || 0;
+  document.getElementById('edit_jul').value = item.realisasi_jul || 0;
+  document.getElementById('edit_agu').value = item.realisasi_agu || 0;
+  document.getElementById('edit_sep').value = item.realisasi_sep || 0;
+  document.getElementById('edit_okt').value = item.realisasi_okt || 0;
+  document.getElementById('edit_nov').value = item.realisasi_nov || 0;
+  document.getElementById('edit_des').value = item.realisasi_des || 0;
+
+  // Tampilkan Modal Edit
+  document.getElementById('modal-edit-pendapatan').classList.remove('hidden');
+}
+
+
+
     
     // ---------------- PERHITUNGAN PIUTANG KERJASAMA ----------------
     function hitungKerjasama() {
