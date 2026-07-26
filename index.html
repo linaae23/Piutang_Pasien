@@ -882,6 +882,7 @@ function renderDashboardPendapatan(data, startIdx, endIdx) {
   document.getElementById('dash-info-periode').innerText = txtPeriode;
 }
 
+   
 // ---------------- 6. RENDER TABEL PENDAPATAN ----------------
 function renderTabelPendapatan(data, startIdx, endIdx) {
   const tbody = document.getElementById('tabelPendapatan');
@@ -898,37 +899,36 @@ function renderTabelPendapatan(data, startIdx, endIdx) {
     tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Tidak ada data rekap pendapatan yang cocok dengan filter.</td></tr>`;
     return;
   }
+// Tambahkan header <th class="p-2.5 text-center">Aksi</th> pada <thead> tabel HTML Anda 
+  // Pada fungsi renderTabelPendapatan, tambahkan kolom tombol Edit di setiap <tr>:
+tbody.innerHTML = data.map(i => {
+  const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
+  const anggaran = Number(i.anggaran || 0);
+  const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
+  const sisa = anggaran - realisasiPeriode;
+  const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
 
-  tbody.innerHTML = data.map(i => {
-    const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
-    const anggaran = Number(i.anggaran || 0);
-    const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
-    const sisa = anggaran - realisasiPeriode;
-
-    // Styling jika baris adalah Header / Total
-    const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
-
-    // Encode JSON item agar aman dimasukkan ke event onclick
+  // Encode JSON item agar aman dimasukkan ke event onclick
   const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
 
-    return `
-      <tr class="${isHeaderClass} font-mono">
-        <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
-        <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
-        <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
-        <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
-        <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
-        <td class="p-2.5 text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
-          Rp ${sisa.toLocaleString('id-ID')}
-        </td>
-        <td class="p-2.5 text-center">
+  return `
+    <tr class="${isHeaderClass} font-mono">
+      <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
+      <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
+      <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
+      <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
+      <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
+      <td class="p-2.5 border-r text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
+        Rp ${sisa.toLocaleString('id-ID')}
+      </td>
+      <td class="p-2.5 text-center">
         <button onclick="bukaModalEditPendapatan(${itemJson})" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
           ✏️ Edit
         </button>
       </td>
-      </tr>
-    `;
-  }).join('');
+    </tr>
+  `;
+}).join('');
 }
 
 // ---------------- 7. RESET FILTER PENDAPATAN ----------------
