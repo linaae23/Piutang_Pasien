@@ -1154,59 +1154,59 @@ function bukaModalEditPendapatanByKode(kode) {
 
     // ---------------- FETCH SEMUA DATA LAPORAN ----------------
     async function loadSemuaLaporan() {
-      // 1. Load Data Pasien
-      const { data: dataPasien, error: errPasien } = await supabaseClient.from('piutang_pasien').select('*').order('id', { ascending: false });
-      if (!errPasien && dataPasien) {
-        listDataPasienMaster = dataPasien;
-        terapkanFilterPasien();
-      }
+  // 1. Load Data Pasien
+  const { data: dataPasien, error: errPasien } = await supabaseClient
+    .from('piutang_pasien')
+    .select('*')
+    .order('id', { ascending: false });
+    
+  if (!errPasien && dataPasien) {
+    listDataPasienMaster = dataPasien;
+    terapkanFilterPasien();
+  }
 
-      // 2. Load Data Rekap Pendapatan dari View (v_laporan_pendapatan)
-      const { data: dataP } = await supabaseClient.from('v_laporan_pendapatan').select('*');
-      let totalP = 0;
-      if (dataP && dataP.length > 0) {
-        // Hanya jumlahkan dari baris non-header/root untuk konsolidasi
-        totalP = dataP.reduce((acc, curr) => acc + Number(curr.total_realisasi || 0), 0);
-        
-        document.getElementById('tabelPendapatan').innerHTML = dataP.map(i => `
-          <tr class="hover:bg-slate-50 font-mono">
-            <td class="p-2.5 border-r font-bold text-slate-800">${i.kode_rekening || '-'}</td>
-            <td class="p-2.5 border-r font-sans font-medium text-slate-800">${i.uraian || '-'}</td>
-            <td class="p-2.5 border-r text-right">Rp ${Number(i.anggaran || 0).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${Number(i.total_realisasi || 0).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 border-r text-center font-bold text-blue-600">${i.persentase_pencapaian || 0}%</td>
-            <td class="p-2.5 text-right font-semibold ${Number(i.sisa_anggaran) < 0 ? 'text-red-600' : 'text-slate-700'}">Rp ${Number(i.sisa_anggaran || 0).toLocaleString('id-ID')}</td>
-          </tr>
-        `).join('');
-      } else {
-        document.getElementById('tabelPendapatan').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada data rekap pendapatan.</td></tr>`;
-      }
+  // 2. Load Data Rekap Pendapatan (Gunakan fungsi interaktif baru)
+  await loadDataPendapatan();
 
-      // 3. Load Data Kerjasama
-      const { data: dataK } = await supabaseClient.from('piutang_kerjasama').select('*').order('id', { ascending: false });
-      let totalK = 0;
-      if (dataK) {
-        totalK = dataK.reduce((acc, curr) => acc + Number(curr.sisa_piutang || 0), 0);
-        document.getElementById('tabelKerjasama').innerHTML = dataK.map(i => `
-          <tr class="hover:bg-slate-50">
-            <td class="p-2.5 font-mono">${i.tanggal_tagihan || '-'}</td>
-            <td class="p-2.5 font-mono">${i.no_transaksi || '-'}</td>
-            <td class="p-2.5 font-semibold text-slate-800">${i.nama_instansi || '-'}</td>
-            <td class="p-2.5">Rp ${Number(i.jumlah_piutang).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 text-emerald-600 font-medium">Rp ${Number(i.pembayaran).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 font-bold text-red-600">Rp ${Number(i.sisa_piutang).toLocaleString('id-ID')}</td>
-            <td class="p-2.5 font-semibold">${i.status || 'Belum Lunas'}</td>
-          </tr>
-        `).join('');
-      }
+  // Hitung totalP dari data detail (non-header) untuk Laporan Konsolidasi
+  const dataDetail = listMasterPendapatan.filter(i => i.is_header === false);
+  const targetData = dataDetail.length > 0 ? dataDetail : listMasterPendapatan;
+  
+  const totalP = targetData.reduce((acc, curr) => {
+    // Total realisasi Januari s/d Desember
+    const rowTotal = KEY_BULAN.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
+    return acc + rowTotal;
+  }, 0);
 
-      // 4. Update Laporan Konsolidasi
-      const totalSisaPasien = listDataPasienMaster.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
-      document.getElementById('sum-pendapatan').innerText = `Rp ${totalP.toLocaleString('id-ID')}`;
-      document.getElementById('sum-piutang-kerjasama').innerText = `Rp ${totalK.toLocaleString('id-ID')}`;
-      document.getElementById('sum-piutang-pasien').innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
-      document.getElementById('sum-total-keseluruhan').innerText = `Rp ${(totalP + totalK + totalSisaPasien).toLocaleString('id-ID')}`;
-    }
+  // 3. Load Data Kerjasama
+  const { data: dataK } = await supabaseClient
+    .from('piutang_kerjasama')
+    .select('*')
+    .order('id', { ascending: false });
+    
+  let totalK = 0;
+  if (dataK) {
+    totalK = dataK.reduce((acc, curr) => acc + Number(curr.sisa_piutang || 0), 0);
+    document.getElementById('tabelKerjasama').innerHTML = dataK.map(i => `
+      <tr class="hover:bg-slate-50">
+        <td class="p-2.5 font-mono">${i.tanggal_tagihan || '-'}</td>
+        <td class="p-2.5 font-mono">${i.no_transaksi || '-'}</td>
+        <td class="p-2.5 font-semibold text-slate-800">${i.nama_instansi || '-'}</td>
+        <td class="p-2.5">Rp ${Number(i.jumlah_piutang).toLocaleString('id-ID')}</td>
+        <td class="p-2.5 text-emerald-600 font-medium">Rp ${Number(i.pembayaran).toLocaleString('id-ID')}</td>
+        <td class="p-2.5 font-bold text-red-600">Rp ${Number(i.sisa_piutang).toLocaleString('id-ID')}</td>
+        <td class="p-2.5 font-semibold">${i.status || 'Belum Lunas'}</td>
+      </tr>
+    `).join('');
+  }
+
+  // 4. Update Laporan Konsolidasi
+  const totalSisaPasien = listDataPasienMaster.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
+  document.getElementById('sum-pendapatan').innerText = `Rp ${totalP.toLocaleString('id-ID')}`;
+  document.getElementById('sum-piutang-kerjasama').innerText = `Rp ${totalK.toLocaleString('id-ID')}`;
+  document.getElementById('sum-piutang-pasien').innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
+  document.getElementById('sum-total-keseluruhan').innerText = `Rp ${(totalP + totalK + totalSisaPasien).toLocaleString('id-ID')}`;
+}
 
     // ---------------- FILTER & RENDER LAPORAN PASIEN ----------------
     function terapkanFilterPasien() {
