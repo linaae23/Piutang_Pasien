@@ -275,6 +275,84 @@
         </form>
       </section>
 
+<!-- MODAL EDIT PENDAPATAN -->
+<div id="modal-edit-pendapatan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    
+    <!-- Modal Header -->
+    <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+      <h3 class="font-bold text-sm">✏️ Edit Data Rekap Pendapatan</h3>
+      <button onclick="tutupModalEditPendapatan()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+    </div>
+
+    <!-- Modal Body / Form -->
+    <form id="formEditPendapatan" onsubmit="simpanPerubahanPendapatan(event)" class="p-4 overflow-y-auto space-y-4 text-xs">
+      <input type="hidden" id="edit_id">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Kode Rekening</label>
+          <input type="text" id="edit_kode_rekening" required class="w-full border p-2 rounded bg-slate-100 font-mono" readonly>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Parent Kode (Induk)</label>
+          <input type="text" id="edit_parent_kode" class="w-full border p-2 rounded font-mono">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Uraian / Nama Rekening</label>
+          <input type="text" id="edit_uraian" required class="w-full border p-2 rounded">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Tipe Rekening</label>
+          <select id="edit_is_header" class="w-full border p-2 rounded bg-white">
+            <option value="false">Detail / Non-Header</option>
+            <option value="true">Header / Induk</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-700 mb-1">Target Anggaran (Rp)</label>
+        <input type="number" id="edit_anggaran" step="any" required class="w-full border p-2 rounded font-mono">
+      </div>
+
+      <!-- Input Realisasi 12 Bulan -->
+      <div class="border-t pt-3">
+        <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Rp):</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 font-mono">
+          <div><label>Jan:</label><input type="number" id="edit_jan" class="w-full border p-1.5 rounded"></div>
+          <div><label>Feb:</label><input type="number" id="edit_feb" class="w-full border p-1.5 rounded"></div>
+          <div><label>Mar:</label><input type="number" id="edit_mar" class="w-full border p-1.5 rounded"></div>
+          <div><label>Apr:</label><input type="number" id="edit_apr" class="w-full border p-1.5 rounded"></div>
+          <div><label>Mei:</label><input type="number" id="edit_mei" class="w-full border p-1.5 rounded"></div>
+          <div><label>Jun:</label><input type="number" id="edit_jun" class="w-full border p-1.5 rounded"></div>
+          <div><label>Jul:</label><input type="number" id="edit_jul" class="w-full border p-1.5 rounded"></div>
+          <div><label>Agu:</label><input type="number" id="edit_agu" class="w-full border p-1.5 rounded"></div>
+          <div><label>Sep:</label><input type="number" id="edit_sep" class="w-full border p-1.5 rounded"></div>
+          <div><label>Okt:</label><input type="number" id="edit_okt" class="w-full border p-1.5 rounded"></div>
+          <div><label>Nov:</label><input type="number" id="edit_nov" class="w-full border p-1.5 rounded"></div>
+          <div><label>Des:</label><input type="number" id="edit_des" class="w-full border p-1.5 rounded"></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Buttons -->
+      <div class="flex justify-end gap-2 border-t pt-3">
+        <button type="button" onclick="tutupModalEditPendapatan()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded">
+          Batal
+        </button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
+          💾 Simpan Perubahan
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+      
       <!-- ================= 3. FORM INPUT PIUTANG KERJASAMA ================= -->
       <section id="view-input-kerjasama" class="modul-view hidden">
         <div class="mb-6">
@@ -826,9 +904,12 @@ function renderTabelPendapatan(data, startIdx, endIdx) {
     const anggaran = Number(i.anggaran || 0);
     const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
     const sisa = anggaran - realisasiPeriode;
-    
+
     // Styling jika baris adalah Header / Total
     const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
+
+    // Encode JSON item agar aman dimasukkan ke event onclick
+  const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
 
     return `
       <tr class="${isHeaderClass} font-mono">
@@ -840,6 +921,11 @@ function renderTabelPendapatan(data, startIdx, endIdx) {
         <td class="p-2.5 text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
           Rp ${sisa.toLocaleString('id-ID')}
         </td>
+        <td class="p-2.5 text-center">
+        <button onclick="bukaModalEditPendapatan(${itemJson})" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
+          ✏️ Edit
+        </button>
+      </td>
       </tr>
     `;
   }).join('');
@@ -1166,6 +1252,83 @@ window.bukaView = function(viewId) {
       `).join('');
     }
 
+// 1. Membuka Modal & Mengisi Data Lama ke Form Modal
+function bukaModalEditPendapatan(item) {
+  document.getElementById('edit_id').value = item.id || '';
+  document.getElementById('edit_kode_rekening').value = item.kode_rekening || '';
+  document.getElementById('edit_parent_kode').value = item.parent_kode || '';
+  document.getElementById('edit_uraian').value = item.uraian || '';
+  document.getElementById('edit_is_header').value = item.is_header ? 'true' : 'false';
+  document.getElementById('edit_anggaran').value = item.anggaran || 0;
+
+  // Realisasi bulanan
+  document.getElementById('edit_jan').value = item.realisasi_jan || 0;
+  document.getElementById('edit_feb').value = item.realisasi_feb || 0;
+  document.getElementById('edit_mar').value = item.realisasi_mar || 0;
+  document.getElementById('edit_apr').value = item.realisasi_apr || 0;
+  document.getElementById('edit_mei').value = item.realisasi_mei || 0;
+  document.getElementById('edit_jun').value = item.realisasi_jun || 0;
+  document.getElementById('edit_jul').value = item.realisasi_jul || 0;
+  document.getElementById('edit_agu').value = item.realisasi_agu || 0;
+  document.getElementById('edit_sep').value = item.realisasi_sep || 0;
+  document.getElementById('edit_okt').value = item.realisasi_okt || 0;
+  document.getElementById('edit_nov').value = item.realisasi_nov || 0;
+  document.getElementById('edit_des').value = item.realisasi_des || 0;
+
+  document.getElementById('modal-edit-pendapatan').classList.remove('hidden');
+}
+
+// 2. Menutup Modal
+function tutupModalEditPendapatan() {
+  document.getElementById('modal-edit-pendapatan').classList.add('hidden');
+}
+
+// 3. Mengirimkan Update Data ke Supabase
+async function simpanPerubahanPendapatan(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('edit_id').value;
+  const kodeRekening = document.getElementById('edit_kode_rekening').value;
+  const parentInput = document.getElementById('edit_parent_kode').value.trim();
+
+  const payload = {
+    uraian: document.getElementById('edit_uraian').value.trim(),
+    parent_kode: parentInput !== "" ? parentInput : null, // Mencegah foreign key constraint error
+    is_header: document.getElementById('edit_is_header').value === 'true',
+    anggaran: parseFloat(document.getElementById('edit_anggaran').value) || 0,
+    realisasi_jan: parseFloat(document.getElementById('edit_jan').value) || 0,
+    realisasi_feb: parseFloat(document.getElementById('edit_feb').value) || 0,
+    realisasi_mar: parseFloat(document.getElementById('edit_mar').value) || 0,
+    realisasi_apr: parseFloat(document.getElementById('edit_apr').value) || 0,
+    realisasi_mei: parseFloat(document.getElementById('edit_mei').value) || 0,
+    realisasi_jun: parseFloat(document.getElementById('edit_jun').value) || 0,
+    realisasi_jul: parseFloat(document.getElementById('edit_jul').value) || 0,
+    realisasi_agu: parseFloat(document.getElementById('edit_agu').value) || 0,
+    realisasi_sep: parseFloat(document.getElementById('edit_sep').value) || 0,
+    realisasi_okt: parseFloat(document.getElementById('edit_okt').value) || 0,
+    realisasi_nov: parseFloat(document.getElementById('edit_nov').value) || 0,
+    realisasi_des: parseFloat(document.getElementById('edit_des').value) || 0
+  };
+
+  // Gunakan filter berdasarkan ID (jika ada) atau kode_rekening
+  let query = supabaseClient.from('rekap_pendapatan').update(payload);
+  if (id) {
+    query = query.eq('id', id);
+  } else {
+    query = query.eq('kode_rekening', kodeRekening);
+  }
+
+  const { error } = await query;
+
+  if (error) {
+    alert('Gagal mengedit data: ' + error.message);
+  } else {
+    alert('Data pendapatan berhasil diperbarui!');
+    tutupModalEditPendapatan();
+    loadDataPendapatan(); // Reload tabel & dashboard
+  }
+}
+    
     // ---------------- MODAL DETAIL & EDIT PASIEN ----------------
     function bukaDetailPasien(id) {
       const item = listDataPasienMaster.find(d => d.id === id);
