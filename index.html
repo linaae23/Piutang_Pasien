@@ -771,9 +771,14 @@ async function loadDataPendapatan() {
     return;
   }
 
+  // 1. Simpan data ke variabel global
   listMasterPendapatan = data || [];
+
+  // 2. Generate checkbox pilihan
   renderCheckboxUraian(listMasterPendapatan);
-  terapkanFilterPendapatan();
+
+  // 3. Panggil resetFilterPendapatan() agar tabel & dashboard langsung ter-render otomatis!
+  resetFilterPendapatan(); 
 }
 
 // ---------------- 2. GENERATE FILTER CHECKBOX URAIAN ----------------
