@@ -273,148 +273,142 @@
       </section>
 
       <!-- ================= 3. MODUL PIUTANG KERJA SAMA ================= -->
-      <section id="view-input-kerjasama" class="modul-view hidden space-y-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Form Input Piutang Kerjasama</h1>
-                <p class="text-sm text-gray-500">Masukkan data piutang kerjasama dengan lengkap.</p>
-            </div>
-        <form id="formPiutangKerjasama" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-xs">
-          <input type="hidden" id="edit_id" value="">
-          <!-- Modal Form Piutang Kerja Sama -->
-      <div id="ksFormModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
-          <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
-              <div class="flex justify-between items-center border-b pb-3">
-                  <h3 id="ksModalTitle" class="text-lg font-bold text-gray-800">Form Input Piutang Kerjasama</h3>
-                  <button onclick="closeModalKerjasama()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
-              </div>
+<section id="view-input-kerjasama" class="modul-view hidden space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Form Input Piutang Kerjasama</h1>
+      <p class="text-sm text-gray-500">Masukkan data piutang kerjasama dengan lengkap.</p>
+    </div>
+  </div>
 
-              <form id="ksPiutangForm" onsubmit="simpanPiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                  <input type="hidden" id="ks-edit-id">
+  <!-- Container Form -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+    <form id="ksPiutangForm" onsubmit="simpanPiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+      <input type="hidden" id="ks-edit-id">
 
-                  <div>
-                      <label class="block font-medium mb-1">Tahun Piutang *</label>
-                      <input type="number" id="ks_tahun_piutang" required class="w-full border p-2 rounded">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Bulan Piutang *</label>
-                      <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
-                          <option value="">Pilih Bulan</option>
-                          <option>Januari</option><option>Februari</option><option>Maret</option>
-                          <option>April</option><option>Mei</option><option>Juni</option>
-                          <option>Juli</option><option>Agustus</option><option>September</option>
-                          <option>Oktober</option><option>November</option><option>Desember</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Nama Perusahaan *</label>
-                      <input type="text" id="ks_nama_perusahaan" required class="w-full border p-2 rounded">
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1">Tanggal Surat</label>
-                      <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Kota / Keterangan</label>
-                      <input type="text" id="ks_kota_keterangan" class="w-full border p-2 rounded">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Jenis Layanan</label>
-                      <select id="ks_jenis" class="w-full border p-2 rounded">
-                          <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
-                          <option value="Rawat Inap">Rawat Inap</option>
-                          <option value="Rawat Jalan">Rawat Jalan</option>
-                          <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
-                          <option value="Obat Rawat Inap">Obat Rawat Inap</option>
-                          <option value="BPJS Pelayanan">BPJS Pelayanan</option>
-                          <option value="BPJS Pelayanan Susulan">BPJS Pelayanan Susulan</option>
-                          <option value="BPJS Obat">BPJS Obat</option>
-                          <option value="BPJS Obat Susulan">BPJS Obat Susulan</option>
-                          <option value="BPJS Alkes CAPD">BPJS Alkes CAPD</option>
-                      </select>
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1">Tahun Layanan</label>
-                      <input type="number" id="ks_tahun_layanan" class="w-full border p-2 rounded">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Bulan Layanan</label>
-                      <select id="ks_bulan_layanan" class="w-full border p-2 rounded">
-                          <option value="">Pilih Bulan</option>
-                          <option>Januari</option><option>Februari</option><option>Maret</option>
-                          <option>April</option><option>Mei</option><option>Juni</option>
-                          <option>Juli</option><option>Agustus</option><option>September</option>
-                          <option>Oktober</option><option>November</option><option>Desember</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Jumlah Pasien</label>
-                      <input type="number" id="ks_jumlah_pasien" value="0" class="w-full border p-2 rounded">
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1">Nomor Tagihan</label>
-                      <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
-                  </div>
-                  <div class="col-span-2">
-                      <label class="block font-medium mb-1">Link Dokumen (URL)</label>
-                      <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
-                      <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Tambah (Rp)</label>
-                      <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Koreksi + (Rp)</label>
-                      <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1">Bayar (Rp)</label>
-                      <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Koreksi - (Rp)</label>
-                      <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Biaya Transfer (Rp)</label>
-                      <input type="number" id="ks_biaya_transfer" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-                  </div>
-
-                  <div>
-                      <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
-                      <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Tanggal Bayar</label>
-                      <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
-                  </div>
-                  <div>
-                      <label class="block font-medium mb-1">Status Piutang</label>
-                      <input type="text" id="ks_status" readonly placeholder="Otomatis (Belum Lunas / Lunas)" class="w-full border p-2 rounded bg-gray-100 font-semibold">
-                  </div>
-                  
-                  <div class="col-span-3">
-                      <label class="block font-medium mb-1">Keterangan</label>
-                      <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
-                  </div>
-
-                  <div class="col-span-3 flex justify-end gap-2 border-t pt-3">
-                      <button type="button" onclick="closeModalKerjasama()" class="px-4 py-2 border rounded text-gray-600">Batal</button>
-                      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium">Simpan Data</button>
-                  </div>
-              </form>
-          </div>
+      <div>
+        <label class="block font-medium mb-1">Tahun Piutang *</label>
+        <input type="number" id="ks_tahun_piutang" required class="w-full border p-2 rounded">
       </div>
-      </section>
+      <div>
+        <label class="block font-medium mb-1">Bulan Piutang *</label>
+        <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
+          <option value="">Pilih Bulan</option>
+          <option>Januari</option><option>Februari</option><option>Maret</option>
+          <option>April</option><option>Mei</option><option>Juni</option>
+          <option>Juli</option><option>Agustus</option><option>September</option>
+          <option>Oktober</option><option>November</option><option>Desember</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Nama Perusahaan *</label>
+        <input type="text" id="ks_nama_perusahaan" required class="w-full border p-2 rounded">
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1">Tanggal Surat</label>
+        <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Kota / Keterangan</label>
+        <input type="text" id="ks_kota_keterangan" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Jenis Layanan</label>
+        <select id="ks_jenis" class="w-full border p-2 rounded">
+          <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
+          <option value="Rawat Inap">Rawat Inap</option>
+          <option value="Rawat Jalan">Rawat Jalan</option>
+          <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
+          <option value="Obat Rawat Inap">Obat Rawat Inap</option>
+          <option value="BPJS Pelayanan">BPJS Pelayanan</option>
+          <option value="BPJS Pelayanan Susulan">BPJS Pelayanan Susulan</option>
+          <option value="BPJS Obat">BPJS Obat</option>
+          <option value="BPJS Obat Susulan">BPJS Obat Susulan</option>
+          <option value="BPJS Alkes CAPD">BPJS Alkes CAPD</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1">Tahun Layanan</label>
+        <input type="number" id="ks_tahun_layanan" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Bulan Layanan</label>
+        <select id="ks_bulan_layanan" class="w-full border p-2 rounded">
+          <option value="">Pilih Bulan</option>
+          <option>Januari</option><option>Februari</option><option>Maret</option>
+          <option>April</option><option>Mei</option><option>Juni</option>
+          <option>Juli</option><option>Agustus</option><option>September</option>
+          <option>Oktober</option><option>November</option><option>Desember</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Jumlah Pasien</label>
+        <input type="number" id="ks_jumlah_pasien" value="0" class="w-full border p-2 rounded">
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1">Nomor Tagihan</label>
+        <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
+      </div>
+      <div class="col-span-1 md:col-span-2">
+        <label class="block font-medium mb-1">Link Dokumen (URL)</label>
+        <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
+        <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Tambah (Rp)</label>
+        <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Koreksi + (Rp)</label>
+        <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1">Bayar (Rp)</label>
+        <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Koreksi - (Rp)</label>
+        <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Biaya Transfer (Rp)</label>
+        <input type="number" id="ks_biaya_transfer" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+
+      <div>
+        <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
+        <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Tanggal Bayar</label>
+        <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Status Piutang</label>
+        <input type="text" id="ks_status" readonly placeholder="Otomatis (Belum Lunas / Lunas)" class="w-full border p-2 rounded bg-gray-100 font-semibold">
+      </div>
+      
+      <div class="col-span-1 md:col-span-3">
+        <label class="block font-medium mb-1">Keterangan</label>
+        <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
+      </div>
+
+      <div class="col-span-1 md:col-span-3 flex justify-end gap-2 border-t pt-3">
+        <button type="reset" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data</button>
+      </div>
+    </form>
+  </div>
+</section>
 
     
       <!-- ================= 4. LAPORAN PIUTANG PASIEN ================= -->
