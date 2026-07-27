@@ -1452,36 +1452,51 @@
     }
 
     function editPiutangKerjasama(id) {
-        const row = ksCurrentData.find(item => item.id === id);
-        if (!row) return;
-
-        document.getElementById('ks-edit-id').value = row.id;
-        document.getElementById('ksModalTitle').innerText = 'Koreksi / Edit Piutang Kerjasama';
-        document.getElementById('ks_tahun_piutang').value = row.tahun_piutang || '';
-        document.getElementById('ks_bulan_piutang').value = row.bulan_piutang || '';
-        document.getElementById('ks_nama_perusahaan').value = row.nama_perusahaan || '';
-        document.getElementById('ks_tanggal_surat').value = row.tanggal_surat || '';
-        document.getElementById('ks_kota_keterangan').value = row.kota_keterangan || '';
-        document.getElementById('ks_jenis').value = row.jenis || 'Rawat Inap & Rawat Jalan';
-        document.getElementById('ks_tahun_layanan').value = row.tahun_layanan || '';
-        document.getElementById('ks_bulan_layanan').value = row.bulan_layanan || '';
-        document.getElementById('ks_jumlah_pasien').value = row.jumlah_pasien || 0;
-        document.getElementById('ks_nomor_tagihan').value = row.nomor_tagihan || '';
-        document.getElementById('ks_link_dokumen').value = row.link_dokumen || '';
-        document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;
-        document.getElementById('ks_tambah').value = row.tambah || 0;
-        document.getElementById('ks_koreksi_plus').value = row.koreksi_plus || 0;
-        document.getElementById('ks_bayar').value = row.bayar || 0;
-        document.getElementById('ks_koreksi_minus').value = row.koreksi_minus || 0;
-        document.getElementById('ks_biaya_transfer').value = row.biaya_transfer || 0;
-        document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
-        document.getElementById('ks_status').value = row.status || 'Belum Lunas';
-        document.getElementById('ks_keterangan').value = row.keterangan || '';
-
-        calcSaldoAkhirKerjasama();
-        document.getElementById('ksFormModal').classList.remove('hidden');
+    // 1. Cari data berdasarkan ID (Gunakan == agar aman dari perbedaan tipe string/number)
+    const row = ksCurrentData.find(item => item.id == id);
+    if (!row) {
+        alert('Data tidak ditemukan!');
+        return;
     }
 
+        // 2. Isi nilai ke form input
+    document.getElementById('ks-edit-id').value = row.id;
+    document.getElementById('ks_tahun_piutang').value = row.tahun_piutang || '';
+    document.getElementById('ks_bulan_piutang').value = row.bulan_piutang || '';
+    document.getElementById('ks_nama_perusahaan').value = row.nama_perusahaan || '';
+    document.getElementById('ks_tanggal_surat').value = row.tanggal_surat || '';
+    document.getElementById('ks_kota_keterangan').value = row.kota_keterangan || '';
+    document.getElementById('ks_jenis').value = row.jenis || 'Rawat Inap & Rawat Jalan';
+    document.getElementById('ks_tahun_layanan').value = row.tahun_layanan || '';
+    document.getElementById('ks_bulan_layanan').value = row.bulan_layanan || '';
+    document.getElementById('ks_jumlah_pasien').value = row.jumlah_pasien || 0;
+    document.getElementById('ks_nomor_tagihan').value = row.nomor_tagihan || '';
+    document.getElementById('ks_link_dokumen').value = row.link_dokumen || '';
+    document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;
+    document.getElementById('ks_tambah').value = row.tambah || 0;
+    document.getElementById('ks_koreksi_plus').value = row.koreksi_plus || 0;
+    document.getElementById('ks_bayar').value = row.bayar || 0;
+    document.getElementById('ks_koreksi_minus').value = row.koreksi_minus || 0;
+    document.getElementById('ks_biaya_transfer').value = row.biaya_transfer || 0;
+    document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
+    document.getElementById('ks_status').value = row.status || 'Belum Lunas';
+    document.getElementById('ks_keterangan').value = row.keterangan || '';
+
+        // 3. Jalankan ulang estimasi kalkulasi tampilan
+    if (typeof calcSaldoAkhirKerjasama === 'function') {
+        calcSaldoAkhirKerjasama();
+    }
+// 4. Buka halaman Form Input Piutang Kerjasama & scroll ke atas
+    if (typeof bukaView === 'function') {
+        bukaView('input-kerjasama');
+    } else {
+        // Fallback jika tidak menggunakan bukaView
+        const viewInput = document.getElementById('view-input-kerjasama');
+        if (viewInput) viewInput.classList.remove('hidden');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
     async function deletePiutangKerjasama(id) {
         if (confirm('Yakin ingin menghapus data piutang kerjasama ini?')) {
             const { error } = await supabaseClient.from('piutang_kerjasama').delete().eq('id', id);
