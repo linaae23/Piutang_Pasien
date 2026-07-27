@@ -1432,7 +1432,15 @@ function renderDashboardKerjasama(data) {
 }
 
 // Simpan Data (Insert / Update)
-async function simpanPiutangKerjasama() {
+async function simpanPiutangKerjasama(event) {
+  // 🛑 1. Wajib: Cegah browser melakukan reload/refresh halaman
+    if (event) event.preventDefault();
+  
+// --- Proses validasi & pengiriman data ke database ---
+    const { data, error } = await supabase
+        .from('piutang_kerjasama')
+        .insert([ dataPayload ]);
+  
     const nilaiKlaim = parseFloat(document.getElementById('ks_nilai_klaim').value) || 0;
     const totalBayar = parseFloat(document.getElementById('ks_pembayaran').value) || 0;
     const saldoAkhir = nilaiKlaim - totalBayar;
@@ -1458,8 +1466,16 @@ async function simpanPiutangKerjasama() {
     if (error) {
         alert('Gagal menyimpan data: ' + error.message);
     } else {
-        closeModalKerjasama();
-        fetchPiutangKerjasama();
+        alert('Data Piutang Kerja Sama berhasil disimpan!');
+        
+        // 2. Tutup Modal Form
+        tutupModalKerjasama(); 
+        
+        // 3. Reset Filter & Muat Ulang Data (Agar data baru langsung kelihatan)
+        resetFilterKerjasama(); 
+
+        // 4. Pastikan tampilan tetap di tab Input Piutang Kerja Sama
+        showSection('input-piutang-kerjasama'); // Sesuaikan dengan fungsi navigasi tab Anda
     }
 }
 
