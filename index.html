@@ -913,18 +913,38 @@
     let listDataKerjasamaFiltered = [];
 
     // NAVIGASI VIEW
-    function bukaView(viewId) {
-      document.querySelectorAll('.modul-view').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`view-${viewId}`).classList.remove('hidden');
+    function bukaView(viewName) {
+  // 1. Sembunyikan seluruh modul view
+  document.querySelectorAll('.modul-view').forEach(view => {
+    view.classList.add('hidden');
+  });
 
-      document.querySelectorAll('nav button').forEach(btn => {
-        btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2";
-      });
+  // 2. Tampilkan section view yang dipilih
+  const targetView = document.getElementById(`view-${viewName}`);
+  if (targetView) {
+    targetView.classList.remove('hidden');
+  }
 
-      const activeBtn = document.getElementById(`btn-${viewId}`);
-      if (activeBtn) {
-        activeBtn.className = "w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2";
-      }
+  // 3. Reset warna semua tombol sidebar ke tampilan default
+  document.querySelectorAll('aside nav button').forEach(btn => {
+    btn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2';
+  });
+
+  // 4. Highlight tombol aktif dengan warna shadow (khusus konsolidasi pakai warna amber)
+  const activeBtn = document.getElementById(`btn-${viewName}`);
+  if (activeBtn) {
+    if (viewName === 'laporan-gabungan') {
+      activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-amber-500 text-white font-semibold shadow-lg shadow-amber-500/30 transition flex items-center gap-2';
+    } else {
+      activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30 transition flex items-center gap-2';
+    }
+  }
+
+  // 5. Jalankan kalkulasi otomatis jika menu Laporan Gabungan diklik
+  if (viewName === 'laporan-gabungan') {
+    updateLaporanKonsolidasi();
+  }
+}
 
       loadSemuaLaporan();
     }
@@ -1555,7 +1575,29 @@ function exportCSVKerjasama() {
     link.click();
     document.body.removeChild(link);
 }
+   //Buat Fungsi Perhitungan yang Aman// 
+function updateLaporanKonsolidasi() {
+  // Safeguard: Pastikan variabel/array terdefinisi agar tidak crash/error
+  const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
+  const nilP = (typeof totalP !== 'undefined' && !isNaN(totalP)) ? Number(totalP) : 0;
+  const nilK = (typeof totalK !== 'undefined' && !isNaN(totalK)) ? Number(totalK) : 0;
 
+  // Hitung sisa piutang pasien
+  const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
+  const totalKeseluruhan = nilP + nilK + totalSisaPasien;
+
+  // Cek ketersediaan elemen DOM sebelum mengisi nilai
+  const elPendapatan = document.getElementById('sum-pendapatan');
+  const elPiutangKerjasama = document.getElementById('sum-piutang-kerjasama');
+  const elPiutangPasien = document.getElementById('sum-piutang-pasien');
+  const elTotalKeseluruhan = document.getElementById('sum-total-keseluruhan');
+
+  if (elPendapatan) elPendapatan.innerText = `Rp ${nilP.toLocaleString('id-ID')}`;
+  if (elPiutangKerjasama) elPiutangKerjasama.innerText = `Rp ${nilK.toLocaleString('id-ID')}`;
+  if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
+  if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
+}
+    
     // ---------------- SUBMIT HANDLER PASIEN & PENDAPATAN ----------------
     document.getElementById('formPiutangPasien').addEventListener('submit', async (e) => {
       e.preventDefault();
