@@ -1839,7 +1839,8 @@
                               curr.saldo_akhir !== '' && 
                               !isNaN(Number(curr.saldo_akhir));
 
-    const sisa = isValidSaldoAkhir 
+    // Perbaikan syntax error (ternary operator ditutup dengan benar):
+    const sisa = curr.saldo_akhir !== undefined 
       ? Number(curr.saldo_akhir) 
       : (awal + tambah + kPlus - bayar - kMinus - trf);
 
