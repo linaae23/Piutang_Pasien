@@ -521,14 +521,17 @@
                 <label class="block font-medium mb-1">Tanggal Bayar</label>
                 <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
             </div>
-            <div>
-                <label class="block font-medium mb-1">Status Piutang</label>
-                <select id="ks_status" class="w-full border p-2 rounded">
-                    <option value="Belum Lunas">Belum Lunas</option>
-                    <option value="Lunas">Lunas</option>
-                </select>
-            </div>
-
+            <div class="mb-3">
+    <label for="ks_status" class="form-label">Status Piutang</label>
+    <input 
+        type="text" 
+        id="ks_status" 
+        class="form-control" 
+        readonly 
+        placeholder="Otomatis (Belum Lunas / Lunas)" 
+    />
+</div>
+            
             <div class="col-span-3">
                 <label class="block font-medium mb-1">Keterangan</label>
                 <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
@@ -1291,15 +1294,22 @@ function fmtKS(num) {
 
 // Hitung Saldo Akhir Realtime di Modal
 function calcSaldoAkhirKerjasama() {
-    const awal = parseFloat(document.getElementById('ks_saldo_awal').value) || 0;
-    const tambah = parseFloat(document.getElementById('ks_tambah').value) || 0;
-    const kPlus = parseFloat(document.getElementById('ks_koreksi_plus').value) || 0;
-    const bayar = parseFloat(document.getElementById('ks_bayar').value) || 0;
-    const kMinus = parseFloat(document.getElementById('ks_koreksi_minus').value) || 0;
-    const trf = parseFloat(document.getElementById('ks_biaya_transfer').value) || 0;
+    const nilaiKlaim = parseFloat(document.getElementById('ks_nilai_klaim').value) || 0;
+    const totalBayar = parseFloat(document.getElementById('ks_pembayaran').value) || 0;
+    
+    // Hitung Saldo Akhir
+    const saldoAkhir = nilaiKlaim - totalBayar;
+    document.getElementById('ks_saldo_akhir').value = saldoAkhir;
 
-    const akhir = awal + tambah + kPlus - bayar - kMinus - trf;
-    document.getElementById('ks_saldo_akhir_preview').value = fmtKS(akhir);
+    // 💡 RUMUS OTOMATIS STATUS
+    // Jika saldo akhir > 0 (belum nol), status = "Belum Lunas". Jika 0 atau kurang, status = "Lunas"
+    const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+
+    // Set nilai status otomatis ke input form
+    const inputStatus = document.getElementById('ks_status');
+    if (inputStatus) {
+        inputStatus.value = statusOtomatis;
+    }
 }
 
 // Fetch Data dengan Filter Kombinasi
@@ -1422,31 +1432,20 @@ function renderDashboardKerjasama(data) {
 }
 
 // Simpan Data (Insert / Update)
-async function savePiutangKerjasama(e) {
-    e.preventDefault();
-    const id = document.getElementById('ks-edit-id').value;
+async function simpanPiutangKerjasama() {
+    const nilaiKlaim = parseFloat(document.getElementById('ks_nilai_klaim').value) || 0;
+    const totalBayar = parseFloat(document.getElementById('ks_pembayaran').value) || 0;
+    const saldoAkhir = nilaiKlaim - totalBayar;
 
-    const payload = {
-        tahun_piutang: parseInt(document.getElementById('ks_tahun_piutang').value),
-        bulan_piutang: document.getElementById('ks_bulan_piutang').value,
-        nama_perusahaan: document.getElementById('ks_nama_perusahaan').value,
-        tanggal_surat: document.getElementById('ks_tanggal_surat').value || null,
-        kota_keterangan: document.getElementById('ks_kota_keterangan').value || null,
-        jenis: document.getElementById('ks_jenis').value,
-        tahun_layanan: document.getElementById('ks_tahun_layanan').value ? parseInt(document.getElementById('ks_tahun_layanan').value) : null,
-        bulan_layanan: document.getElementById('ks_bulan_layanan').value || null,
-        jumlah_pasien: parseInt(document.getElementById('ks_jumlah_pasien').value) || 0,
-        nomor_tagihan: document.getElementById('ks_nomor_tagihan').value || null,
-        link_dokumen: document.getElementById('ks_link_dokumen').value || null,
-        saldo_awal: parseFloat(document.getElementById('ks_saldo_awal').value) || 0,
-        tambah: parseFloat(document.getElementById('ks_tambah').value) || 0,
-        koreksi_plus: parseFloat(document.getElementById('ks_koreksi_plus').value) || 0,
-        bayar: parseFloat(document.getElementById('ks_bayar').value) || 0,
-        koreksi_minus: parseFloat(document.getElementById('ks_koreksi_minus').value) || 0,
-        biaya_transfer: parseFloat(document.getElementById('ks_biaya_transfer').value) || 0,
-        tanggal_bayar: document.getElementById('ks_tanggal_bayar').value || null,
-        status: document.getElementById('ks_status').value,
-        keterangan: document.getElementById('ks_keterangan').value || null
+    // 💡 Penentuan Status Otomatis
+    const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+
+    const dataPayload = {
+        // ... field data lainnya ...
+        nilai_klaim: nilaiKlaim,
+        pembayaran: totalBayar,
+        saldo_akhir: saldoAkhir,
+        status: statusOtomatis // Saved automatically
     };
 
     let error;
