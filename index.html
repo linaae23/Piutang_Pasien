@@ -1803,19 +1803,24 @@
     }
 
     function updateLaporanKonsolidasi() {
-      const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
-      
-      const dataDetailPendapatan = (typeof listMasterPendapatan !== 'undefined' && Array.isArray(listMasterPendapatan)) 
-        ? listMasterPendapatan.filter(i => i.is_header === false) 
-        : [];
-      const targetData = dataDetailPendapatan.length > 0 ? dataDetailPendapatan : (listMasterPendapatan || []);
-      
-      const nilP = targetData.reduce((acc, curr) => {
-        const rowTotal = KEY_BULAN.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
-        return acc + rowTotal;
-      }, 0);
-      
-// 1. DUKUNGAN FALLBACK VARIABEL (Mencegah Array Kosong)
+  // 1. Data Pasien
+  const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) 
+    ? listDataPasienMaster 
+    : [];
+
+  // 2. Data Pendapatan
+  const dataDetailPendapatan = (typeof listMasterPendapatan !== 'undefined' && Array.isArray(listMasterPendapatan)) 
+    ? listMasterPendapatan.filter(i => i.is_header === false) 
+    : [];
+  const targetData = dataDetailPendapatan.length > 0 ? dataDetailPendapatan : (typeof listMasterPendapatan !== 'undefined' ? listMasterPendapatan : []);
+
+  const nilP = targetData.reduce((acc, curr) => {
+    const keys = typeof KEY_BULAN !== 'undefined' ? KEY_BULAN : [];
+    const rowTotal = keys.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
+    return acc + rowTotal;
+  }, 0);
+
+  // 3. Data Kerjasama (Fallback tunggal tanpa deklarasi ganda)
   let dataKerjasama = [];
   if (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster) && listDataKerjasamaMaster.length > 0) {
     dataKerjasama = listDataKerjasamaMaster;
@@ -1824,42 +1829,43 @@
   } else if (typeof listKerjasamaMaster !== 'undefined' && Array.isArray(listKerjasamaMaster)) {
     dataKerjasama = listKerjasamaMaster;
   }
-      const dataKerjasama = (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster)) ? listDataKerjasamaMaster : [];
-      const nilK = dataKerjasama.reduce((acc, curr) => {
-        const awal = Number(curr.saldo_awal) || 0;
-        const tambah = Number(curr.tambah) || 0;
-        const kPlus = Number(curr.koreksi_plus) || 0;
-        const bayar = Number(curr.bayar) || 0;
-        const kMinus = Number(curr.koreksi_minus) || 0;
-        const trf = Number(curr.biaya_transfer) || 0;
-        
-        // Pastikan saldo_akhir benar-benar berisi angka valid (bukan null, undefined, atau string kosong)
+
+  const nilK = dataKerjasama.reduce((acc, curr) => {
+    const awal = Number(curr.saldo_awal) || 0;
+    const tambah = Number(curr.tambah) || 0;
+    const kPlus = Number(curr.koreksi_plus) || 0;
+    const bayar = Number(curr.bayar) || 0;
+    const kMinus = Number(curr.koreksi_minus) || 0;
+    const trf = Number(curr.biaya_transfer) || 0;
+
+    // Gunakan pengecekan validitas saldo_akhir dengan benar
     const isValidSaldoAkhir = curr.saldo_akhir !== null && 
                               curr.saldo_akhir !== undefined && 
                               curr.saldo_akhir !== '' && 
                               !isNaN(Number(curr.saldo_akhir));
 
-    // Perbaikan syntax error (ternary operator ditutup dengan benar):
-    const sisa = curr.saldo_akhir !== undefined 
+    const sisa = isValidSaldoAkhir 
       ? Number(curr.saldo_akhir) 
       : (awal + tambah + kPlus - bayar - kMinus - trf);
 
     return acc + sisa;
   }, 0);
 
-      const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
-      const totalKeseluruhan = nilP + nilK + totalSisaPasien;
+  // 4. Hitung Total Pasien & Keseluruhan
+  const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
+  const totalKeseluruhan = nilP + nilK + totalSisaPasien;
 
-      const elPendapatan = document.getElementById('sum-pendapatan');
-      const elPiutangKerjasama = document.getElementById('sum-piutang-kerjasama');
-      const elPiutangPasien = document.getElementById('sum-piutang-pasien');
-      const elTotalKeseluruhan = document.getElementById('sum-total-keseluruhan');
+  // 5. Update Tampilan HTML
+  const elPendapatan = document.getElementById('sum-pendapatan');
+  const elPiutangKerjasama = document.getElementById('sum-piutang-kerjasama');
+  const elPiutangPasien = document.getElementById('sum-piutang-pasien');
+  const elTotalKeseluruhan = document.getElementById('sum-total-keseluruhan');
 
-      if (elPendapatan) elPendapatan.innerText = `Rp ${nilP.toLocaleString('id-ID')}`;
-      if (elPiutangKerjasama) elPiutangKerjasama.innerText = `Rp ${nilK.toLocaleString('id-ID')}`;
-      if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
-      if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
-    }
+  if (elPendapatan) elPendapatan.innerText = `Rp ${nilP.toLocaleString('id-ID')}`;
+  if (elPiutangKerjasama) elPiutangKerjasama.innerText = `Rp ${nilK.toLocaleString('id-ID')}`;
+  if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
+  if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
+}
 
     // ---------------- SUBMIT HANDLER PASIEN & PENDAPATAN ----------------
     document.getElementById('formPiutangPasien').addEventListener('submit', async (e) => {
