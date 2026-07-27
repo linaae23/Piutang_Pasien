@@ -763,7 +763,7 @@
             📥 Export Laporan Kerjasama (CSV)
           </button>
         </div>
-
+</section>
         <!-- STATISTIK RINGKASAN KERJASAMA -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -1304,7 +1304,7 @@ function calcSaldoAkhirKerjasama() {
 
 // Fetch Data dengan Filter Kombinasi
 async function fetchPiutangKerjasama() {
-    let query = supabase.from('piutang_kerjasama').select('*').order('created_at', { ascending: false });
+    let query = supabaseClient.from('piutang_kerjasama').select('*').order('created_at', { ascending: false });
 
     const thnPiutang = document.getElementById('f-ks-tahun-piutang').value;
     const blnPiutang = document.getElementById('f-ks-bulan-piutang').value;
@@ -1451,9 +1451,9 @@ async function savePiutangKerjasama(e) {
 
     let error;
     if (id) {
-        ({ error } = await supabase.from('piutang_kerjasama').update(payload).eq('id', id));
+        ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', id));
     } else {
-        ({ error } = await supabase.from('piutang_kerjasama').insert([payload]));
+        ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
     }
 
     if (error) {
@@ -1499,7 +1499,7 @@ function editPiutangKerjasama(id) {
 // Hapus Baris
 async function deletePiutangKerjasama(id) {
     if (confirm('Yakin ingin menghapus data piutang kerjasama ini?')) {
-        const { error } = await supabase.from('piutang_kerjasama').delete().eq('id', id);
+        const { error } = await supabaseClient.from('piutang_kerjasama').delete().eq('id', id);
         if (error) alert('Gagal menghapus: ' + error.message);
         else fetchPiutangKerjasama();
     }
