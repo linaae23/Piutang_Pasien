@@ -1814,7 +1814,16 @@
         const rowTotal = KEY_BULAN.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
         return acc + rowTotal;
       }, 0);
-
+      
+// 1. DUKUNGAN FALLBACK VARIABEL (Mencegah Array Kosong)
+  let dataKerjasama = [];
+  if (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster) && listDataKerjasamaMaster.length > 0) {
+    dataKerjasama = listDataKerjasamaMaster;
+  } else if (typeof ksCurrentData !== 'undefined' && Array.isArray(ksCurrentData)) {
+    dataKerjasama = ksCurrentData;
+  } else if (typeof listKerjasamaMaster !== 'undefined' && Array.isArray(listKerjasamaMaster)) {
+    dataKerjasama = listKerjasamaMaster;
+  }
       const dataKerjasama = (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster)) ? listDataKerjasamaMaster : [];
       const nilK = dataKerjasama.reduce((acc, curr) => {
         const awal = Number(curr.saldo_awal) || 0;
@@ -1823,9 +1832,19 @@
         const bayar = Number(curr.bayar) || 0;
         const kMinus = Number(curr.koreksi_minus) || 0;
         const trf = Number(curr.biaya_transfer) || 0;
-        const sisa = curr.saldo_akhir !== undefined ? Number(curr.saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
-        return acc + sisa;
-      }, 0);
+        
+        // Pastikan saldo_akhir benar-benar berisi angka valid (bukan null, undefined, atau string kosong)
+    const isValidSaldoAkhir = curr.saldo_akhir !== null && 
+                              curr.saldo_akhir !== undefined && 
+                              curr.saldo_akhir !== '' && 
+                              !isNaN(Number(curr.saldo_akhir));
+
+    const sisa = isValidSaldoAkhir 
+      ? Number(curr.saldo_akhir) 
+      : (awal + tambah + kPlus - bayar - kMinus - trf);
+
+    return acc + sisa;
+  }, 0);
 
       const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
       const totalKeseluruhan = nilP + nilK + totalSisaPasien;
