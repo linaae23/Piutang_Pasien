@@ -272,278 +272,264 @@
         </form>
       </section>
 
-<!-- ========================================== -->
-<!-- MODUL: PIUTANG KERJA SAMA                  -->
-<!-- ========================================== -->
-<section id="view-input-kerjasama" class="modul-view hidden space-y-6">
-    
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Dashboard Piutang Kerja Sama</h1>
-            <p class="text-sm text-gray-500">Kelola piutang, pelunasan, dan rekapitulasi data kerjasama.</p>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 shadow">
-                📥 Unduh Laporan
-            </button>
-            <button onclick="openModalKerjasama()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow">
-                + Tambah Piutang
-            </button>
-        </div>
-    </div>
-
-    <!-- Dashboard Widgets -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-            <p class="text-sm font-medium text-gray-500">Total Piutang (Kotor)</p>
-            <h3 id="dash-ks-total-piutang" class="text-2xl font-bold text-blue-600 mt-1">Rp 0</h3>
-            <p class="text-xs text-gray-400 mt-1">Saldo Awal + Tambah + Koreksi(+)</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-            <p class="text-sm font-medium text-gray-500">Total Pembayaran</p>
-            <h3 id="dash-ks-total-bayar" class="text-2xl font-bold text-emerald-600 mt-1">Rp 0</h3>
-            <p class="text-xs text-gray-400 mt-1">Total Dana Diterima</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-            <p class="text-sm font-medium text-gray-500">Saldo Akhir Piutang</p>
-            <h3 id="dash-ks-saldo-akhir" class="text-2xl font-bold text-rose-600 mt-1">Rp 0</h3>
-            <p class="text-xs text-gray-400 mt-1">Sisa Piutang Berjalan</p>
-        </div>
-    </div>
-
-    <!-- Panel Filter Kombinasi -->
-    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-        <h2 class="text-base font-semibold text-gray-700">Filter Data Piutang Kerja Sama</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+      <!-- ================= 3. MODUL PIUTANG KERJA SAMA ================= -->
+      <section id="view-input-kerjasama" class="modul-view hidden space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Thn Piutang</label>
-                <input type="number" id="f-ks-tahun-piutang" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                <h1 class="text-2xl font-bold text-gray-900">Dashboard Piutang Kerja Sama</h1>
+                <p class="text-sm text-gray-500">Kelola piutang, pelunasan, dan rekapitulasi data kerjasama.</p>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Bln Piutang</label>
-                <select id="f-ks-bulan-piutang" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                    <option value="">-- Semua Bulan --</option>
-                    <option>Januari</option><option>Februari</option><option>Maret</option>
-                    <option>April</option><option>Mei</option><option>Juni</option>
-                    <option>Juli</option><option>Agustus</option><option>September</option>
-                    <option>Oktober</option><option>November</option><option>Desember</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Thn Layanan</label>
-                <input type="number" id="f-ks-tahun-layanan" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Bln Layanan</label>
-                <select id="f-ks-bulan-layanan" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                    <option value="">-- Semua Bulan --</option>
-                    <option>Januari</option><option>Februari</option><option>Maret</option>
-                    <option>April</option><option>Mei</option><option>Juni</option>
-                    <option>Juli</option><option>Agustus</option><option>September</option>
-                    <option>Oktober</option><option>November</option><option>Desember</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perusahaan</label>
-                <input type="text" id="f-ks-perusahaan" placeholder="Cari Perusahaan..." class="w-full text-sm border-gray-300 rounded-md border p-2">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                <select id="f-ks-status" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                    <option value="">-- Semua Status --</option>
-                    <option value="Lunas">Lunas</option>
-                    <option value="Belum Lunas">Belum Lunas</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Awal)</label>
-                <input type="date" id="f-ks-bayar-start" class="w-full text-sm border-gray-300 rounded-md border p-2">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Akhir)</label>
-                <input type="date" id="f-ks-bayar-end" class="w-full text-sm border-gray-300 rounded-md border p-2">
+            <div class="flex gap-2">
+                <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 shadow">
+                    📥 Unduh Laporan
+                </button>
+                <button onclick="openModalKerjasama()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow">
+                    + Tambah Piutang
+                </button>
             </div>
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-            <button onclick="resetFilterKerjasama()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md border">Reset Filter</button>
-            <button onclick="fetchPiutangKerjasama()" class="px-4 py-1.5 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-md">Terapkan Filter</button>
-        </div>
-    </div>
 
-    <!-- Data Table -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-        <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
-                <tr>
-                    <th class="p-3">Periode Piutang</th>
-                    <th class="p-3">Perusahaan</th>
-                    <th class="p-3">Tgl Surat</th>
-                    <th class="p-3">Kota / Ket</th>
-                    <th class="p-3">Jenis</th>
-                    <th class="p-3">Periode Layanan</th>
-                    <th class="p-3 text-center">Pasien</th>
-                    <th class="p-3">No. Tagihan</th>
-                    <th class="p-3">Dokumen</th>
-                    <th class="p-3 text-right">Saldo Awal</th>
-                    <th class="p-3 text-right">Tambah</th>
-                    <th class="p-3 text-right">Koreksi (+)</th>
-                    <th class="p-3 text-right">Bayar</th>
-                    <th class="p-3 text-right">Koreksi (-)</th>
-                    <th class="p-3 text-right">Biaya Trf</th>
-                    <th class="p-3 text-right">Saldo Akhir</th>
-                    <th class="p-3">Tgl Bayar</th>
-                    <th class="p-3 text-center">Status</th>
-                    <th class="p-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="ks-table-body" class="divide-y divide-gray-100">
-                <!-- Dynamic Data Rows -->
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<!-- Modal Form Piutang Kerja Sama -->
-<div id="ksFormModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-            <h3 id="ksModalTitle" class="text-lg font-bold text-gray-800">Form Input Piutang Kerjasama</h3>
-            <button onclick="closeModalKerjasama()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Piutang (Kotor)</p>
+                <h3 id="dash-ks-total-piutang" class="text-2xl font-bold text-blue-600 mt-1">Rp 0</h3>
+                <p class="text-xs text-gray-400 mt-1">Saldo Awal + Tambah + Koreksi(+)</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Pembayaran</p>
+                <h3 id="dash-ks-total-bayar" class="text-2xl font-bold text-emerald-600 mt-1">Rp 0</h3>
+                <p class="text-xs text-gray-400 mt-1">Total Dana Diterima</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Saldo Akhir Piutang</p>
+                <h3 id="dash-ks-saldo-akhir" class="text-2xl font-bold text-rose-600 mt-1">Rp 0</h3>
+                <p class="text-xs text-gray-400 mt-1">Sisa Piutang Berjalan</p>
+            </div>
         </div>
 
-        <form id="ksPiutangForm" onsubmit="savePiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <input type="hidden" id="ks-edit-id">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <h2 class="text-base font-semibold text-gray-700">Filter Data Piutang Kerja Sama</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Thn Piutang</label>
+                    <input type="number" id="f-ks-tahun-piutang" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Bln Piutang</label>
+                    <select id="f-ks-bulan-piutang" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                        <option value="">-- Semua Bulan --</option>
+                        <option>Januari</option><option>Februari</option><option>Maret</option>
+                        <option>April</option><option>Mei</option><option>Juni</option>
+                        <option>Juli</option><option>Agustus</option><option>September</option>
+                        <option>Oktober</option><option>November</option><option>Desember</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Thn Layanan</label>
+                    <input type="number" id="f-ks-tahun-layanan" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Bln Layanan</label>
+                    <select id="f-ks-bulan-layanan" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                        <option value="">-- Semua Bulan --</option>
+                        <option>Januari</option><option>Februari</option><option>Maret</option>
+                        <option>April</option><option>Mei</option><option>Juni</option>
+                        <option>Juli</option><option>Agustus</option><option>September</option>
+                        <option>Oktober</option><option>November</option><option>Desember</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perusahaan</label>
+                    <input type="text" id="f-ks-perusahaan" placeholder="Cari Perusahaan..." class="w-full text-sm border-gray-300 rounded-md border p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                    <select id="f-ks-status" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                        <option value="">-- Semua Status --</option>
+                        <option value="Lunas">Lunas</option>
+                        <option value="Belum Lunas">Belum Lunas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Awal)</label>
+                    <input type="date" id="f-ks-bayar-start" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Akhir)</label>
+                    <input type="date" id="f-ks-bayar-end" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="resetFilterKerjasama()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md border">Reset Filter</button>
+                <button onclick="fetchPiutangKerjasama()" class="px-4 py-1.5 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-md">Terapkan Filter</button>
+            </div>
+        </div>
 
-            <div>
-                <label class="block font-medium mb-1">Tahun Piutang *</label>
-                <input type="number" id="ks_tahun_piutang" required class="w-full border p-2 rounded">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Bulan Piutang *</label>
-                <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
-                    <option value="">Pilih Bulan</option>
-                    <option>Januari</option><option>Februari</option><option>Maret</option>
-                    <option>April</option><option>Mei</option><option>Juni</option>
-                    <option>Juli</option><option>Agustus</option><option>September</option>
-                    <option>Oktober</option><option>November</option><option>Desember</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Nama Perusahaan *</label>
-                <input type="text" id="ks_nama_perusahaan" required class="w-full border p-2 rounded">
-            </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
+                    <tr>
+                        <th class="p-3">Periode Piutang</th>
+                        <th class="p-3">Perusahaan</th>
+                        <th class="p-3">Tgl Surat</th>
+                        <th class="p-3">Kota / Ket</th>
+                        <th class="p-3">Jenis</th>
+                        <th class="p-3">Periode Layanan</th>
+                        <th class="p-3 text-center">Pasien</th>
+                        <th class="p-3">No. Tagihan</th>
+                        <th class="p-3">Dokumen</th>
+                        <th class="p-3 text-right">Saldo Awal</th>
+                        <th class="p-3 text-right">Tambah</th>
+                        <th class="p-3 text-right">Koreksi (+)</th>
+                        <th class="p-3 text-right">Bayar</th>
+                        <th class="p-3 text-right">Koreksi (-)</th>
+                        <th class="p-3 text-right">Biaya Trf</th>
+                        <th class="p-3 text-right">Saldo Akhir</th>
+                        <th class="p-3">Tgl Bayar</th>
+                        <th class="p-3 text-center">Status</th>
+                        <th class="p-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="ks-table-body" class="divide-y divide-gray-100">
+                    <!-- Data Dinamis -->
+                </tbody>
+            </table>
+        </div>
+      </section>
 
-            <div>
-                <label class="block font-medium mb-1">Tanggal Surat</label>
-                <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Kota / Keterangan</label>
-                <input type="text" id="ks_kota_keterangan" class="w-full border p-2 rounded">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Jenis Layanan</label>
-                <select id="ks_jenis" class="w-full border p-2 rounded">
-                    <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
-                    <option value="Rawat Inap">Rawat Inap</option>
-                    <option value="Rawat Jalan">Rawat Jalan</option>
-                    <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
-                    <option value="Obat Rawat Inap">Obat Rawat Inap</option>
-                    <option value="BPJS Pelayanan">BPJS Pelayanan</option>
-                    <option value="BPJS Pelayanan Susulan">BPJS Pelayanan Susulan</option>
-                    <option value="BPJS Obat">BPJS Obat</option>
-                    <option value="BPJS Obat Susulan">BPJS Obat Susulan</option>
-                    <option value="BPJS Alkes CAPD">BPJS Alkes CAPD</option>
-                </select>
-            </div>
+      <!-- Modal Form Piutang Kerja Sama -->
+      <div id="ksFormModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
+          <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
+              <div class="flex justify-between items-center border-b pb-3">
+                  <h3 id="ksModalTitle" class="text-lg font-bold text-gray-800">Form Input Piutang Kerjasama</h3>
+                  <button onclick="closeModalKerjasama()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+              </div>
 
-            <div>
-                <label class="block font-medium mb-1">Tahun Layanan</label>
-                <input type="number" id="ks_tahun_layanan" class="w-full border p-2 rounded">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Bulan Layanan</label>
-                <select id="ks_bulan_layanan" class="w-full border p-2 rounded">
-                    <option value="">Pilih Bulan</option>
-                    <option>Januari</option><option>Februari</option><option>Maret</option>
-                    <option>April</option><option>Mei</option><option>Juni</option>
-                    <option>Juli</option><option>Agustus</option><option>September</option>
-                    <option>Oktober</option><option>November</option><option>Desember</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Jumlah Pasien</label>
-                <input type="number" id="ks_jumlah_pasien" value="0" class="w-full border p-2 rounded">
-            </div>
+              <form id="ksPiutangForm" onsubmit="simpanPiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <input type="hidden" id="ks-edit-id">
 
-            <div>
-                <label class="block font-medium mb-1">Nomor Tagihan</label>
-                <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
-            </div>
-            <div class="col-span-2">
-                <label class="block font-medium mb-1">Link Dokumen (URL)</label>
-                <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
-            </div>
+                  <div>
+                      <label class="block font-medium mb-1">Tahun Piutang *</label>
+                      <input type="number" id="ks_tahun_piutang" required class="w-full border p-2 rounded">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Bulan Piutang *</label>
+                      <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
+                          <option value="">Pilih Bulan</option>
+                          <option>Januari</option><option>Februari</option><option>Maret</option>
+                          <option>April</option><option>Mei</option><option>Juni</option>
+                          <option>Juli</option><option>Agustus</option><option>September</option>
+                          <option>Oktober</option><option>November</option><option>Desember</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Nama Perusahaan *</label>
+                      <input type="text" id="ks_nama_perusahaan" required class="w-full border p-2 rounded">
+                  </div>
 
-            <!-- Perhitungan Keuangan -->
-            <div>
-                <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
-                <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Tambah (Rp)</label>
-                <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Koreksi + (Rp)</label>
-                <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
+                  <div>
+                      <label class="block font-medium mb-1">Tanggal Surat</label>
+                      <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Kota / Keterangan</label>
+                      <input type="text" id="ks_kota_keterangan" class="w-full border p-2 rounded">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Jenis Layanan</label>
+                      <select id="ks_jenis" class="w-full border p-2 rounded">
+                          <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
+                          <option value="Rawat Inap">Rawat Inap</option>
+                          <option value="Rawat Jalan">Rawat Jalan</option>
+                          <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
+                          <option value="Obat Rawat Inap">Obat Rawat Inap</option>
+                          <option value="BPJS Pelayanan">BPJS Pelayanan</option>
+                          <option value="BPJS Pelayanan Susulan">BPJS Pelayanan Susulan</option>
+                          <option value="BPJS Obat">BPJS Obat</option>
+                          <option value="BPJS Obat Susulan">BPJS Obat Susulan</option>
+                          <option value="BPJS Alkes CAPD">BPJS Alkes CAPD</option>
+                      </select>
+                  </div>
 
-            <div>
-                <label class="block font-medium mb-1">Bayar (Rp)</label>
-                <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Koreksi - (Rp)</label>
-                <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Biaya Transfer (Rp)</label>
-                <input type="number" id="ks_biaya_transfer" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-            </div>
+                  <div>
+                      <label class="block font-medium mb-1">Tahun Layanan</label>
+                      <input type="number" id="ks_tahun_layanan" class="w-full border p-2 rounded">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Bulan Layanan</label>
+                      <select id="ks_bulan_layanan" class="w-full border p-2 rounded">
+                          <option value="">Pilih Bulan</option>
+                          <option>Januari</option><option>Februari</option><option>Maret</option>
+                          <option>April</option><option>Mei</option><option>Juni</option>
+                          <option>Juli</option><option>Agustus</option><option>September</option>
+                          <option>Oktober</option><option>November</option><option>Desember</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Jumlah Pasien</label>
+                      <input type="number" id="ks_jumlah_pasien" value="0" class="w-full border p-2 rounded">
+                  </div>
 
-            <div>
-                <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
-                <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
-            </div>
-            <div>
-                <label class="block font-medium mb-1">Tanggal Bayar</label>
-                <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
-            </div>
-            <div class="mb-3">
-    <label for="ks_status" class="form-label">Status Piutang</label>
-    <input 
-        type="text" 
-        id="ks_status" 
-        class="form-control" 
-        readonly 
-        placeholder="Otomatis (Belum Lunas / Lunas)" 
-    />
-</div>
-            
-            <div class="col-span-3">
-                <label class="block font-medium mb-1">Keterangan</label>
-                <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
-            </div>
+                  <div>
+                      <label class="block font-medium mb-1">Nomor Tagihan</label>
+                      <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
+                  </div>
+                  <div class="col-span-2">
+                      <label class="block font-medium mb-1">Link Dokumen (URL)</label>
+                      <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
+                  </div>
 
-            <div class="col-span-3 flex justify-end gap-2 border-t pt-3">
-                <button type="button" onclick="closeModalKerjasama()" class="px-4 py-2 border rounded text-gray-600">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium">Simpan Data</button>
-            </div>
-        </form>
-    </div>
-</div>
+                  <div>
+                      <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
+                      <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Tambah (Rp)</label>
+                      <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Koreksi + (Rp)</label>
+                      <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+
+                  <div>
+                      <label class="block font-medium mb-1">Bayar (Rp)</label>
+                      <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Koreksi - (Rp)</label>
+                      <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Biaya Transfer (Rp)</label>
+                      <input type="number" id="ks_biaya_transfer" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+                  </div>
+
+                  <div>
+                      <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
+                      <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Tanggal Bayar</label>
+                      <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
+                  </div>
+                  <div>
+                      <label class="block font-medium mb-1">Status Piutang</label>
+                      <input type="text" id="ks_status" readonly placeholder="Otomatis (Belum Lunas / Lunas)" class="w-full border p-2 rounded bg-gray-100 font-semibold">
+                  </div>
+                  
+                  <div class="col-span-3">
+                      <label class="block font-medium mb-1">Keterangan</label>
+                      <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
+                  </div>
+
+                  <div class="col-span-3 flex justify-end gap-2 border-t pt-3">
+                      <button type="button" onclick="closeModalKerjasama()" class="px-4 py-2 border rounded text-gray-600">Batal</button>
+                      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium">Simpan Data</button>
+                  </div>
+              </form>
+          </div>
+      </div>
 
       <!-- ================= 4. LAPORAN PIUTANG PASIEN ================= -->
       <section id="view-laporan-pasien" class="modul-view hidden">
@@ -755,18 +741,18 @@
         </div>
       </section>
 
-      <!-- ================= 6. LAPORAN PIUTANG KERJASAMA (DIPERBARUI) ================= -->
+      <!-- ================= 6. LAPORAN PIUTANG KERJASAMA ================= -->
       <section id="view-laporan-kerjasama" class="modul-view hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
             <h1 class="text-xl font-bold text-slate-800">🤝 Laporan Piutang Kerjasama Perusahaan / Asuransi</h1>
             <p class="text-xs text-slate-500">Monitoring piutang perusahaan mitra, status kelunasan, dan ekspor laporan.</p>
           </div>
-          <button onclick="downloadCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+          <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
             📥 Export Laporan Kerjasama (CSV)
           </button>
         </div>
-</section>
+
         <!-- STATISTIK RINGKASAN KERJASAMA -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -786,6 +772,7 @@
             <p id="k-stat-total-mitra" class="text-lg font-bold text-blue-600 mt-1">0 Transaksi</p>
           </div>
         </div>
+      </section>
 
       <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
       <section id="view-laporan-gabungan" class="modul-view hidden">
@@ -917,38 +904,32 @@
 
     // NAVIGASI VIEW
     function bukaView(viewName) {
-  // 1. Sembunyikan seluruh modul view
-  document.querySelectorAll('.modul-view').forEach(view => {
-    view.classList.add('hidden');
-  });
+      document.querySelectorAll('.modul-view').forEach(view => {
+        view.classList.add('hidden');
+      });
 
-  // 2. Tampilkan section view yang dipilih
-  const targetView = document.getElementById(`view-${viewName}`);
-  if (targetView) {
-    targetView.classList.remove('hidden');
-  }
+      const targetView = document.getElementById(`view-${viewName}`);
+      if (targetView) {
+        targetView.classList.remove('hidden');
+      }
 
-  // 3. Reset warna semua tombol sidebar ke tampilan default
-  document.querySelectorAll('aside nav button').forEach(btn => {
-    btn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2';
-  });
+      document.querySelectorAll('aside nav button').forEach(btn => {
+        btn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2';
+      });
 
-  // 4. Highlight tombol aktif dengan warna shadow (khusus konsolidasi pakai warna amber)
-  const activeBtn = document.getElementById(`btn-${viewName}`);
-  if (activeBtn) {
-    if (viewName === 'laporan-gabungan') {
-      activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-amber-500 text-white font-semibold shadow-lg shadow-amber-500/30 transition flex items-center gap-2';
-    } else {
-      activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30 transition flex items-center gap-2';
+      const activeBtn = document.getElementById(`btn-${viewName}`);
+      if (activeBtn) {
+        if (viewName === 'laporan-gabungan') {
+          activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-amber-500 text-white font-semibold shadow-lg shadow-amber-500/30 transition flex items-center gap-2';
+        } else {
+          activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30 transition flex items-center gap-2';
+        }
+      }
+
+      if (viewName === 'laporan-gabungan') {
+        updateLaporanKonsolidasi();
+      }
     }
-  }
-
-  // 5. Jalankan kalkulasi otomatis jika menu Laporan Gabungan diklik
-  if (viewName === 'laporan-gabungan') {
-    updateLaporanKonsolidasi();
-  }
-}
-
 
     // ---------------- PERHITUNGAN PASIEN ----------------
     function hitungBelumTerbayarPasien() {
@@ -962,21 +943,33 @@
     }
 
     ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
-      document.getElementById(id).addEventListener('input', hitungBelumTerbayarPasien);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', hitungBelumTerbayarPasien);
     });
 
     const selectKpknl = document.getElementById('kirim_kpknl');
     const containerTglKpknl = document.getElementById('container_tgl_kpknl');
     const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
 
-    selectKpknl.addEventListener('change', (e) => {
-      if (e.target.value === 'Sudah') {
-        containerTglKpknl.classList.remove('hidden');
-      } else {
-        containerTglKpknl.classList.add('hidden');
-        inputTglKpknl.value = '';
-      }
-    });
+    if (selectKpknl) {
+      selectKpknl.addEventListener('change', (e) => {
+        if (e.target.value === 'Sudah') {
+          containerTglKpknl.classList.remove('hidden');
+        } else {
+          containerTglKpknl.classList.add('hidden');
+          inputTglKpknl.value = '';
+        }
+      });
+    }
+
+    function batalEditPasien() {
+      const form = document.getElementById('formPiutangPasien');
+      if (form) form.reset();
+      document.getElementById('edit_id').value = '';
+      document.getElementById('btnSubmitPasien').innerText = '+ Simpan Data Pasien';
+      document.getElementById('btnBatalPasien').classList.add('hidden');
+      if (containerTglKpknl) containerTglKpknl.classList.add('hidden');
+    }
 
     // ---------------- LOGIKA REKAP PENDAPATAN ----------------
     let listMasterPendapatan = [];
@@ -992,11 +985,6 @@
       'realisasi_mei', 'realisasi_jun', 'realisasi_jul', 'realisasi_agu',
       'realisasi_sep', 'realisasi_okt', 'realisasi_nov', 'realisasi_des'
     ];
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const elSelesai = document.getElementById('p_filter_bulan_selesai');
-      if (elSelesai) elSelesai.value = "11";
-    });
 
     async function loadDataPendapatan() {
       const { data, error } = await supabaseClient
@@ -1030,7 +1018,7 @@
           <input type="checkbox" id="check_uraian_all" checked onchange="toggleSelectAllUraian(this)">
           <span>Pilih Semua</span>
         </label>
-      ` + uniqueUraian.map((u, idx) => `
+      ` + uniqueUraian.map((u) => `
         <label class="flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 p-0.5 rounded">
           <input type="checkbox" value="${u}" class="item-check-uraian" checked onchange="terapkanFilterPendapatan()">
           <span class="truncate">${u}</span>
@@ -1282,335 +1270,592 @@
     }
 
     // ==========================================
-// JAVASCRIPT LOGIC: PIUTANG KERJA SAMA
-// ==========================================
+    // LOGIKA PIUTANG KERJA SAMA
+    // ==========================================
 
-let ksCurrentData = [];
+    let ksCurrentData = [];
 
-// Format Angka Rupiah
-function fmtKS(num) {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
-}
-
-// Hitung Saldo Akhir Realtime di Modal
-function calcSaldoAkhirKerjasama() {
-    const nilaiKlaim = parseFloat(document.getElementById('ks_nilai_klaim').value) || 0;
-    const totalBayar = parseFloat(document.getElementById('ks_pembayaran').value) || 0;
-    
-    // Hitung Saldo Akhir
-    const saldoAkhir = nilaiKlaim - totalBayar;
-    document.getElementById('ks_saldo_akhir').value = saldoAkhir;
-
-    // 💡 RUMUS OTOMATIS STATUS
-    // Jika saldo akhir > 0 (belum nol), status = "Belum Lunas". Jika 0 atau kurang, status = "Lunas"
-    const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
-
-    // Set nilai status otomatis ke input form
-    const inputStatus = document.getElementById('ks_status');
-    if (inputStatus) {
-        inputStatus.value = statusOtomatis;
+    function fmtKS(num) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
     }
-}
 
-// Fetch Data dengan Filter Kombinasi
-async function fetchPiutangKerjasama() {
-    let query = supabaseClient.from('piutang_kerjasama').select('*').order('created_at', { ascending: false });
+    function calcSaldoAkhirKerjasama() {
+        const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
+        const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
+        const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
+        const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
+        const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
+        const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
 
-    const thnPiutang = document.getElementById('f-ks-tahun-piutang').value;
-    const blnPiutang = document.getElementById('f-ks-bulan-piutang').value;
-    const thnLayanan = document.getElementById('f-ks-tahun-layanan').value;
-    const blnLayanan = document.getElementById('f-ks-bulan-layanan').value;
-    const perusahaan = document.getElementById('f-ks-perusahaan').value;
-    const status = document.getElementById('f-ks-status').value;
-    const tglStart = document.getElementById('f-ks-bayar-start').value;
-    const tglEnd = document.getElementById('f-ks-bayar-end').value;
+        const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
+        
+        const previewEl = document.getElementById('ks_saldo_akhir_preview');
+        if (previewEl) previewEl.value = fmtKS(saldoAkhir);
 
-    if (thnPiutang) query = query.eq('tahun_piutang', parseInt(thnPiutang));
-    if (blnPiutang) query = query.eq('bulan_piutang', blnPiutang);
-    if (thnLayanan) query = query.eq('tahun_layanan', parseInt(thnLayanan));
-    if (blnLayanan) query = query.eq('bulan_layanan', blnLayanan);
-    if (perusahaan) query = query.ilike('nama_perusahaan', `%${perusahaan}%`);
-    if (status) query = query.eq('status', status);
-    if (tglStart) query = query.gte('tanggal_bayar', tglStart);
-    if (tglEnd) query = query.lte('tanggal_bayar', tglEnd);
+        const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+        const inputStatus = document.getElementById('ks_status');
+        if (inputStatus) {
+            inputStatus.value = statusOtomatis;
+        }
+    }
 
-    const { data, error } = await query;
+    async function fetchPiutangKerjasama() {
+        let query = supabaseClient.from('piutang_kerjasama').select('*').order('created_at', { ascending: false });
 
-    if (error) {
-        alert('Gagal mengambil data Piutang Kerja Sama: ' + error.message);
+        const thnPiutang = document.getElementById('f-ks-tahun-piutang').value;
+        const blnPiutang = document.getElementById('f-ks-bulan-piutang').value;
+        const thnLayanan = document.getElementById('f-ks-tahun-layanan').value;
+        const blnLayanan = document.getElementById('f-ks-bulan-layanan').value;
+        const perusahaan = document.getElementById('f-ks-perusahaan').value;
+        const status = document.getElementById('f-ks-status').value;
+        const tglStart = document.getElementById('f-ks-bayar-start').value;
+        const tglEnd = document.getElementById('f-ks-bayar-end').value;
+
+        if (thnPiutang) query = query.eq('tahun_piutang', parseInt(thnPiutang));
+        if (blnPiutang) query = query.eq('bulan_piutang', blnPiutang);
+        if (thnLayanan) query = query.eq('tahun_layanan', parseInt(thnLayanan));
+        if (blnLayanan) query = query.eq('bulan_layanan', blnLayanan);
+        if (perusahaan) query = query.ilike('nama_perusahaan', `%${perusahaan}%`);
+        if (status) query = query.eq('status', status);
+        if (tglStart) query = query.gte('tanggal_bayar', tglStart);
+        if (tglEnd) query = query.lte('tanggal_bayar', tglEnd);
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Gagal mengambil data Piutang Kerja Sama:', error.message);
+            return;
+        }
+
+        ksCurrentData = data || [];
+        renderTableKerjasama(ksCurrentData);
+        renderDashboardKerjasama(ksCurrentData);
+    }
+
+    function renderTableKerjasama(data) {
+        const tbody = document.getElementById('ks-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="19" class="p-4 text-center text-gray-400">Tidak ada data ditemukan.</td></tr>`;
+            return;
+        }
+
+        data.forEach(row => {
+            const linkDoc = row.link_dokumen 
+                ? `<a href="${row.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:underline">Buka</a>` 
+                : '-';
+
+            const statusBadge = row.status === 'Lunas' 
+                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Lunas</span>` 
+                : `<span class="bg-rose-100 text-rose-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Belum Lunas</span>`;
+
+            const saldoAkhir = row.saldo_akhir !== undefined 
+                ? row.saldo_akhir 
+                : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
+                    <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
+                    <td class="p-3">${row.tanggal_surat || '-'}</td>
+                    <td class="p-3">${row.kota_keterangan || '-'}</td>
+                    <td class="p-3">${row.jenis || '-'}</td>
+                    <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
+                    <td class="p-3 text-center">${row.jumlah_pasien || 0}</td>
+                    <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
+                    <td class="p-3 text-center">${linkDoc}</td>
+                    <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
+                    <td class="p-3 text-right text-emerald-600">+${fmtKS(row.tambah)}</td>
+                    <td class="p-3 text-right text-emerald-600">+${fmtKS(row.koreksi_plus)}</td>
+                    <td class="p-3 text-right text-blue-600">${fmtKS(row.bayar)}</td>
+                    <td class="p-3 text-right text-rose-600">-${fmtKS(row.koreksi_minus)}</td>
+                    <td class="p-3 text-right">${fmtKS(row.biaya_transfer)}</td>
+                    <td class="p-3 text-right font-bold text-gray-900">${fmtKS(saldoAkhir)}</td>
+                    <td class="p-3">${row.tanggal_bayar || '-'}</td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                    <td class="p-3">
+                        <div class="flex gap-1">
+                            <button onclick="editPiutangKerjasama(${row.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
+                            <button onclick="deletePiutangKerjasama(${row.id})" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderDashboardKerjasama(data) {
+        let totalPiutang = 0;
+        let totalBayar = 0;
+        let totalSaldoAkhir = 0;
+
+        data.forEach(row => {
+            const awal = Number(row.saldo_awal) || 0;
+            const tambah = Number(row.tambah) || 0;
+            const kPlus = Number(row.koreksi_plus) || 0;
+            const bayar = Number(row.bayar) || 0;
+            const kMinus = Number(row.koreksi_minus) || 0;
+            const trf = Number(row.biaya_transfer) || 0;
+
+            const akhir = row.saldo_akhir !== undefined ? Number(row.saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
+
+            totalPiutang += (awal + tambah + kPlus);
+            totalBayar += bayar;
+            totalSaldoAkhir += akhir;
+        });
+
+        const elPiutang = document.getElementById('dash-ks-total-piutang');
+        const elBayar = document.getElementById('dash-ks-total-bayar');
+        const elAkhir = document.getElementById('dash-ks-saldo-akhir');
+
+        if (elPiutang) elPiutang.innerText = fmtKS(totalPiutang);
+        if (elBayar) elBayar.innerText = fmtKS(totalBayar);
+        if (elAkhir) elAkhir.innerText = fmtKS(totalSaldoAkhir);
+
+        const kPiutang = document.getElementById('k-stat-total-piutang');
+        const kBayar = document.getElementById('k-stat-total-bayar');
+        const kSisa = document.getElementById('k-stat-sisa-piutang');
+        const kMitra = document.getElementById('k-stat-total-mitra');
+
+        if (kPiutang) kPiutang.innerText = fmtKS(totalPiutang);
+        if (kBayar) kBayar.innerText = fmtKS(totalBayar);
+        if (kSisa) kSisa.innerText = fmtKS(totalSaldoAkhir);
+        if (kMitra) kMitra.innerText = `${data.length} Transaksi`;
+    }
+
+    async function simpanPiutangKerjasama(event) {
+        if (event) event.preventDefault();
+
+        const id = document.getElementById('ks-edit-id')?.value;
+
+        const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
+        const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
+        const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
+        const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
+        const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
+        const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
+
+        const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
+        const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+
+        const payload = {
+            tahun_piutang: parseInt(document.getElementById('ks_tahun_piutang')?.value) || null,
+            bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
+            nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
+            tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
+            kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
+            jenis: document.getElementById('ks_jenis')?.value || '',
+            tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
+            bulan_layanan: document.getElementById('ks_bulan_layanan')?.value || '',
+            jumlah_pasien: parseInt(document.getElementById('ks_jumlah_pasien')?.value) || 0,
+            nomor_tagihan: document.getElementById('ks_nomor_tagihan')?.value || '',
+            link_dokumen: document.getElementById('ks_link_dokumen')?.value || '',
+            saldo_awal: awal,
+            tambah: tambah,
+            koreksi_plus: kPlus,
+            bayar: bayar,
+            koreksi_minus: kMinus,
+            biaya_transfer: trf,
+            saldo_akhir: saldoAkhir,
+            tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
+            status: statusOtomatis,
+            keterangan: document.getElementById('ks_keterangan')?.value || ''
+        };
+
+        let error;
+        if (id) {
+            ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', id));
+        } else {
+            ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
+        }
+
+        if (error) {
+            alert('Gagal menyimpan data: ' + error.message);
+        } else {
+            alert('Data Piutang Kerja Sama berhasil disimpan!');
+            closeModalKerjasama();
+            fetchPiutangKerjasama();
+            loadSemuaLaporan();
+        }
+    }
+
+    function editPiutangKerjasama(id) {
+        const row = ksCurrentData.find(item => item.id === id);
+        if (!row) return;
+
+        document.getElementById('ks-edit-id').value = row.id;
+        document.getElementById('ksModalTitle').innerText = 'Koreksi / Edit Piutang Kerjasama';
+        document.getElementById('ks_tahun_piutang').value = row.tahun_piutang || '';
+        document.getElementById('ks_bulan_piutang').value = row.bulan_piutang || '';
+        document.getElementById('ks_nama_perusahaan').value = row.nama_perusahaan || '';
+        document.getElementById('ks_tanggal_surat').value = row.tanggal_surat || '';
+        document.getElementById('ks_kota_keterangan').value = row.kota_keterangan || '';
+        document.getElementById('ks_jenis').value = row.jenis || 'Rawat Inap & Rawat Jalan';
+        document.getElementById('ks_tahun_layanan').value = row.tahun_layanan || '';
+        document.getElementById('ks_bulan_layanan').value = row.bulan_layanan || '';
+        document.getElementById('ks_jumlah_pasien').value = row.jumlah_pasien || 0;
+        document.getElementById('ks_nomor_tagihan').value = row.nomor_tagihan || '';
+        document.getElementById('ks_link_dokumen').value = row.link_dokumen || '';
+        document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;
+        document.getElementById('ks_tambah').value = row.tambah || 0;
+        document.getElementById('ks_koreksi_plus').value = row.koreksi_plus || 0;
+        document.getElementById('ks_bayar').value = row.bayar || 0;
+        document.getElementById('ks_koreksi_minus').value = row.koreksi_minus || 0;
+        document.getElementById('ks_biaya_transfer').value = row.biaya_transfer || 0;
+        document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
+        document.getElementById('ks_status').value = row.status || 'Belum Lunas';
+        document.getElementById('ks_keterangan').value = row.keterangan || '';
+
+        calcSaldoAkhirKerjasama();
+        document.getElementById('ksFormModal').classList.remove('hidden');
+    }
+
+    async function deletePiutangKerjasama(id) {
+        if (confirm('Yakin ingin menghapus data piutang kerjasama ini?')) {
+            const { error } = await supabaseClient.from('piutang_kerjasama').delete().eq('id', id);
+            if (error) alert('Gagal menghapus: ' + error.message);
+            else fetchPiutangKerjasama();
+        }
+    }
+
+    function openModalKerjasama() {
+        document.getElementById('ksPiutangForm').reset();
+        document.getElementById('ks-edit-id').value = '';
+        document.getElementById('ksModalTitle').innerText = 'Tambah Piutang Kerjasama';
+        document.getElementById('ksFormModal').classList.remove('hidden');
+        calcSaldoAkhirKerjasama();
+    }
+
+    function closeModalKerjasama() {
+        document.getElementById('ksFormModal').classList.add('hidden');
+    }
+
+    function resetFilterKerjasama() {
+        document.querySelectorAll('#f-ks-tahun-piutang, #f-ks-bulan-piutang, #f-ks-tahun-layanan, #f-ks-bulan-layanan, #f-ks-perusahaan, #f-ks-status, #f-ks-bayar-start, #f-ks-bayar-end').forEach(el => el.value = '');
+        fetchPiutangKerjasama();
+    }
+
+    function exportCSVKerjasama() {
+        if (!ksCurrentData.length) {
+            alert('Tidak ada data untuk diunduh.');
+            return;
+        }
+
+        const headers = ["Tahun Piutang", "Bulan Piutang", "Nama Perusahaan", "Tanggal Surat", "Kota/Keterangan", "Jenis", "Tahun Layanan", "Bulan Layanan", "Jumlah Pasien", "Nomor Tagihan", "Link Dokumen", "Saldo Awal", "Tambah", "Koreksi +", "Bayar", "Koreksi -", "Biaya Transfer", "Saldo Akhir", "Tanggal Bayar", "Status", "Keterangan"];
+        
+        let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+
+        ksCurrentData.forEach(row => {
+            const saldoAkhir = row.saldo_akhir !== undefined 
+                ? row.saldo_akhir 
+                : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
+
+            const r = [
+                row.tahun_piutang || '',
+                `"${row.bulan_piutang || ''}"`,
+                `"${row.nama_perusahaan || ''}"`,
+                row.tanggal_surat || '',
+                `"${row.kota_keterangan || ''}"`,
+                `"${row.jenis || ''}"`,
+                row.tahun_layanan || '',
+                `"${row.bulan_layanan || ''}"`,
+                row.jumlah_pasien || 0,
+                `"${row.nomor_tagihan || ''}"`,
+                `"${row.link_dokumen || ''}"`,
+                row.saldo_awal || 0,
+                row.tambah || 0,
+                row.koreksi_plus || 0,
+                row.bayar || 0,
+                row.koreksi_minus || 0,
+                row.biaya_transfer || 0,
+                saldoAkhir || 0,
+                row.tanggal_bayar || '',
+                `"${row.status || ''}"`,
+                `"${row.keterangan || ''}"`
+            ];
+            csvContent += r.join(",") + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Laporan_Piutang_Kerjasama_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // ---------------- FILTER & RENDER LAPORAN PASIEN ----------------
+    function terapkanFilterPasien() {
+      const tglMulai = document.getElementById('filter_tgl_mulai')?.value;
+      const tglSelesai = document.getElementById('filter_tgl_selesai')?.value;
+      const tahun = document.getElementById('filter_tahun')?.value;
+      const jenis = document.getElementById('filter_jenis')?.value;
+      const statusPiutang = document.getElementById('filter_status_piutang')?.value;
+      const keyword = (document.getElementById('inputCariPasien')?.value || '').toLowerCase();
+
+      listDataPasienFiltered = listDataPasienMaster.filter(item => {
+        if (tglMulai && item.tgl_masuk_rs && item.tgl_masuk_rs < tglMulai) return false;
+        if (tglSelesai && item.tgl_masuk_rs && item.tgl_masuk_rs > tglSelesai) return false;
+        if (tahun && String(item.tahun_piutang) !== String(tahun)) return false;
+        if (jenis && item.jenis_perawatan !== jenis) return false;
+        if (statusPiutang === 'lunas' && Number(item.belum_terbayar || 0) > 0) return false;
+        if (statusPiutang === 'piutang' && Number(item.belum_terbayar || 0) <= 0) return false;
+        if (keyword) {
+          const matchNama = (item.nama_pasien || '').toLowerCase().includes(keyword);
+          const matchRM = (item.no_rm || '').toLowerCase().includes(keyword);
+          const matchTrx = (item.no_transaksi || '').toLowerCase().includes(keyword);
+          if (!matchNama && !matchRM && !matchTrx) return false;
+        }
+        return true;
+      });
+
+      renderTabelPasien(listDataPasienFiltered);
+      renderStatistikPasien(listDataPasienFiltered);
+    }
+
+    function renderTabelPasien(data) {
+      const tbody = document.getElementById('tabelPasien');
+      if (!tbody) return;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data pasien yang ditemukan.</td></tr>`;
         return;
-    }
+      }
 
-    ksCurrentData = data || [];
-    renderTableKerjasama(ksCurrentData);
-    renderDashboardKerjasama(ksCurrentData);
-}
+      tbody.innerHTML = data.map(i => {
+        const totalBiaya = Number(i.jumlah_biaya || 0);
+        const sisa = Number(i.belum_terbayar || 0);
+        const linkDoc = i.link_dokumen 
+          ? `<a href="${i.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Buka</a>`
+          : '-';
 
-// Render Tabel
-function renderTableKerjasama(data) {
-    const tbody = document.getElementById('ks-table-body');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="19" class="p-4 text-center text-gray-400">Tidak ada data ditemukan.</td></tr>`;
-        return;
-    }
-
-    data.forEach(row => {
-        const linkDoc = row.link_dokumen 
-            ? `<a href="${row.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:underline">Buka</a>` 
-            : '-';
-
-        const statusBadge = row.status === 'Lunas' 
-            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Lunas</span>` 
-            : `<span class="bg-rose-100 text-rose-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Belum Lunas</span>`;
-
-        const saldoAkhir = row.saldo_akhir !== undefined 
-            ? row.saldo_akhir 
-            : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
-
-        tbody.innerHTML += `
-            <tr class="hover:bg-gray-50">
-                <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
-                <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
-                <td class="p-3">${row.tanggal_surat || '-'}</td>
-                <td class="p-3">${row.kota_keterangan || '-'}</td>
-                <td class="p-3">${row.jenis || '-'}</td>
-                <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
-                <td class="p-3 text-center">${row.jumlah_pasien || 0}</td>
-                <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
-                <td class="p-3 text-center">${linkDoc}</td>
-                <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
-                <td class="p-3 text-right text-emerald-600">+${fmtKS(row.tambah)}</td>
-                <td class="p-3 text-right text-emerald-600">+${fmtKS(row.koreksi_plus)}</td>
-                <td class="p-3 text-right text-blue-600">${fmtKS(row.bayar)}</td>
-                <td class="p-3 text-right text-rose-600">-${fmtKS(row.koreksi_minus)}</td>
-                <td class="p-3 text-right">${fmtKS(row.biaya_transfer)}</td>
-                <td class="p-3 text-right font-bold text-gray-900">${fmtKS(saldoAkhir)}</td>
-                <td class="p-3">${row.tanggal_bayar || '-'}</td>
-                <td class="p-3 text-center">${statusBadge}</td>
-                <td class="p-3">
-                    <div class="flex gap-1">
-                        <button onclick="editPiutangKerjasama(${row.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
-                        <button onclick="deletePiutangKerjasama(${row.id})" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
-                    </div>
-                </td>
-            </tr>
+        return `
+          <tr class="hover:bg-slate-50 border-b">
+            <td class="p-2.5 border-r font-mono">${i.no_rm || '-'}</td>
+            <td class="p-2.5 border-r font-semibold">${i.nama_pasien || '-'}</td>
+            <td class="p-2.5 border-r font-mono">${i.no_transaksi || '-'}</td>
+            <td class="p-2.5 border-r">${i.bangsal || '-'} / Kelas ${i.kelas || '-'}</td>
+            <td class="p-2.5 border-r">${i.jenis_perawatan || '-'} (${i.kategori || '-'})</td>
+            <td class="p-2.5 border-r text-right font-mono">Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+            <td class="p-2.5 border-r text-right font-mono font-bold ${sisa > 0 ? 'text-red-600' : 'text-emerald-600'}">
+              Rp ${sisa.toLocaleString('id-ID')}
+            </td>
+            <td class="p-2.5 border-r">${i.kirim_kpknl || 'Belum'}</td>
+            <td class="p-2.5 border-r text-center">${linkDoc}</td>
+            <td class="p-2.5 text-center flex gap-1 justify-center">
+              <button onclick="bukaModalDetailPasien(${i.id})" class="bg-blue-500 hover:bg-blue-600 text-white text-[10px] px-2 py-1 rounded">Detail</button>
+              <button onclick="editPasien(${i.id})" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-1 rounded">Edit</button>
+              <button onclick="hapusPasien(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">Hapus</button>
+            </td>
+          </tr>
         `;
-    });
-}
-
-// Render Widget Dashboard
-function renderDashboardKerjasama(data) {
-    let totalPiutang = 0;
-    let totalBayar = 0;
-    let totalSaldoAkhir = 0;
-
-    data.forEach(row => {
-        const awal = Number(row.saldo_awal) || 0;
-        const tambah = Number(row.tambah) || 0;
-        const kPlus = Number(row.koreksi_plus) || 0;
-        const bayar = Number(row.bayar) || 0;
-        const kMinus = Number(row.koreksi_minus) || 0;
-        const trf = Number(row.biaya_transfer) || 0;
-
-        const akhir = row.saldo_akhir !== undefined ? Number(row.saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
-
-        totalPiutang += (awal + tambah + kPlus);
-        totalBayar += bayar;
-        totalSaldoAkhir += akhir;
-    });
-
-    const elPiutang = document.getElementById('dash-ks-total-piutang');
-    const elBayar = document.getElementById('dash-ks-total-bayar');
-    const elAkhir = document.getElementById('dash-ks-saldo-akhir');
-
-    if (elPiutang) elPiutang.innerText = fmtKS(totalPiutang);
-    if (elBayar) elBayar.innerText = fmtKS(totalBayar);
-    if (elAkhir) elAkhir.innerText = fmtKS(totalSaldoAkhir);
-}
-
-// Simpan Data (Insert / Update)
-async function simpanPiutangKerjasama(event) {
-  // 🛑 1. Wajib: Cegah browser melakukan reload/refresh halaman
-    if (event) event.preventDefault();
-  
-// --- Proses validasi & pengiriman data ke database ---
-    const { data, error } = await supabase
-        .from('piutang_kerjasama')
-        .insert([ dataPayload ]);
-  
-    const nilaiKlaim = parseFloat(document.getElementById('ks_nilai_klaim').value) || 0;
-    const totalBayar = parseFloat(document.getElementById('ks_pembayaran').value) || 0;
-    const saldoAkhir = nilaiKlaim - totalBayar;
-
-    // 💡 Penentuan Status Otomatis
-    const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
-
-    const dataPayload = {
-        // ... field data lainnya ...
-        nilai_klaim: nilaiKlaim,
-        pembayaran: totalBayar,
-        saldo_akhir: saldoAkhir,
-        status: statusOtomatis // Saved automatically
-    };
-
-    let error;
-    if (id) {
-        ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', id));
-    } else {
-        ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
+      }).join('');
     }
 
-    if (error) {
-        alert('Gagal menyimpan data: ' + error.message);
-    } else {
-        alert('Data Piutang Kerja Sama berhasil disimpan!');
-        
-        // 2. Tutup Modal Form
-        tutupModalKerjasama(); 
-        
-        // 3. Reset Filter & Muat Ulang Data (Agar data baru langsung kelihatan)
-        resetFilterKerjasama(); 
+    function renderStatistikPasien(data) {
+      let totalBiaya = 0;
+      let totalMasuk = 0;
+      let totalSisa = 0;
 
-        // 4. Pastikan tampilan tetap di tab Input Piutang Kerja Sama
-        showSection('input-piutang-kerjasama'); // Sesuaikan dengan fungsi navigasi tab Anda
+      data.forEach(i => {
+        const b = Number(i.jumlah_biaya || 0);
+        const awal = Number(i.pembayaran_awal || 0);
+        const angs = Number(i.jumlah_angsuran || 0);
+        const s = Number(i.belum_terbayar || 0);
+
+        totalBiaya += b;
+        totalMasuk += (awal + angs);
+        totalSisa += s;
+      });
+
+      const elBiaya = document.getElementById('stat-total-biaya');
+      const elMasuk = document.getElementById('stat-total-masuk');
+      const elSisa = document.getElementById('stat-sisa-piutang');
+      const elTotal = document.getElementById('stat-total-pasien');
+
+      if (elBiaya) elBiaya.innerText = `Rp ${totalBiaya.toLocaleString('id-ID')}`;
+      if (elMasuk) elMasuk.innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+      if (elSisa) elSisa.innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
+      if (elTotal) elTotal.innerText = `${data.length} Pasien`;
     }
-}
 
-// Edit Baris
-function editPiutangKerjasama(id) {
-    const row = ksCurrentData.find(item => item.id === id);
-    if (!row) return;
+    function editPasien(id) {
+      const item = listDataPasienMaster.find(x => x.id === id);
+      if (!item) return;
 
-    document.getElementById('ks-edit-id').value = row.id;
-    document.getElementById('ksModalTitle').innerText = 'Koreksi / Edit Piutang Kerjasama';
-    document.getElementById('ks_tahun_piutang').value = row.tahun_piutang || '';
-    document.getElementById('ks_bulan_piutang').value = row.bulan_piutang || '';
-    document.getElementById('ks_nama_perusahaan').value = row.nama_perusahaan || '';
-    document.getElementById('ks_tanggal_surat').value = row.tanggal_surat || '';
-    document.getElementById('ks_kota_keterangan').value = row.kota_keterangan || '';
-    document.getElementById('ks_jenis').value = row.jenis || 'Rawat Inap & Rawat Jalan';
-    document.getElementById('ks_tahun_layanan').value = row.tahun_layanan || '';
-    document.getElementById('ks_bulan_layanan').value = row.bulan_layanan || '';
-    document.getElementById('ks_jumlah_pasien').value = row.jumlah_pasien || 0;
-    document.getElementById('ks_nomor_tagihan').value = row.nomor_tagihan || '';
-    document.getElementById('ks_link_dokumen').value = row.link_dokumen || '';
-    document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;
-    document.getElementById('ks_tambah').value = row.tambah || 0;
-    document.getElementById('ks_koreksi_plus').value = row.koreksi_plus || 0;
-    document.getElementById('ks_bayar').value = row.bayar || 0;
-    document.getElementById('ks_koreksi_minus').value = row.koreksi_minus || 0;
-    document.getElementById('ks_biaya_transfer').value = row.biaya_transfer || 0;
-    document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
-    document.getElementById('ks_status').value = row.status || 'Belum Lunas';
-    document.getElementById('ks_keterangan').value = row.keterangan || '';
+      document.getElementById('edit_id').value = item.id;
+      document.getElementById('nama_pasien').value = item.nama_pasien || '';
+      document.getElementById('alamat_pasien').value = item.alamat_pasien || '';
+      document.getElementById('no_rm').value = item.no_rm || '';
+      document.getElementById('no_transaksi').value = item.no_transaksi || '';
+      document.getElementById('tahun_piutang').value = item.tahun_piutang || '';
+      document.getElementById('tgl_masuk_rs').value = item.tgl_masuk_rs || '';
+      document.getElementById('tgl_keluar_rs').value = item.tgl_keluar_rs || '';
+      document.getElementById('bangsal').value = item.bangsal || '';
+      document.getElementById('kelas').value = item.kelas || '';
+      document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
+      document.getElementById('kategori').value = item.kategori || '';
 
-    calcSaldoAkhirKerjasama();
-    document.getElementById('ksFormModal').classList.remove('hidden');
-}
+      if (item.kirim_kpknl && item.kirim_kpknl.startsWith('Sudah')) {
+        selectKpknl.value = 'Sudah';
+        containerTglKpknl.classList.remove('hidden');
+        const match = item.kirim_kpknl.match(/\((.*?)\)/);
+        if (match) inputTglKpknl.value = match[1];
+      } else {
+        selectKpknl.value = 'Belum';
+        containerTglKpknl.classList.add('hidden');
+        inputTglKpknl.value = '';
+      }
 
-// Hapus Baris
-async function deletePiutangKerjasama(id) {
-    if (confirm('Yakin ingin menghapus data piutang kerjasama ini?')) {
-        const { error } = await supabaseClient.from('piutang_kerjasama').delete().eq('id', id);
-        if (error) alert('Gagal menghapus: ' + error.message);
-        else fetchPiutangKerjasama();
+      document.getElementById('link_dokumen').value = item.link_dokumen || '';
+      document.getElementById('jumlah_biaya').value = item.jumlah_biaya || 0;
+      document.getElementById('potongan').value = item.potongan || 0;
+      document.getElementById('pembayaran_awal').value = item.pembayaran_awal || 0;
+      document.getElementById('jumlah_angsuran').value = item.jumlah_angsuran || 0;
+      document.getElementById('belum_terbayar').value = item.belum_terbayar || 0;
+
+      document.getElementById('tagihan_1').value = item.tagihan_1 || '';
+      document.getElementById('tagihan_2').value = item.tagihan_2 || '';
+      document.getElementById('tagihan_3').value = item.tagihan_3 || '';
+
+      document.getElementById('btnSubmitPasien').innerText = '✏️ Update Data Pasien';
+      document.getElementById('btnBatalPasien').classList.remove('hidden');
+
+      bukaView('input-pasien');
     }
-}
 
-// Modal Handler
-function openModalKerjasama() {
-    document.getElementById('ksPiutangForm').reset();
-    document.getElementById('ks-edit-id').value = '';
-    document.getElementById('ksModalTitle').innerText = 'Tambah Piutang Kerjasama';
-    document.getElementById('ksFormModal').classList.remove('hidden');
-    calcSaldoAkhirKerjasama();
-}
+    async function hapusPasien(id) {
+      if (confirm('Apakah Anda yakin ingin menghapus data pasien ini?')) {
+        const { error } = await supabaseClient.from('piutang_pasien').delete().eq('id', id);
+        if (error) {
+          alert('Gagal menghapus data: ' + error.message);
+        } else {
+          alert('Data pasien berhasil dihapus.');
+          loadSemuaLaporan();
+        }
+      }
+    }
 
-function closeModalKerjasama() {
-    document.getElementById('ksFormModal').classList.add('hidden');
-}
+    function bukaModalDetailPasien(id) {
+      const item = listDataPasienMaster.find(x => x.id === id);
+      if (!item) return;
 
-function resetFilterKerjasama() {
-    document.querySelectorAll('#f-ks-tahun-piutang, #f-ks-bulan-piutang, #f-ks-tahun-layanan, #f-ks-bulan-layanan, #f-ks-perusahaan, #f-ks-status, #f-ks-bayar-start, #f-ks-bayar-end').forEach(el => el.value = '');
-    fetchPiutangKerjasama();
-}
+      const container = document.getElementById('kontenDetail');
+      container.innerHTML = `
+        <div><strong>Nama Pasien:</strong> ${item.nama_pasien || '-'}</div>
+        <div><strong>No. RM:</strong> ${item.no_rm || '-'}</div>
+        <div><strong>No. Transaksi:</strong> ${item.no_transaksi || '-'}</div>
+        <div><strong>Alamat:</strong> ${item.alamat_pasien || '-'}</div>
+        <div><strong>Bangsal / Kelas:</strong> ${item.bangsal || '-'} / ${item.kelas || '-'}</div>
+        <div><strong>Jenis / Kategori:</strong> ${item.jenis_perawatan || '-'} / ${item.kategori || '-'}</div>
+        <div><strong>Tgl Masuk RS:</strong> ${item.tgl_masuk_rs || '-'}</div>
+        <div><strong>Tgl Keluar RS:</strong> ${item.tgl_keluar_rs || '-'}</div>
+        <div><strong>Jumlah Biaya:</strong> Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</div>
+        <div><strong>Potongan:</strong> Rp ${Number(item.potongan || 0).toLocaleString('id-ID')}</div>
+        <div><strong>Pembayaran Awal:</strong> Rp ${Number(item.pembayaran_awal || 0).toLocaleString('id-ID')}</div>
+        <div><strong>Jumlah Angsuran:</strong> Rp ${Number(item.jumlah_angsuran || 0).toLocaleString('id-ID')}</div>
+        <div><strong>Sisa Piutang:</strong> Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</div>
+        <div><strong>Status KPKNL:</strong> ${item.kirim_kpknl || '-'}</div>
+        <div><strong>Tagihan 1:</strong> ${item.tagihan_1 || '-'}</div>
+        <div><strong>Tagihan 2:</strong> ${item.tagihan_2 || '-'}</div>
+        <div><strong>Tagihan 3:</strong> ${item.tagihan_3 || '-'}</div>
+        <div><strong>Link Dokumen:</strong> ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Buka Link</a>` : '-'}</div>
+      `;
 
-// Ekspor ke CSV
-function exportCSVKerjasama() {
-    if (!ksCurrentData.length) {
-        alert('Tidak ada data untuk diunduh.');
+      document.getElementById('modalDetail').classList.remove('hidden');
+      document.getElementById('modalDetail').classList.add('flex');
+    }
+
+    function tutupModal() {
+      document.getElementById('modalDetail').classList.add('hidden');
+      document.getElementById('modalDetail').classList.remove('flex');
+    }
+
+    function downloadCSVPasien() {
+      if (listDataPasienFiltered.length === 0) {
+        alert('Tidak ada data pasien untuk diunduh.');
         return;
+      }
+
+      const headers = ["No RM", "Nama Pasien", "No Transaksi", "Alamat", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Tahun Piutang", "Tgl Masuk", "Tgl Keluar", "Jumlah Biaya", "Potongan", "Pembayaran Awal", "Jumlah Angsuran", "Sisa Piutang", "KPKNL", "Tagihan 1", "Tagihan 2", "Tagihan 3", "Link Dokumen"];
+
+      const rows = listDataPasienFiltered.map(i => [
+        `"${i.no_rm || ''}"`,
+        `"${i.nama_pasien || ''}"`,
+        `"${i.no_transaksi || ''}"`,
+        `"${i.alamat_pasien || ''}"`,
+        `"${i.bangsal || ''}"`,
+        `"${i.kelas || ''}"`,
+        `"${i.jenis_perawatan || ''}"`,
+        `"${i.kategori || ''}"`,
+        i.tahun_piutang || '',
+        i.tgl_masuk_rs || '',
+        i.tgl_keluar_rs || '',
+        i.jumlah_biaya || 0,
+        i.potongan || 0,
+        i.pembayaran_awal || 0,
+        i.jumlah_angsuran || 0,
+        i.belum_terbayar || 0,
+        `"${i.kirim_kpknl || ''}"`,
+        i.tagihan_1 || '',
+        i.tagihan_2 || '',
+        i.tagihan_3 || '',
+        `"${i.link_dokumen || ''}"`
+      ]);
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
-    const headers = ["Tahun Piutang", "Bulan Piutang", "Nama Perusahaan", "Tanggal Surat", "Kota/Keterangan", "Jenis", "Tahun Layanan", "Bulan Layanan", "Jumlah Pasien", "Nomor Tagihan", "Link Dokumen", "Saldo Awal", "Tambah", "Koreksi +", "Bayar", "Koreksi -", "Biaya Transfer", "Saldo Akhir", "Tanggal Bayar", "Status", "Keterangan"];
-    
-    let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+    function updateLaporanKonsolidasi() {
+      const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
+      
+      const dataDetailPendapatan = (typeof listMasterPendapatan !== 'undefined' && Array.isArray(listMasterPendapatan)) 
+        ? listMasterPendapatan.filter(i => i.is_header === false) 
+        : [];
+      const targetData = dataDetailPendapatan.length > 0 ? dataDetailPendapatan : (listMasterPendapatan || []);
+      
+      const nilP = targetData.reduce((acc, curr) => {
+        const rowTotal = KEY_BULAN.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
+        return acc + rowTotal;
+      }, 0);
 
-    ksCurrentData.forEach(row => {
-        const saldoAkhir = row.saldo_akhir !== undefined 
-            ? row.saldo_akhir 
-            : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
+      const dataKerjasama = (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster)) ? listDataKerjasamaMaster : [];
+      const nilK = dataKerjasama.reduce((acc, curr) => {
+        const awal = Number(curr.saldo_awal) || 0;
+        const tambah = Number(curr.tambah) || 0;
+        const kPlus = Number(curr.koreksi_plus) || 0;
+        const bayar = Number(curr.bayar) || 0;
+        const kMinus = Number(curr.koreksi_minus) || 0;
+        const trf = Number(curr.biaya_transfer) || 0;
+        const sisa = curr.saldo_akhir !== undefined ? Number(curr.saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
+        return acc + sisa;
+      }, 0);
 
-        const r = [
-            row.tahun_piutang || '',
-            `"${row.bulan_piutang || ''}"`,
-            `"${row.nama_perusahaan || ''}"`,
-            row.tanggal_surat || '',
-            `"${row.kota_keterangan || ''}"`,
-            `"${row.jenis || ''}"`,
-            row.tahun_layanan || '',
-            `"${row.bulan_layanan || ''}"`,
-            row.jumlah_pasien || 0,
-            `"${row.nomor_tagihan || ''}"`,
-            `"${row.link_dokumen || ''}"`,
-            row.saldo_awal || 0,
-            row.tambah || 0,
-            row.koreksi_plus || 0,
-            row.bayar || 0,
-            row.koreksi_minus || 0,
-            row.biaya_transfer || 0,
-            saldoAkhir || 0,
-            row.tanggal_bayar || '',
-            `"${row.status || ''}"`,
-            `"${row.keterangan || ''}"`
-        ];
-        csvContent += r.join(",") + "\n";
-    });
+      const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
+      const totalKeseluruhan = nilP + nilK + totalSisaPasien;
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Laporan_Piutang_Kerjasama_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-   //Buat Fungsi Perhitungan yang Aman// 
-function updateLaporanKonsolidasi() {
-  // Safeguard: Pastikan variabel/array terdefinisi agar tidak crash/error
-  const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
-  const nilP = (typeof totalP !== 'undefined' && !isNaN(totalP)) ? Number(totalP) : 0;
-  const nilK = (typeof totalK !== 'undefined' && !isNaN(totalK)) ? Number(totalK) : 0;
+      const elPendapatan = document.getElementById('sum-pendapatan');
+      const elPiutangKerjasama = document.getElementById('sum-piutang-kerjasama');
+      const elPiutangPasien = document.getElementById('sum-piutang-pasien');
+      const elTotalKeseluruhan = document.getElementById('sum-total-keseluruhan');
 
-  // Hitung sisa piutang pasien
-  const totalSisaPasien = dataPasien.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
-  const totalKeseluruhan = nilP + nilK + totalSisaPasien;
+      if (elPendapatan) elPendapatan.innerText = `Rp ${nilP.toLocaleString('id-ID')}`;
+      if (elPiutangKerjasama) elPiutangKerjasama.innerText = `Rp ${nilK.toLocaleString('id-ID')}`;
+      if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
+      if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
+    }
 
-  // Cek ketersediaan elemen DOM sebelum mengisi nilai
-  const elPendapatan = document.getElementById('sum-pendapatan');
-  const elPiutangKerjasama = document.getElementById('sum-piutang-kerjasama');
-  const elPiutangPasien = document.getElementById('sum-piutang-pasien');
-  const elTotalKeseluruhan = document.getElementById('sum-total-keseluruhan');
-
-  if (elPendapatan) elPendapatan.innerText = `Rp ${nilP.toLocaleString('id-ID')}`;
-  if (elPiutangKerjasama) elPiutangKerjasama.innerText = `Rp ${nilK.toLocaleString('id-ID')}`;
-  if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
-  if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
-}
-    
     // ---------------- SUBMIT HANDLER PASIEN & PENDAPATAN ----------------
     document.getElementById('formPiutangPasien').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1712,258 +1957,16 @@ function updateLaporanKonsolidasi() {
       // 2. Load Data Rekap Pendapatan
       await loadDataPendapatan();
 
-      const dataDetail = listMasterPendapatan.filter(i => i.is_header === false);
-      const targetData = dataDetail.length > 0 ? dataDetail : listMasterPendapatan;
-      
-      const totalP = targetData.reduce((acc, curr) => {
-        const rowTotal = KEY_BULAN.reduce((sum, key) => sum + Number(curr[key] || 0), 0);
-        return acc + rowTotal;
-      }, 0);
-
-      // 3. Load Data Kerjasama (Lengkap & Terfilter)
-      const { data: dataK, error: errK } = await supabaseClient
-        .from('piutang_kerjasama')
-        .select('*')
-        .order('id', { ascending: false });
-        
-      let totalK = 0;
-      if (!errK && dataK) {
-        listDataKerjasamaMaster = dataK;
-        terapkanFilterKerjasama();
-        totalK = dataK.reduce((acc, curr) => acc + Number(curr.sisa_piutang || 0), 0);
-      }
-
-      // 4. Update Laporan Konsolidasi
-      const totalSisaPasien = listDataPasienMaster.reduce((acc, curr) => acc + Number(curr.belum_terbayar || 0), 0);
-      document.getElementById('sum-pendapatan').innerText = `Rp ${totalP.toLocaleString('id-ID')}`;
-      document.getElementById('sum-piutang-kerjasama').innerText = `Rp ${totalK.toLocaleString('id-ID')}`;
-      document.getElementById('sum-piutang-pasien').innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
-      document.getElementById('sum-total-keseluruhan').innerText = `Rp ${(totalP + totalK + totalSisaPasien).toLocaleString('id-ID')}`;
+      // 3. Load Data Kerjasama
+      fetchPiutangKerjasama();
     }
 
-    // ---------------- FILTER & RENDER LAPORAN PASIEN ----------------
-    function terapkanFilterPasien() {
-      const tglMulai = document.getElementById('filter_tgl_mulai').value;
-      const tglSelesai = document.getElementById('filter_tgl_selesai').value;
-      const tahun = document.getElementById('filter_tahun').value;
-      const jenis = document.getElementById('filter_jenis').value;
-      const statusPiutang = document.getElementById('filter_status_piutang').value;
-      const keyword = document.getElementById('inputCariPasien').value.toLowerCase();
+    document.addEventListener("DOMContentLoaded", () => {
+      const elSelesai = document.getElementById('p_filter_bulan_selesai');
+      if (elSelesai) elSelesai.value = "11";
 
-      listDataPasienFiltered = listDataPasienMaster.filter(item => {
-        if (tglMulai && item.tgl_masuk_rs && item.tgl_masuk_rs < tglMulai) return false;
-        if (tglSelesai && item.tgl_masuk_rs && item.tgl_masuk_rs > tglSelesai) return false;
-        if (tahun && String(item.tahun_piutang) !== tahun) return false;
-        if (jenis && item.jenis_perawatan !== jenis) return false;
-
-        if (statusPiutang === 'lunas' && (item.belum_terbayar || 0) > 0) return false;
-        if (statusPiutang === 'piutang' && (item.belum_terbayar || 0) <= 0) return false;
-
-        if (keyword) {
-          const matchNama = item.nama_pasien && item.nama_pasien.toLowerCase().includes(keyword);
-          const matchRM = item.no_rm && item.no_rm.toLowerCase().includes(keyword);
-          const matchTrx = item.no_transaksi && item.no_transaksi.toLowerCase().includes(keyword);
-          if (!matchNama && !matchRM && !matchTrx) return false;
-        }
-
-        return true;
-      });
-
-      updateStatistikPasien(listDataPasienFiltered);
-      renderTabelPasien(listDataPasienFiltered);
-    }
-
-    function updateStatistikPasien(data) {
-      let totalBiaya = 0;
-      let totalSisa = 0;
-      let totalMasuk = 0;
-
-      data.forEach(i => {
-        const biaya = parseFloat(i.jumlah_biaya) || 0;
-        const sisa = parseFloat(i.belum_terbayar) || 0;
-        const awal = parseFloat(i.pembayaran_awal) || 0;
-        const angsuran = parseFloat(i.jumlah_angsuran) || 0;
-
-        totalBiaya += biaya;
-        totalSisa += sisa;
-        totalMasuk += (awal + angsuran);
-      });
-
-      document.getElementById('stat-total-biaya').innerText = `Rp ${totalBiaya.toLocaleString('id-ID')}`;
-      document.getElementById('stat-total-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
-      document.getElementById('stat-sisa-piutang').innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
-      document.getElementById('stat-total-pasien').innerText = `${data.length} Pasien`;
-    }
-
-    function renderTabelPasien(data) {
-      const tbody = document.getElementById('tabelPasien');
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data sesuai kriteria filter.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = data.map(item => `
-        <tr class="hover:bg-slate-50">
-          <td class="p-2.5 border-r font-mono">${item.no_rm || '-'}</td>
-          <td class="p-2.5 border-r font-semibold text-slate-800">${item.nama_pasien || '-'}</td>
-          <td class="p-2.5 border-r font-mono text-slate-600">${item.no_transaksi || '-'}</td>
-          <td class="p-2.5 border-r">${item.bangsal || '-'} (${item.kelas || '-'})</td>
-          <td class="p-2.5 border-r">${item.jenis_perawatan || '-'} - ${item.kategori || '-'}</td>
-          <td class="p-2.5 border-r font-medium">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
-          <td class="p-2.5 border-r text-red-600 font-bold">Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</td>
-          <td class="p-2.5 border-r font-semibold text-blue-700">${item.kirim_kpknl || 'Belum'}</td>
-          <td class="p-2.5 border-r text-center">
-            ${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-600 underline">Buka</a>` : '-'}
-          </td>
-          <td class="p-2.5 text-center">
-            <div class="flex justify-center gap-1">
-              <button onclick="bukaDetailPasien(${item.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold text-[10px]">Detail</button>
-              <button onclick="editDataPasien(${item.id})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 font-semibold text-[10px]">Edit</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // ---------------- MODAL DETAIL & EDIT PASIEN ----------------
-    function bukaDetailPasien(id) {
-      const item = listDataPasienMaster.find(d => d.id === id);
-      if (!item) return;
-
-      const konten = `
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Nama Pasien:</span> ${item.nama_pasien || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. RM:</span> ${item.no_rm || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Alamat:</span> ${item.alamat_pasien || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">No. Transaksi:</span> ${item.no_transaksi || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Masuk RS:</span> ${item.tgl_masuk_rs || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Keluar RS:</span> ${item.tgl_keluar_rs || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Bangsal / Kelas:</span> ${item.bangsal || '-'} / ${item.kelas || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jenis / Kategori:</span> ${item.jenis_perawatan || '-'} / ${item.kategori || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tahun Piutang:</span> ${item.tahun_piutang || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Status KPKNL:</span> ${item.kirim_kpknl || 'Belum'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Biaya:</span> Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Potongan:</span> Rp ${Number(item.potongan || 0).toLocaleString('id-ID')}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Pembayaran Awal:</span> Rp ${Number(item.pembayaran_awal || 0).toLocaleString('id-ID')}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Jumlah Angsuran:</span> Rp ${Number(item.jumlah_angsuran || 0).toLocaleString('id-ID')}</div>
-        <div class="bg-red-50 text-red-700 p-2 rounded border font-bold col-span-1 md:col-span-2">Belum Terbayar: Rp ${Number(item.belum_terbayar || 0).toLocaleString('id-ID')}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 1:</span> ${item.tagihan_1 || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 2:</span> ${item.tagihan_2 || '-'}</div>
-        <div class="bg-slate-50 p-2 rounded border"><span class="font-bold">Tgl Tagihan 3:</span> ${item.tagihan_3 || '-'}</div>
-      `;
-
-      document.getElementById('kontenDetail').innerHTML = konten;
-      document.getElementById('modalDetail').classList.remove('hidden');
-      document.getElementById('modalDetail').classList.add('flex');
-    }
-
-    function tutupModal() {
-      document.getElementById('modalDetail').classList.add('hidden');
-      document.getElementById('modalDetail').classList.remove('flex');
-    }
-
-    function editDataPasien(id) {
-      const item = listDataPasienMaster.find(d => d.id === id);
-      if (!item) return;
-
-      bukaView('input-pasien');
-
-      document.getElementById('edit_id').value = item.id;
-      document.getElementById('nama_pasien').value = item.nama_pasien || '';
-      document.getElementById('alamat_pasien').value = item.alamat_pasien || '';
-      document.getElementById('no_rm').value = item.no_rm || '';
-      document.getElementById('no_transaksi').value = item.no_transaksi || '';
-      document.getElementById('tahun_piutang').value = item.tahun_piutang || '';
-      document.getElementById('tgl_masuk_rs').value = item.tgl_masuk_rs || '';
-      document.getElementById('tgl_keluar_rs').value = item.tgl_keluar_rs || '';
-      document.getElementById('bangsal').value = item.bangsal || '';
-      document.getElementById('kelas').value = item.kelas || '';
-      document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
-      document.getElementById('kategori').value = item.kategori || '';
-
-      if (item.kirim_kpknl && item.kirim_kpknl.startsWith('Sudah')) {
-        selectKpknl.value = 'Sudah';
-        containerTglKpknl.classList.remove('hidden');
-        const match = item.kirim_kpknl.match(/\((.*?)\)/);
-        inputTglKpknl.value = match ? match[1] : '';
-      } else {
-        selectKpknl.value = 'Belum';
-        containerTglKpknl.classList.add('hidden');
-        inputTglKpknl.value = '';
-      }
-
-      document.getElementById('jumlah_biaya').value = item.jumlah_biaya || 0;
-      document.getElementById('potongan').value = item.potongan || 0;
-      document.getElementById('pembayaran_awal').value = item.pembayaran_awal || 0;
-      document.getElementById('jumlah_angsuran').value = item.jumlah_angsuran || 0;
-      document.getElementById('belum_terbayar').value = item.belum_terbayar || 0;
-
-      document.getElementById('tagihan_1').value = item.tagihan_1 || '';
-      document.getElementById('tagihan_2').value = item.tagihan_2 || '';
-      document.getElementById('tagihan_3').value = item.tagihan_3 || '';
-      document.getElementById('link_dokumen').value = item.link_dokumen || '';
-
-      document.getElementById('btnSubmitPasien').innerText = '💾 Update Data Pasien';
-      document.getElementById('btnSubmitPasien').className = 'w-full bg-amber-600 text-white font-semibold py-2 px-4 rounded hover:bg-amber-700 transition h-[38px]';
-      document.getElementById('btnBatalPasien').classList.remove('hidden');
-    }
-
-    function batalEditPasien() {
-      document.getElementById('edit_id').value = '';
-      document.getElementById('formPiutangPasien').reset();
-      containerTglKpknl.classList.add('hidden');
-      hitungBelumTerbayarPasien();
-
-      document.getElementById('btnSubmitPasien').innerText = '+ Simpan Data Pasien';
-      document.getElementById('btnSubmitPasien').className = 'w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]';
-      document.getElementById('btnBatalPasien').classList.add('hidden');
-    }
-
-    // ---------------- EXPORT CSV PASIEN ----------------
-    function downloadCSVPasien() {
-      if (listDataPasienFiltered.length === 0) {
-        alert('Tidak ada data laporan pasien untuk diunduh.');
-        return;
-      }
-
-      const headers = ["No. RM", "Nama Pasien", "Alamat", "No TRX", "Tgl Masuk", "Tgl Keluar", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Tahun", "Status KPKNL", "Jumlah Biaya", "Potongan", "Pembayaran Awal", "Jumlah Angsuran", "Sisa Piutang", "Tagihan 1", "Tagihan 2", "Tagihan 3", "Link Dokumen"];
-      
-      const rows = listDataPasienFiltered.map(item => [
-        `"${item.no_rm || ''}"`,
-        `"${item.nama_pasien || ''}"`,
-        `"${item.alamat_pasien || ''}"`,
-        `"${item.no_transaksi || ''}"`,
-        `"${item.tgl_masuk_rs || ''}"`,
-        `"${item.tgl_keluar_rs || ''}"`,
-        `"${item.bangsal || ''}"`,
-        `"${item.kelas || ''}"`,
-        `"${item.jenis_perawatan || ''}"`,
-        `"${item.kategori || ''}"`,
-        `"${item.tahun_piutang || ''}"`,
-        `"${item.kirim_kpknl || ''}"`,
-        item.jumlah_biaya || 0,
-        item.potongan || 0,
-        item.pembayaran_awal || 0,
-        item.jumlah_angsuran || 0,
-        item.belum_terbayar || 0,
-        `"${item.tagihan_1 || ''}"`,
-        `"${item.tagihan_2 || ''}"`,
-        `"${item.tagihan_3 || ''}"`,
-        `"${item.link_dokumen || ''}"`
-      ]);
-
-      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // Inisialisasi awal saat pertama kali dibuka
-    loadSemuaLaporan();
+      loadSemuaLaporan();
+    });
   </script>
 </body>
 </html>
