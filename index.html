@@ -538,8 +538,17 @@
             <p class="text-xs text-slate-500">Monitoring realisasi pendapatan, pencapaian target anggaran, dan ekspor laporan.</p>
           </div>
           <button onclick="downloadCSVPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-            📥 Export Laporan Pendapatan (CSV)
+            📥 Export Pendapatan (CSV)
           </button>
+          <!-- Tombol Export Excel -->
+  <button onclick="downloadExcelPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
+    <span>📊</span> Export Excel
+  </button>
+
+  <!-- Tombol Export PDF -->
+  <button onclick="downloadPDFPendapatan()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
+    <span>📄</span> Export PDF
+  </button>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
@@ -648,16 +657,6 @@
           <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
             📥 Export Laporan Kerjasama (CSV)
           </button>
-          <div class="flex gap-2">
-  <!-- Tombol Export Excel -->
-  <button onclick="downloadExcelPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
-    <span>📊</span> Export Excel
-  </button>
-
-  <!-- Tombol Export PDF -->
-  <button onclick="downloadPDFPendapatan()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
-    <span>📄</span> Export PDF
-  </button>
         </div>
         
         <!-- STATISTIK RINGKASAN KERJASAMA -->
