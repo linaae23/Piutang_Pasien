@@ -53,13 +53,13 @@
 
         <!-- KELOMPOK LAPORAN -->
         <div>
-          <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">LAPORAN & REKAP</p>
+          <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">LAPORAN & </p>
           <div class="space-y-1">
             <button onclick="bukaView('laporan-pasien')" id="btn-laporan-pasien" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
               <span>📋</span> Laporan Piutang Pasien
             </button>
             <button onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>📊</span> Laporan Rekap Pendapatan
+              <span>📊</span> Laporan  Pendapatan
             </button>
             <button onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
               <span>🤝</span> Laporan Piutang Kerjasama
@@ -985,21 +985,118 @@
     ];
 
     async function loadDataPendapatan() {
-      const { data, error } = await supabaseClient
-        .from('rekap_pendapatan')
-        .select('*')
-        .order('kode_rekening', { ascending: true });
+  const { data, error } = await supabaseClient
+    .from('rekap_pendapatan')
+    .select('*')
+    .order('kode_rekening', { ascending: true });
 
-      if (error) {
-        console.error('Gagal mengambil data rekap_pendapatan:', error.message);
-        return;
-      }
+  if (error) {
+    console.error('Gagal mengambil data rekap_pendapatan:', error.message);
+    return;
+  }
 
-      listMasterPendapatan = data || [];
+  // PASS DATA KE FUNGSI HITUNG OTOMATIS SEBELUM DIRENDER
+  listMasterPendapatan = hitungOtomatisRekapPendapatan(data || []);
       renderCheckboxUraian(listMasterPendapatan);
       resetFilterPendapatan(); 
     }
 
+// Fungsi Hitung Rekap Pendapatan Otomatis
+function hitungOtomatisRekapPendapatan(dataPendapatan) {
+  // Daftar kolom angka sesuai dengan KEY_BULAN + anggaran pada script Anda
+  const kolomAngka = [
+    'anggaran', 'target', 
+    'realisasi_jan', 'realisasi_feb', 'realisasi_mar', 'realisasi_apr', 
+    'realisasi_mei', 'realisasi_jun', 'realisasi_jul', 'realisasi_agu', 
+    'realisasi_sep', 'realisasi_okt', 'realisasi_nov', 'realisasi_des'
+  ];
+
+  const mapData = {};
+  dataPendapatan.forEach(item => {
+    const key = item.kode_rekening || item.uraian?.trim();
+    if (key) mapData[key] = item;
+  });
+
+  const hitungTotal = (daftarBaris, kolom) => 
+    daftarBaris.reduce((acc, row) => acc + (parseFloat(row[kolom]) || 0), 0);
+
+  kolomAngka.forEach(kolom => {
+    // LEVEL 1
+    const detailMoewardiRetribusi = dataPendapatan.filter(item => item.parent_kode === '4.1.2.1.1.5.01');
+    if (mapData['4.1.2.1.1.5.01']) {
+      mapData['4.1.2.1.1.5.01'][kolom] = hitungTotal(detailMoewardiRetribusi, kolom);
+    }
+
+    if (mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)']) {
+      const a = parseFloat(mapData['a. SEWA RUMAH DINAS']?.[kolom]) || 0;
+      const b = parseFloat(mapData['b. SEWA RUANGAN / AULA']?.[kolom]) || 0;
+      const c = parseFloat(mapData['c. SEWA KANTIN']?.[kolom]) || 0;
+      const d = parseFloat(mapData['d. SEWA LAHAN PARKIR']?.[kolom]) || 0;
+      mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)'][kolom] = a + b + c + d;
+    }
+
+    if (mapData['PENDAPATAN BLUD DR JASA GIRO']) {
+      mapData['PENDAPATAN BLUD DR JASA GIRO'][kolom] = parseFloat(mapData['JASA GIRO']?.[kolom]) || 0;
+    }
+    if (mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA']) {
+      mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA'][kolom] = parseFloat(mapData['PENERIMAAN BUNGA']?.[kolom]) || 0;
+    }
+
+    // LEVEL 2
+    if (mapData['RETRIBUSI PELAY.KESEHT. DI RSUD']) {
+      mapData['RETRIBUSI PELAY.KESEHT. DI RSUD'][kolom] = parseFloat(mapData['4.1.2.1.1.5.01']?.[kolom]) || 0;
+    }
+    if (mapData['4.1.4.16.2.1.01']) {
+      const pLain = parseFloat(mapData['PENDAPATAN LAIN-LAIN (PIHAK-3, DLL)']?.[kolom]) || 0;
+      const pSewa = parseFloat(mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)']?.[kolom]) || 0;
+      mapData['4.1.4.16.2.1.01'][kolom] = pLain + pSewa;
+    }
+    if (mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']) {
+      const pGiro = parseFloat(mapData['PENDAPATAN BLUD DR JASA GIRO']?.[kolom]) || 0;
+      const pBunga = parseFloat(mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA']?.[kolom]) || 0;
+      mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH'][kolom] = pGiro + pBunga;
+    }
+
+    // LEVEL 3
+    if (mapData['RETRIBUSI PELAYANAN KESEHATAN']) {
+      mapData['RETRIBUSI PELAYANAN KESEHATAN'][kolom] = parseFloat(mapData['RETRIBUSI PELAY.KESEHT. DI RSUD']?.[kolom]) || 0;
+    }
+    if (mapData['PENDAPATAN BLUD DR JASA LAYANAN']) {
+      mapData['PENDAPATAN BLUD DR JASA LAYANAN'][kolom] = parseFloat(mapData['4.1.4.16.2.1.01']?.[kolom]) || 0;
+    }
+
+    // LEVEL 4
+    if (mapData['RETRIBUSI JASA UMUM']) {
+      mapData['RETRIBUSI JASA UMUM'][kolom] = parseFloat(mapData['RETRIBUSI PELAYANAN KESEHATAN']?.[kolom]) || 0;
+    }
+    if (mapData['4.1.4.16']) {
+      const pJasa = parseFloat(mapData['PENDAPATAN BLUD DR JASA LAYANAN']?.[kolom]) || 0;
+      const pLainLain = parseFloat(mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']?.[kolom]) || 0;
+      mapData['4.1.4.16'][kolom] = pJasa + pLainLain;
+    }
+
+    // LEVEL 5
+    if (mapData['RETRIBUSI DAERAH']) {
+      mapData['RETRIBUSI DAERAH'][kolom] = parseFloat(mapData['RETRIBUSI JASA UMUM']?.[kolom]) || 0;
+    }
+    if (mapData['LAIN-LAIN PAD YANG SAH']) {
+      mapData['LAIN-LAIN PAD YANG SAH'][kolom] = parseFloat(mapData['4.1.4.16']?.[kolom]) || 0;
+    }
+
+    // LEVEL 6 (TOP HEADER)
+    if (mapData['PENDAPATAN ASLI DAERAH (PAD)']) {
+      const retribusi = parseFloat(mapData['RETRIBUSI DAERAH']?.[kolom]) || 0;
+      const lainPAD = parseFloat(mapData['LAIN-LAIN PAD YANG SAH']?.[kolom]) || 0;
+      mapData['PENDAPATAN ASLI DAERAH (PAD)'][kolom] = retribusi + lainPAD;
+    }
+    if (mapData['PENDAPATAN BLUD']) {
+      mapData['PENDAPATAN BLUD'][kolom] = parseFloat(mapData['PENDAPATAN ASLI DAERAH (PAD)']?.[kolom]) || 0;
+    }
+  });
+
+  return dataPendapatan;
+}
+    
     function renderCheckboxUraian(data) {
       const container = document.getElementById('container-check-uraian');
       if (!container) return;
