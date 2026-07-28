@@ -3,9 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Keuangan, Pendapatan & Piutang RS</title>
+  <title>Sistem Pendapatan & Piutang RS</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Library untuk Export Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- Library untuk Export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-slate-100 font-sans antialiased">
 
@@ -642,6 +648,16 @@
           <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
             📥 Export Laporan Kerjasama (CSV)
           </button>
+          <div class="flex gap-2">
+  <!-- Tombol Export Excel -->
+  <button onclick="downloadExcelPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
+    <span>📊</span> Export Excel
+  </button>
+
+  <!-- Tombol Export PDF -->
+  <button onclick="downloadPDFPendapatan()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
+    <span>📄</span> Export PDF
+  </button>
         </div>
         
         <!-- STATISTIK RINGKASAN KERJASAMA -->
@@ -1363,6 +1379,115 @@ function hitungOtomatisRekapPendapatan(dataPendapatan) {
         loadDataPendapatan();
       }
     }
+// Function Export PDF Rekap Pendapatan
+function downloadPDFPendapatan() {
+  if (!listMasterPendapatan || listMasterPendapatan.length === 0) {
+    alert("Data pendapatan kosong!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  // Format Landscape ('l') agar tabel muat 12 bulan
+  const doc = new jsPDF('l', 'mm', 'a4');
+
+  // Judul Laporan
+  doc.setFontSize(14);
+  doc.text("LAPORAN REKAP PENDAPATAN", 14, 15);
+  doc.setFontSize(10);
+  doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
+
+  // Menyusun Header & Body Tabel PDF
+  const tableHeaders = [
+    ["Kode", "Uraian", "Target", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+  ];
+
+  const tableData = listMasterPendapatan.map(item => [
+    item.kode_rekening || "-",
+    item.uraian || "-",
+    (item.anggaran || 0).toLocaleString('id-ID'),
+    (item.realisasi_jan || 0).toLocaleString('id-ID'),
+    (item.realisasi_feb || 0).toLocaleString('id-ID'),
+    (item.realisasi_mar || 0).toLocaleString('id-ID'),
+    (item.realisasi_apr || 0).toLocaleString('id-ID'),
+    (item.realisasi_mei || 0).toLocaleString('id-ID'),
+    (item.realisasi_jun || 0).toLocaleString('id-ID'),
+    (item.realisasi_jul || 0).toLocaleString('id-ID'),
+    (item.realisasi_agu || 0).toLocaleString('id-ID'),
+    (item.realisasi_sep || 0).toLocaleString('id-ID'),
+    (item.realisasi_okt || 0).toLocaleString('id-ID'),
+    (item.realisasi_nov || 0).toLocaleString('id-ID'),
+    (item.realisasi_des || 0).toLocaleString('id-ID')
+  ]);
+
+  // Generate Tabel Menggunakan AutoTable
+  doc.autoTable({
+    startY: 26,
+    head: tableHeaders,
+    body: tableData,
+    styles: { fontSize: 7, cellPadding: 1.5 },
+    headStyles: { fillColor: [15, 23, 42] }, // Warna slate-900
+    theme: 'grid'
+  });
+
+  // Simpan File PDF
+  doc.save(`Laporan_Rekap_Pendapatan_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+// Function Export PDF Rekap Pendapatan
+function downloadPDFPendapatan() {
+  if (!listMasterPendapatan || listMasterPendapatan.length === 0) {
+    alert("Data pendapatan kosong!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  // Format Landscape ('l') agar tabel muat 12 bulan
+  const doc = new jsPDF('l', 'mm', 'a4');
+
+  // Judul Laporan
+  doc.setFontSize(14);
+  doc.text("LAPORAN REKAP PENDAPATAN", 14, 15);
+  doc.setFontSize(10);
+  doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
+
+  // Menyusun Header & Body Tabel PDF
+  const tableHeaders = [
+    ["Kode", "Uraian", "Target", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+  ];
+
+  const tableData = listMasterPendapatan.map(item => [
+    item.kode_rekening || "-",
+    item.uraian || "-",
+    (item.anggaran || 0).toLocaleString('id-ID'),
+    (item.realisasi_jan || 0).toLocaleString('id-ID'),
+    (item.realisasi_feb || 0).toLocaleString('id-ID'),
+    (item.realisasi_mar || 0).toLocaleString('id-ID'),
+    (item.realisasi_apr || 0).toLocaleString('id-ID'),
+    (item.realisasi_mei || 0).toLocaleString('id-ID'),
+    (item.realisasi_jun || 0).toLocaleString('id-ID'),
+    (item.realisasi_jul || 0).toLocaleString('id-ID'),
+    (item.realisasi_agu || 0).toLocaleString('id-ID'),
+    (item.realisasi_sep || 0).toLocaleString('id-ID'),
+    (item.realisasi_okt || 0).toLocaleString('id-ID'),
+    (item.realisasi_nov || 0).toLocaleString('id-ID'),
+    (item.realisasi_des || 0).toLocaleString('id-ID')
+  ]);
+
+  // Generate Tabel Menggunakan AutoTable
+  doc.autoTable({
+    startY: 26,
+    head: tableHeaders,
+    body: tableData,
+    styles: { fontSize: 7, cellPadding: 1.5 },
+    headStyles: { fillColor: [15, 23, 42] }, // Warna slate-900
+    theme: 'grid'
+  });
+
+  // Simpan File PDF
+  doc.save(`Laporan_Rekap_Pendapatan_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+    
+    
 
     // ==========================================
     // LOGIKA PIUTANG KERJA SAMA
