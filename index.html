@@ -374,15 +374,25 @@
         <label class="block font-medium mb-1">Nomor Tagihan</label>
         <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
       </div>
-      <div class="col-span-1 md:col-span-2">
-        <label class="block font-medium mb-1">Link Dokumen (URL)</label>
-        <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
-      </div>
-
       <div>
         <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
         <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
       </div>
+      
+      <div class="col-span-1 md:col-span-2">
+        <label class="block font-medium mb-1">Link Dokumen (URL)</label>
+        <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
+      </div>
+     
+      <div>
+        <label class="block font-medium mb-1">Tanggal Bayar</label>
+        <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Bayar (Rp)</label>
+        <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
+      </div>
+      
       <div>
         <label class="block font-medium mb-1">Tambah (Rp)</label>
         <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
@@ -392,10 +402,7 @@
         <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
       </div>
 
-      <div>
-        <label class="block font-medium mb-1">Bayar (Rp)</label>
-        <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
+      
       <div>
         <label class="block font-medium mb-1">Koreksi - (Rp)</label>
         <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
@@ -409,10 +416,7 @@
         <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
         <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
       </div>
-      <div>
-        <label class="block font-medium mb-1">Tanggal Bayar</label>
-        <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
-      </div>
+      
       <div>
         <label class="block font-medium mb-1">Status Piutang</label>
         <input type="text" id="ks_status" readonly placeholder="Otomatis (Belum Lunas / Lunas)" class="w-full border p-2 rounded bg-gray-100 font-semibold">
@@ -755,13 +759,13 @@
                         <th class="p-3">No. Tagihan</th>
                         <th class="p-3">Dokumen</th>
                         <th class="p-3 text-right">Saldo Awal</th>
+                        <th class="p-3">Tgl Bayar</th>
+                        <th class="p-3 text-right">Bayar</th>
                         <th class="p-3 text-right">Tambah</th>
                         <th class="p-3 text-right">Koreksi (+)</th>
-                        <th class="p-3 text-right">Bayar</th>
                         <th class="p-3 text-right">Koreksi (-)</th>
                         <th class="p-3 text-right">Biaya Trf</th>
-                        <th class="p-3 text-right">Saldo Akhir</th>
-                        <th class="p-3">Tgl Bayar</th>
+                        <th class="p-3 text-right">Saldo Akhir</th
                         <th class="p-3 text-center">Status</th>
                         <th class="p-3">Aksi</th>
                     </tr>
