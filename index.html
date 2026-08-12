@@ -341,11 +341,10 @@
           <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
           <option value="Rawat Inap">Rawat Inap</option>
           <option value="Rawat Jalan">Rawat Jalan</option>
-          <option value="Rawat Jalan">Lab. Patologi Klinik</option>
-          <option value="Rawat Jalan">Lab. Patologi Anatomi</option>
-          <option value="Rawat Jalan">Lab. Mikrobiologi</option>
-          <option value="Rawat Jalan">Radiologi</option>
-          <option value="Rawat Jalan">Rawat Jalan</option>
+          <option value="Lab. Patologi Klinik">Lab. Patologi Klinik</option>
+          <option value="Lab. Patologi Anatomi">Lab. Patologi Anatomi</option>
+          <option value="Lab. Mikrobiologi">Lab. Mikrobiologi</option>
+          <option value="Radiologi">Radiologi</option>
           <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
           <option value="Obat Rawat Inap">Obat Rawat Inap</option>
           <option value="BPJS Pelayanan">BPJS Pelayanan</option>
@@ -1678,6 +1677,7 @@ function downloadPDFPendapatan() {
             bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
             nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
             tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
+            Nomor_surat: document.getElementById('ks_no_surat')?.value || '',
             kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
             jenis: document.getElementById('ks_jenis')?.value || '',
             tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
@@ -1727,6 +1727,7 @@ function downloadPDFPendapatan() {
     document.getElementById('ks_bulan_piutang').value = row.bulan_piutang || '';
     document.getElementById('ks_nama_perusahaan').value = row.nama_perusahaan || '';
     document.getElementById('ks_tanggal_surat').value = row.tanggal_surat || '';
+    document.getElementById('ks_no_surat').value = row.tanggal_surat || '';  
     document.getElementById('ks_kota_keterangan').value = row.kota_keterangan || '';
     document.getElementById('ks_jenis').value = row.jenis || 'Rawat Inap & Rawat Jalan';
     document.getElementById('ks_tahun_layanan').value = row.tahun_layanan || '';
