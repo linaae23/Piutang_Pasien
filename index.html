@@ -341,6 +341,11 @@
           <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
           <option value="Rawat Inap">Rawat Inap</option>
           <option value="Rawat Jalan">Rawat Jalan</option>
+          <option value="Rawat Jalan">Lab. Patologi Klinik</option>
+          <option value="Rawat Jalan">Lab. Patologi Anatomi</option>
+          <option value="Rawat Jalan">Lab. Mikrobiologi</option>
+          <option value="Rawat Jalan">Radiologi</option>
+          <option value="Rawat Jalan">Rawat Jalan</option>
           <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
           <option value="Obat Rawat Inap">Obat Rawat Inap</option>
           <option value="BPJS Pelayanan">BPJS Pelayanan</option>
@@ -1594,13 +1599,14 @@ function downloadPDFPendapatan() {
                     <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
                     <td class="p-3 text-center">${linkDoc}</td>
                     <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
+                    <td class="p-3">${row.tanggal_bayar || '-'}</td>
+                    <td class="p-3 text-right text-blue-600">${fmtKS(row.bayar)}</td>
                     <td class="p-3 text-right text-emerald-600">+${fmtKS(row.tambah)}</td>
                     <td class="p-3 text-right text-emerald-600">+${fmtKS(row.koreksi_plus)}</td>
-                    <td class="p-3 text-right text-blue-600">${fmtKS(row.bayar)}</td>
                     <td class="p-3 text-right text-rose-600">-${fmtKS(row.koreksi_minus)}</td>
                     <td class="p-3 text-right">${fmtKS(row.biaya_transfer)}</td>
                     <td class="p-3 text-right font-bold text-gray-900">${fmtKS(saldoAkhir)}</td>
-                    <td class="p-3">${row.tanggal_bayar || '-'}</td>
+                    
                     <td class="p-3 text-center">${statusBadge}</td>
                     <td class="p-3">
                         <div class="flex gap-1">
