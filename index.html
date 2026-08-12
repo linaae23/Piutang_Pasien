@@ -1727,14 +1727,14 @@ function downloadPDFPendapatan() {
     document.getElementById('ks_bulan_layanan').value = row.bulan_layanan || '';
     document.getElementById('ks_jumlah_pasien').value = row.jumlah_pasien || 0;
     document.getElementById('ks_nomor_tagihan').value = row.nomor_tagihan || '';
+    document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;  
     document.getElementById('ks_link_dokumen').value = row.link_dokumen || '';
-    document.getElementById('ks_saldo_awal').value = row.saldo_awal || 0;
+    document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
+    document.getElementById('ks_bayar').value = row.bayar || 0;  
     document.getElementById('ks_tambah').value = row.tambah || 0;
     document.getElementById('ks_koreksi_plus').value = row.koreksi_plus || 0;
-    document.getElementById('ks_bayar').value = row.bayar || 0;
     document.getElementById('ks_koreksi_minus').value = row.koreksi_minus || 0;
     document.getElementById('ks_biaya_transfer').value = row.biaya_transfer || 0;
-    document.getElementById('ks_tanggal_bayar').value = row.tanggal_bayar || '';
     document.getElementById('ks_status').value = row.status || 'Belum Lunas';
     document.getElementById('ks_keterangan').value = row.keterangan || '';
 
@@ -1784,7 +1784,7 @@ function downloadPDFPendapatan() {
             return;
         }
 
-        const headers = ["Tahun Piutang", "Bulan Piutang", "Nama Perusahaan", "Tanggal Surat", "Kota/Keterangan", "Jenis", "Tahun Layanan", "Bulan Layanan", "Jumlah Pasien", "Nomor Tagihan", "Link Dokumen", "Saldo Awal", "Tambah", "Koreksi +", "Bayar", "Koreksi -", "Biaya Transfer", "Saldo Akhir", "Tanggal Bayar", "Status", "Keterangan"];
+        const headers = ["Tahun Piutang", "Bulan Piutang", "Nama Perusahaan", "Tanggal Surat", "Nomor Surat", "Kota/Keterangan", "Jenis", "Tahun Layanan", "Bulan Layanan", "Jumlah Pasien", "Nomor Tagihan", "Saldo Awal", "Link Dokumen", "Tanggal Bayar", "Bayar", "Tambah", "Koreksi +",  "Koreksi -", "Biaya Transfer", "Saldo Akhir", "Status", "Keterangan"];
         
         let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
 
