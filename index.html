@@ -1591,6 +1591,7 @@ function downloadPDFPendapatan() {
                     <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
                     <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
                     <td class="p-3">${row.tanggal_surat || '-'}</td>
+                    <td class="p-3 font-mono">${row.nomor_surat || '-'}</td>
                     <td class="p-3">${row.kota_keterangan || '-'}</td>
                     <td class="p-3">${row.jenis || '-'}</td>
                     <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
@@ -1677,7 +1678,7 @@ function downloadPDFPendapatan() {
             bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
             nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
             tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
-            Nomor_surat: document.getElementById('ks_no_surat')?.value || '',
+            nomor_surat: document.getElementById('ks_no_surat')?.value || '',
             kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
             jenis: document.getElementById('ks_jenis')?.value || '',
             tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
@@ -1805,9 +1806,10 @@ function downloadPDFPendapatan() {
                 `"${row.bulan_piutang || ''}"`,
                 `"${row.nama_perusahaan || ''}"`,
                 row.tanggal_surat || '',
+                `"${row.nomor_surat || ''}"`,
                 `"${row.kota_keterangan || ''}"`,
-                `"${row.jenis || ''}"`,
-                row.tahun_layanan || '',
+                row.jenis || '',
+                `"${row.tahun_layanan || ''}"`,
                 `"${row.bulan_layanan || ''}"`,
                 row.jumlah_pasien || 0,
                 `"${row.nomor_tagihan || ''}"`,
