@@ -1588,12 +1588,11 @@ function downloadPDFPendapatan() {
                     <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
                     <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
                     <td class="p-3">${row.tanggal_surat || '-'}</td>
-                    <td class="p-3 font-mono">${row.nomor_surat || '-'}</td>
+                    <td class="p-3 font-mono">${row.no_surat || '-'}</td>
                     <td class="p-3">${row.kota_keterangan || '-'}</td>
                     <td class="p-3">${row.jenis || '-'}</td>
                     <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
                     <td class="p-3 text-center">${row.jumlah_pasien || 0}</td>
-                    <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
                     <td class="p-3 text-center">${linkDoc}</td>
                     <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
                     <td class="p-3">${row.tanggal_bayar || '-'}</td>
@@ -1803,7 +1802,7 @@ function downloadPDFPendapatan() {
                 `"${row.bulan_piutang || ''}"`,
                 `"${row.nama_perusahaan || ''}"`,
                 row.tanggal_surat || '',
-                `"${row.nomor_surat || ''}"`,
+                `"${row.no_surat || ''}"`,
                 `"${row.kota_keterangan || ''}"`,
                 row.jenis || '',
                 `"${row.tahun_layanan || ''}"`,
