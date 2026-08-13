@@ -1593,6 +1593,7 @@ function downloadPDFPendapatan() {
                     <td class="p-3">${row.jenis || '-'}</td>
                     <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
                     <td class="p-3 text-center">${row.jumlah_pasien || 0}</td>
+                    <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
                     <td class="p-3 text-center">${linkDoc}</td>
                     <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
                     <td class="p-3">${row.tanggal_bayar || '-'}</td>
@@ -1683,12 +1684,12 @@ function downloadPDFPendapatan() {
             nomor_tagihan: document.getElementById('ks_nomor_tagihan')?.value || '',
             link_dokumen: document.getElementById('ks_link_dokumen')?.value || '',
             saldo_awal: awal,
+            tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
+            bayar: bayar,
             tambah: tambah,
             koreksi_plus: kPlus,
-            bayar: bayar,
             koreksi_minus: kMinus,
             biaya_transfer: trf,
-            tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
             status: statusOtomatis,
             keterangan: document.getElementById('ks_keterangan')?.value || ''
         };
