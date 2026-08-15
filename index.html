@@ -656,129 +656,161 @@
       </section>
 
       <!-- ================= 6. LAPORAN PIUTANG KERJASAMA ================= -->
-      <section id="view-laporan-kerjasama" class="modul-view hidden">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h1 class="text-xl font-bold text-slate-800">🤝 Laporan Piutang Kerjasama Perusahaan / Asuransi</h1>
-            <p class="text-xs text-slate-500">Monitoring piutang perusahaan mitra, status kelunasan, dan ekspor laporan.</p>
-          </div>
-          <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-            📥 Export Laporan Kerjasama (CSV)
-          </button>
+<section id="view-laporan-kerjasama" class="modul-view hidden">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">🤝 Laporan Piutang Kerjasama Perusahaan / Asuransi</h1>
+      <p class="text-xs text-slate-500">Monitoring piutang perusahaan mitra, status kelunasan, dan ekspor laporan.</p>
+    </div>
+    <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+      📥 Export Laporan Kerjasama (CSV)
+    </button>
+  </div>
+  
+  <!-- STATISTIK RINGKASAN KERJASAMA -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Tagihan Piutang</p>
+      <p id="k-stat-total-piutang" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Terbayar / Angsuran</p>
+      <p id="k-stat-total-bayar" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Sisa Piutang Kerjasama</p>
+      <p id="k-stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <p class="text-slate-500 font-medium">Total Transaksi / Mitra</p>
+      <p id="k-stat-total-mitra" class="text-lg font-bold text-blue-600 mt-1">0 Transaksi</p>
+    </div>
+  </div>
+  
+  <!-- FILTER DATA -->
+  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
+    <h2 class="text-base font-semibold text-gray-700">Filter Data Piutang Kerja Sama</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Thn Piutang</label>
+            <input type="number" id="f-ks-tahun-piutang" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
         </div>
-        
-        <!-- STATISTIK RINGKASAN KERJASAMA -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Tagihan Piutang</p>
-            <p id="k-stat-total-piutang" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Terbayar / Angsuran</p>
-            <p id="k-stat-total-bayar" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Sisa Piutang Kerjasama</p>
-            <p id="k-stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Transaksi / Mitra</p>
-            <p id="k-stat-total-mitra" class="text-lg font-bold text-blue-600 mt-1">0 Transaksi</p>
-          </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Bln Piutang</label>
+            <select id="f-ks-bulan-piutang" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                <option value="">-- Semua Bulan --</option>
+                <option>Januari</option><option>Februari</option><option>Maret</option>
+                <option>April</option><option>Mei</option><option>Juni</option>
+                <option>Juli</option><option>Agustus</option><option>September</option>
+                <option>Oktober</option><option>November</option><option>Desember</option>
+            </select>
         </div>
-        
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-            <h2 class="text-base font-semibold text-gray-700">Filter Data Piutang Kerja Sama</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Thn Piutang</label>
-                    <input type="number" id="f-ks-tahun-piutang" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Bln Piutang</label>
-                    <select id="f-ks-bulan-piutang" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                        <option value="">-- Semua Bulan --</option>
-                        <option>Januari</option><option>Februari</option><option>Maret</option>
-                        <option>April</option><option>Mei</option><option>Juni</option>
-                        <option>Juli</option><option>Agustus</option><option>September</option>
-                        <option>Oktober</option><option>November</option><option>Desember</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Thn Layanan</label>
-                    <input type="number" id="f-ks-tahun-layanan" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Bln Layanan</label>
-                    <select id="f-ks-bulan-layanan" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                        <option value="">-- Semua Bulan --</option>
-                        <option>Januari</option><option>Februari</option><option>Maret</option>
-                        <option>April</option><option>Mei</option><option>Juni</option>
-                        <option>Juli</option><option>Agustus</option><option>September</option>
-                        <option>Oktober</option><option>November</option><option>Desember</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perusahaan</label>
-                    <input type="text" id="f-ks-perusahaan" placeholder="Cari Perusahaan..." class="w-full text-sm border-gray-300 rounded-md border p-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                    <select id="f-ks-status" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                        <option value="">-- Semua Status --</option>
-                        <option value="Lunas">Lunas</option>
-                        <option value="Belum Lunas">Belum Lunas</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Awal)</label>
-                    <input type="date" id="f-ks-bayar-start" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Akhir)</label>
-                    <input type="date" id="f-ks-bayar-end" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="resetFilterKerjasama()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md border">Reset Filter</button>
-                <button onclick="fetchPiutangKerjasama()" class="px-4 py-1.5 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-md">Terapkan Filter</button>
-            </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Thn Layanan</label>
+            <input type="number" id="f-ks-tahun-layanan" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Bln Layanan</label>
+            <select id="f-ks-bulan-layanan" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                <option value="">-- Semua Bulan --</option>
+                <option>Januari</option><option>Februari</option><option>Maret</option>
+                <option>April</option><option>Mei</option><option>Juni</option>
+                <option>Juli</option><option>Agustus</option><option>September</option>
+                <option>Oktober</option><option>November</option><option>Desember</option>
+            </select>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-                <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
-                    <tr>
-                        <th class="p-3">Periode Piutang</th>
-                        <th class="p-3">Perusahaan</th>
-                        <th class="p-3">Tgl Surat</th>
-                        <th class="p-3">No Surat</th>
-                        <th class="p-3">Kota / Ket</th>
-                        <th class="p-3">Jenis</th>
-                        <th class="p-3">Periode Layanan</th>
-                        <th class="p-3 text-center">Pasien</th>
-                        <th class="p-3">No. Tagihan</th>
-                        <th class="p-3">Dokumen</th>
-                        <th class="p-3 text-right">Saldo Awal</th>
-                        <th class="p-3">Tgl Bayar</th>
-                        <th class="p-3 text-right">Bayar</th>
-                        <th class="p-3 text-right">Tambah</th>
-                        <th class="p-3 text-right">Koreksi (+)</th>
-                        <th class="p-3 text-right">Koreksi (-)</th>
-                        <th class="p-3 text-right">Biaya Trf</th>
-                        <th class="p-3 text-right">Saldo Akhir</th
-                        <th class="p-3 text-center">Status</th>
-                        <th class="p-3">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="ks-table-body" class="divide-y divide-gray-100">
-                    <!-- Data Dinamis -->
-                </tbody>
-            </table>
+        <!-- 1. NAMA PERUSAHAAN DIUBAH MENJADI DROPDOWN AUTOMATIS -->
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perusahaan</label>
+            <select id="f-ks-perusahaan" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                <option value="">-- Semua Perusahaan --</option>
+                <!-- Akan diisi otomatis dari JS -->
+            </select>
         </div>
-        
-        
-      </section>
+
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+            <select id="f-ks-status" class="w-full text-sm border-gray-300 rounded-md border p-2">
+                <option value="">-- Semua Status --</option>
+                <option value="Lunas">Lunas</option>
+                <option value="Belum Lunas">Belum Lunas</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Awal)</label>
+            <input type="date" id="f-ks-bayar-start" class="w-full text-sm border-gray-300 rounded-md border p-2">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Akhir)</label>
+            <input type="date" id="f-ks-bayar-end" class="w-full text-sm border-gray-300 rounded-md border p-2">
+        </div>
+
+        <!-- 2. PENAMBAHAN DROPDOWN TAMPILAN DATA (LIMIT) -->
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Tampilkan Data</label>
+            <select id="f-ks-limit" onchange="resetHalamanDanFetch()" class="w-full text-sm border-gray-300 rounded-md border p-2 bg-slate-50 font-semibold text-slate-700">
+                <option value="5">5 Data</option>
+                <option value="10" selected>10 Data</option>
+                <option value="20">20 Data</option>
+                <option value="50">50 Data</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="flex justify-end gap-2 pt-2">
+        <button onclick="resetFilterKerjasama()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md border">Reset Filter</button>
+        <button onclick="resetHalamanDanFetch()" class="px-4 py-1.5 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-md">Terapkan Filter</button>
+    </div>
+  </div>
+
+  <!-- TABEL DATA -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto mt-4">
+      <table class="w-full text-left text-xs whitespace-nowrap">
+          <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
+              <tr>
+                  <th class="p-3">Periode Piutang</th>
+                  <th class="p-3">Perusahaan</th>
+                  <th class="p-3">Tgl Surat</th>
+                  <th class="p-3">No Surat</th>
+                  <th class="p-3">Kota / Ket</th>
+                  <th class="p-3">Jenis</th>
+                  <th class="p-3">Periode Layanan</th>
+                  <th class="p-3 text-center">Pasien</th>
+                  <th class="p-3">No. Tagihan</th>
+                  <th class="p-3">Dokumen</th>
+                  <th class="p-3 text-right">Saldo Awal</th>
+                  <th class="p-3">Tgl Bayar</th>
+                  <th class="p-3 text-right">Bayar</th>
+                  <th class="p-3 text-right">Tambah</th>
+                  <th class="p-3 text-right">Koreksi (+)</th>
+                  <th class="p-3 text-right">Koreksi (-)</th>
+                  <th class="p-3 text-right">Biaya Trf</th>
+                  <th class="p-3 text-right">Saldo Akhir</th>
+                  <th class="p-3 text-center">Status</th>
+                  <th class="p-3">Aksi</th>
+              </tr>
+          </thead>
+          <tbody id="ks-table-body" class="divide-y divide-gray-100">
+              <!-- Data Dinamis -->
+          </tbody>
+      </table>
+  </div>
+  
+  <!-- 3. PENAMBAHAN BAR NAVIGASI HALAMAN (PAGINATION) -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4">
+      <span id="ks-info-halaman" class="text-xs text-slate-600">Menampilkan 0 data</span>
+      <div class="flex gap-2">
+          <button id="ks-btn-prev" onclick="pindahHalamanKerjasama(-1)" class="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              &laquo; Sebelumnya
+          </button>
+          <button id="ks-btn-next" onclick="pindahHalamanKerjasama(1)" class="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              Selanjutnya &raquo;
+          </button>
+      </div>
+  </div>
+
+</section>
 
       <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
       <section id="view-laporan-gabungan" class="modul-view hidden">
