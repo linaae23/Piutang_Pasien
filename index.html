@@ -1643,6 +1643,56 @@
         if (elTotalBayar) elTotalBayar.innerText = fmtKS(totalBayar);
         if (elTotalSaldo) elTotalSaldo.innerText = fmtKS(totalSaldoAkhir);
     }
+    // -------------------------------------------------------------------
+    // 1. OTOMATIS LOAD DATA SAAT HALAMAN SELESAI DIBUKA (DOM READY)
+    // -------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      // Panggil data piutang kerja sama saat pertama dibuka
+      if (typeof fetchPiutangKerjasama === 'function') {
+        fetchPiutangKerjasama();
+      }
+      // Panggil data rekap pendapatan
+      if (typeof loadDataPendapatan === 'function') {
+        loadDataPendapatan();
+      }
+    });
+
+    // -------------------------------------------------------------------
+    // 2. FUNGSI EDIT & HAPUS PIUTANG KERJA SAMA (AGAR TIDAK ERROR SAAT DIKLIK)
+    // -------------------------------------------------------------------
+    async function editPiutangKerjasama(id) {
+      const item = ksCurrentData.find(x => x.id === id);
+      if (!item) return alert('Data tidak ditemukan!');
+      
+      // Mengisi form input kerja sama (sesuaikan ID input jika berbeda)
+      if (document.getElementById('ks_id')) document.getElementById('ks_id').value = item.id;
+      if (document.getElementById('ks_nama_perusahaan')) document.getElementById('ks_nama_perusahaan').value = item.nama_perusahaan || '';
+      if (document.getElementById('ks_saldo_awal')) document.getElementById('ks_saldo_awal').value = item.saldo_awal || 0;
+      if (document.getElementById('ks_bayar')) document.getElementById('ks_bayar').value = item.bayar || 0;
+      if (document.getElementById('ks_tambah')) document.getElementById('ks_tambah').value = item.tambah || 0;
+      if (document.getElementById('ks_koreksi_plus')) document.getElementById('ks_koreksi_plus').value = item.koreksi_plus || 0;
+      if (document.getElementById('ks_koreksi_minus')) document.getElementById('ks_koreksi_minus').value = item.koreksi_minus || 0;
+      if (document.getElementById('ks_biaya_transfer')) document.getElementById('ks_biaya_transfer').value = item.biaya_transfer || 0;
+      
+      calcSaldoAkhirKerjasama();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deletePiutangKerjasama(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus data piutang kerja sama ini?')) return;
+
+      const { error } = await supabaseClient
+        .from('piutang_kerjasama')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert('Gagal menghapus data: ' + error.message);
+      } else {
+        alert('Data berhasil dihapus!');
+        fetchPiutangKerjasama();
+      }
+    }
 </script>
 </body>
 </html>
