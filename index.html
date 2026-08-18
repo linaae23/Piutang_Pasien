@@ -2000,13 +2000,13 @@ function updateLaporanKonsolidasi() {
 
       const dataKerjasama = (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster)) ? listDataKerjasamaMaster : [];
       const nilK = dataKerjasama.reduce((acc, curr) => {
-        const awal = Number(curr.saldo_awal) || 0;
-        const tambah = Number(curr.tambah) || 0;
-        const kPlus = Number(curr.koreksi_plus) || 0;
-        const bayar = Number(curr.bayar) || 0;
-        const kMinus = Number(curr.koreksi_minus) || 0;
-        const trf = Number(curr.biaya_transfer) || 0;
-        const sisa = curr.saldo_akhir !== undefined ? Number(curr.saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
+        const awal = Number(ks_saldo_awal) || 0;
+        const tambah = Number(ks_tambah) || 0;
+        const kPlus = Number(ks_koreksi_plus) || 0;
+        const bayar = Number(ks_bayar) || 0;
+        const kMinus = Number(ks_koreksi_minus) || 0;
+        const trf = Number(ks_biaya_transfer) || 0;
+        const sisa = ks_saldo_akhir !== undefined ? Number(ks_saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
         return acc + sisa;
       }, 0);
 
