@@ -987,6 +987,192 @@
       }
     }
 
+  // ==========================================
+// LOGIKA PIUTANG PASIEN PASIEN (LENGKAP)
+// ==========================================
+
+// 1. Ambil Data Pasien dari Supabase
+async function loadDataPasien() {
+  const { data, error } = await supabaseClient
+    .from('piutang_pasien')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Gagal mengambil data piutang_pasien:', error.message);
+    const tbody = document.getElementById('tabelPasien');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-red-500">Gagal memuat data: ${error.message}</td></tr>`;
+    }
+    return;
+  }
+
+  listDataPasienMaster = data || [];
+  terapkanFilterPasien();
+}
+
+// 2. Terapkan Filter & Pencarian Pasien
+function terapkanFilterPasien() {
+  const tglMulai = document.getElementById('filter_tgl_mulai')?.value;
+  const tglSelesai = document.getElementById('filter_tgl_selesai')?.value;
+  const tahun = document.getElementById('filter_tahun')?.value;
+  const jenis = document.getElementById('filter_jenis')?.value;
+  const status = document.getElementById('filter_status_piutang')?.value;
+  const cari = document.getElementById('inputCariPasien')?.value?.toLowerCase();
+
+  listDataPasienFiltered = listDataPasienMaster.filter(item => {
+    if (tglMulai && item.tgl_masuk_rs < tglMulai) return false;
+    if (tglSelesai && item.tgl_masuk_rs > tglSelesai) return false;
+    if (tahun && String(item.tahun_piutang) !== String(tahun)) return false;
+    if (jenis && item.jenis_perawatan !== jenis) return false;
+    
+    const sisa = Number(item.belum_terbayar || 0);
+    if (status === 'lunas' && sisa > 0) return false;
+    if (status === 'piutang' && sisa <= 0) return false;
+
+    if (cari) {
+      const matchNama = (item.nama_pasien || '').toLowerCase().includes(cari);
+      const matchRM = (item.no_rm || '').toLowerCase().includes(cari);
+      const matchTrx = (item.no_transaksi || '').toLowerCase().includes(cari);
+      if (!matchNama && !matchRM && !matchTrx) return false;
+    }
+
+    return true;
+  });
+
+  renderStatistikPasien(listDataPasienFiltered);
+  renderTabelPasien(listDataPasienFiltered);
+}
+
+// 3. Render Ringkasan Kartu Statistik Pasien
+function renderStatistikPasien(data) {
+  let totalBiaya = 0;
+  let totalBayar = 0;
+  let totalSisa = 0;
+
+  data.forEach(i => {
+    const biaya = Number(i.jumlah_biaya || 0);
+    const pot = Number(i.potongan || 0);
+    const awal = Number(i.pembayaran_awal || 0);
+    const angsuran = Number(i.jumlah_angsuran || 0);
+    const sisa = Number(i.belum_terbayar || (biaya - pot - awal - angsuran));
+
+    totalBiaya += biaya;
+    totalBayar += (awal + angsuran);
+    totalSisa += sisa;
+  });
+
+  const elTotalBiaya = document.getElementById('stat-total-biaya');
+  const elTotalMasuk = document.getElementById('stat-total-masuk');
+  const elSisaPiutang = document.getElementById('stat-sisa-piutang');
+  const elTotalPasien = document.getElementById('stat-total-pasien');
+
+  if (elTotalBiaya) elTotalBiaya.innerText = `Rp ${totalBiaya.toLocaleString('id-ID')}`;
+  if (elTotalMasuk) elTotalMasuk.innerText = `Rp ${totalBayar.toLocaleString('id-ID')}`;
+  if (elSisaPiutang) elSisaPiutang.innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
+  if (elTotalPasien) elTotalPasien.innerText = `${data.length} Pasien`;
+}
+
+// 4. Render Data ke Tabel HTML
+function renderTabelPasien(data) {
+  const tbody = document.getElementById('tabelPasien');
+  if (!tbody) return;
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">Tidak ada data pasien yang cocok.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(item => {
+    const sisa = Number(item.belum_terbayar || 0);
+    const linkDoc = item.link_dokumen 
+      ? `<a href="${item.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:underline">Buka</a>`
+      : '-';
+
+    return `
+      <tr class="hover:bg-slate-50 font-mono">
+        <td class="p-2.5 border-r font-bold">${item.no_rm || '-'}</td>
+        <td class="p-2.5 border-r font-sans font-semibold">${item.nama_pasien || '-'}</td>
+        <td class="p-2.5 border-r">${item.no_transaksi || '-'}</td>
+        <td class="p-2.5 border-r font-sans">${item.bangsal || '-'} / ${item.kelas || '-'}</td>
+        <td class="p-2.5 border-r font-sans">${item.jenis_perawatan || '-'} (${item.kategori || '-'})</td>
+        <td class="p-2.5 border-r text-right font-sans">Rp ${Number(item.jumlah_biaya || 0).toLocaleString('id-ID')}</td>
+        <td class="p-2.5 border-r text-right font-sans font-bold ${sisa > 0 ? 'text-red-600' : 'text-emerald-600'}">
+          Rp ${sisa.toLocaleString('id-ID')}
+        </td>
+        <td class="p-2.5 border-r text-center font-sans">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.kirim_kpknl === 'Sudah' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}">
+            ${item.kirim_kpknl || 'Belum'}
+          </span>
+        </td>
+        <td class="p-2.5 border-r text-center font-sans">${linkDoc}</td>
+        <td class="p-2.5 text-center font-sans">
+          <div class="flex items-center justify-center gap-1">
+            <button onclick="editPasien('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-1 rounded">Edit</button>
+            <button onclick="hapusPasien('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">Hapus</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// 5. Handler Simpan Form Input Data Pasien
+const formPasien = document.getElementById('formPiutangPasien');
+if (formPasien) {
+  formPasien.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('edit_id').value;
+    const payload = {
+      nama_pasien: document.getElementById('nama_pasien').value,
+      alamat_pasien: document.getElementById('alamat_pasien').value,
+      no_rm: document.getElementById('no_rm').value,
+      no_transaksi: document.getElementById('no_transaksi').value,
+      tahun_piutang: parseInt(document.getElementById('tahun_piutang').value) || null,
+      tgl_masuk_rs: document.getElementById('tgl_masuk_rs').value || null,
+      tgl_keluar_rs: document.getElementById('tgl_keluar_rs').value || null,
+      bangsal: document.getElementById('bangsal').value,
+      kelas: document.getElementById('kelas').value,
+      jenis_perawatan: document.getElementById('jenis_perawatan').value,
+      kategori: document.getElementById('kategori').value,
+      kirim_kpknl: document.getElementById('kirim_kpknl').value,
+      tgl_kirim_kpknl: document.getElementById('tgl_kirim_kpknl').value || null,
+      link_dokumen: document.getElementById('link_dokumen').value,
+      jumlah_biaya: parseFloat(document.getElementById('jumlah_biaya').value) || 0,
+      potongan: parseFloat(document.getElementById('potongan').value) || 0,
+      pembayaran_awal: parseFloat(document.getElementById('pembayaran_awal').value) || 0,
+      jumlah_angsuran: parseFloat(document.getElementById('jumlah_angsuran').value) || 0,
+      belum_terbayar: parseFloat(document.getElementById('belum_terbayar').value) || 0,
+      tagihan_1: document.getElementById('tagihan_1').value || null,
+      tagihan_2: document.getElementById('tagihan_2').value || null,
+      tagihan_3: document.getElementById('tagihan_3').value || null,
+    };
+
+    let result;
+    if (id) {
+      result = await supabaseClient.from('piutang_pasien').update(payload).eq('id', id);
+    } else {
+      result = await supabaseClient.from('piutang_pasien').insert([payload]);
+    }
+
+    if (result.error) {
+      alert('Gagal menyimpan data pasien: ' + result.error.message);
+    } else {
+      alert('Data pasien berhasil disimpan!');
+      batalEditPasien();
+      loadDataPasien();
+    }
+  });
+}
+
+// 6. Inisialisasi Otomatis Saat Halaman Dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  loadDataPasien();
+  loadDataPendapatan();
+  fetchPiutangKerjasama();
+});
+  
     // ---------------- PERHITUNGAN PASIEN ----------------
     function hitungBelumTerbayarPasien() {
       const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya')?.value) || 0;
