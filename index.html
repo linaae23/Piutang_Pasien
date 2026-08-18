@@ -2040,7 +2040,7 @@ function updateLaporanKonsolidasi() {
       await loadDataPendapatan();
 
       // 3. Load Data Kerjasama
-      fetchPiutangKerjasama();
+      await fetchPiutangKerjasama();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
