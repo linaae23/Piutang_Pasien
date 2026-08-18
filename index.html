@@ -2003,6 +2003,8 @@ function bukaView(viewId) {
 
 async function muatLaporanGabungan() {
   try {
+    console.log("🔄 Memulai kalkulasi Laporan Gabungan...");
+
     // 1. Ambil data dari 3 tabel Supabase
     const [resPasien, resPendapatan, resKerjasama] = await Promise.all([
       supabase.from('piutang_pasien').select('*'),
@@ -2010,15 +2012,24 @@ async function muatLaporanGabungan() {
       supabase.from('piutang_kerjasama').select('*')
     ]);
 
+    // 🔴 CEK ERROR SUPABASE (Jika ada error query / RLS permission)
+    if (resPasien.error) console.error("❌ Error Supabase (piutang_pasien):", resPasien.error);
+    if (resPendapatan.error) console.error("❌ Error Supabase (rekap_pendapatan):", resPendapatan.error);
+    if (resKerjasama.error) console.error("❌ Error Supabase (piutang_kerjasama):", resKerjasama.error);
+
     const dataPasien = resPasien.data || [];
     const dataPendapatan = resPendapatan.data || [];
     const dataKerjasama = resKerjasama.data || [];
 
+    console.log(`📊 Data Terambil: Pasien (${dataPasien.length}), Pendapatan (${dataPendapatan.length}), Kerjasama (${dataKerjasama.length})`);
+
     // 2. Hitung Total Realisasi Pendapatan (Rekap Pendapatan)
     const kolomBulan = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'agu', 'sep', 'okt', 'nov', 'des'];
     const totalPendapatan = dataPendapatan.reduce((acc, item) => {
-      // Hitung baris detail saja agar tidak terhitung ganda dengan baris header/total
-      if (!item.is_header) {
+      // Mencegah bug string "false" dianggap truthy
+      const isHeader = item.is_header === true || item.is_header === 'true' || item.is_header == 1;
+      
+      if (!isHeader) {
         const sumBulan = kolomBulan.reduce((s, bln) => s + (parseFloat(item[bln]) || 0), 0);
         return acc + sumBulan;
       }
@@ -2027,12 +2038,21 @@ async function muatLaporanGabungan() {
 
     // 3. Hitung Total Sisa Piutang Kerjasama
     const totalPiutangKerjasama = dataKerjasama.reduce((acc, item) => {
-      const sAwal = parseFloat(item.ks_saldo_awal) || 0;
-      const tambah = parseFloat(item.ks_tambah) || 0;
-      const kPlus = parseFloat(item.ks_koreksi_plus) || 0;
-      const bayar = parseFloat(item.ks_bayar) || 0;
-      const kMinus = parseFloat(item.ks_koreksi_minus) || 0;
-      const tf = parseFloat(item.ks_biaya_transfer) || 0;
+      // Cek jika saldo_akhir sudah tersimpan langsung di DB
+      if (item.ks_saldo_akhir !== undefined && item.ks_saldo_akhir !== null) {
+        return acc + (parseFloat(item.ks_saldo_akhir) || 0);
+      }
+      if (item.saldo_akhir !== undefined && item.saldo_akhir !== null) {
+        return acc + (parseFloat(item.saldo_akhir) || 0);
+      }
+
+      // Perhitungan manual dengan fallback nama kolom (dengan / tanpa prefix ks_)
+      const sAwal = parseFloat(item.ks_saldo_awal ?? item.saldo_awal) || 0;
+      const tambah = parseFloat(item.ks_tambah ?? item.tambah) || 0;
+      const kPlus = parseFloat(item.ks_koreksi_plus ?? item.koreksi_plus) || 0;
+      const bayar = parseFloat(item.ks_bayar ?? item.bayar) || 0;
+      const kMinus = parseFloat(item.ks_koreksi_minus ?? item.koreksi_minus) || 0;
+      const tf = parseFloat(item.ks_biaya_transfer ?? item.biaya_transfer) || 0;
       
       const sAkhir = (sAwal + tambah + kPlus) - (bayar + kMinus + tf);
       return acc + sAkhir;
@@ -2040,10 +2060,11 @@ async function muatLaporanGabungan() {
 
     // 4. Hitung Total Sisa Piutang Pasien
     const totalPiutangPasien = dataPasien.reduce((acc, item) => {
-      return acc + (parseFloat(item.belum_terbayar) || 0);
+      const sisa = parseFloat(item.belum_terbayar ?? item.sisa_piutang) || 0;
+      return acc + sisa;
     }, 0);
 
-    // 5. Hitung Total Asset Keuangan & Potensi Piutang RS (Keseluruhan)
+    // 5. Hitung Grand Total
     const grandTotal = totalPendapatan + totalPiutangKerjasama + totalPiutangPasien;
 
     // Helper Format Rupiah
@@ -2053,22 +2074,21 @@ async function muatLaporanGabungan() {
       minimumFractionDigits: 0 
     }).format(val);
 
-    // 6. Injeksi Hasil Perhitungan ke Elemen HTML
-    if (document.getElementById('sum-pendapatan')) {
-      document.getElementById('sum-pendapatan').innerText = formatRupiah(totalPendapatan);
-    }
-    if (document.getElementById('sum-piutang-kerjasama')) {
-      document.getElementById('sum-piutang-kerjasama').innerText = formatRupiah(totalPiutangKerjasama);
-    }
-    if (document.getElementById('sum-piutang-pasien')) {
-      document.getElementById('sum-piutang-pasien').innerText = formatRupiah(totalPiutangPasien);
-    }
-    if (document.getElementById('sum-total-keseluruhan')) {
-      document.getElementById('sum-total-keseluruhan').innerText = formatRupiah(grandTotal);
-    }
+    // 6. Injeksi Hasil ke HTML
+    const elPendapatan = document.getElementById('sum-pendapatan');
+    const elKerjasama = document.getElementById('sum-piutang-kerjasama');
+    const elPasien = document.getElementById('sum-piutang-pasien');
+    const elGrandTotal = document.getElementById('sum-total-keseluruhan');
+
+    if (elPendapatan) elPendapatan.innerText = formatRupiah(totalPendapatan);
+    if (elKerjasama) elKerjasama.innerText = formatRupiah(totalPiutangKerjasama);
+    if (elPasien) elPasien.innerText = formatRupiah(totalPiutangPasien);
+    if (elGrandTotal) elGrandTotal.innerText = formatRupiah(grandTotal);
+
+    console.log("✅ Laporan Gabungan Berhasil Diperbarui!");
 
   } catch (err) {
-    console.error("Gagal menghitung Laporan Gabungan:", err);
+    console.error("💥 Gagal menghitung Laporan Gabungan:", err);
   }
 }
   
