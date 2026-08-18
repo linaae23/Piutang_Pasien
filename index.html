@@ -1984,54 +1984,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPiutangKerjasama();
       }
     }
-// ==========================================
-// LOGIKA LAPORAN KONSOLIDASI (LENGKAP)
-// ==========================================
 
-function renderLaporanKonsolidasi() {
-  // 1. Hitung Total Piutang Pasien
-  let totalPiutangPasien = 0;
-  let sisaPiutangPasien = 0;
-  if (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) {
-    listDataPasienMaster.forEach(item => {
-      totalPiutangPasien += Number(item.jumlah_biaya || 0);
-      sisaPiutangPasien += Number(item.belum_terbayar || 0);
-    });
-  }
-
-  // 2. Hitung Total Piutang Kerjasama / Perusahaan
-  let totalPiutangKerjasama = 0;
-  let sisaPiutangKerjasama = 0;
-  if (typeof listKerjasamaMaster !== 'undefined' && Array.isArray(listKerjasamaMaster)) {
-    listKerjasamaMaster.forEach(item => {
-      totalPiutangKerjasama += Number(item.total_piutang || item.jumlah_tagihan || 0);
-      sisaPiutangKerjasama += Number(item.sisa_piutang || item.belum_terbayar || 0);
-    });
-  }
-
-  // 3. Hitung Total Pendapatan
-  let totalPendapatan = 0;
-  if (typeof listPendapatanMaster !== 'undefined' && Array.isArray(listPendapatanMaster)) {
-    listPendapatanMaster.forEach(item => {
-      totalPendapatan += Number(item.total_pendapatan || item.nominal || 0);
-    });
-  }
-
-  // 4. Hitung Gran Total Konsolidasi
-  const grandTotalPiutang = sisaPiutangPasien + sisaPiutangKerjasama;
-
-  // 5. Update Elemen HTML (SESUAIKAN ID ELEMEN DI HTML ANDA)
-  const elPasien = document.getElementById('stat-sisa-piutang');
-  const elKerjasama = document.getElementById('k-stat-sisa-piutang');
-  const elTotalPiutang = document.getElementById('konsolidasi-total-piutang');
-  const elPendapatan = document.getElementById('dash-realisasi');
-
-  if (elPasien) elPasien.innerText = `Rp ${sisaPiutangPasien.toLocaleString('id-ID')}`;
-  if (elKerjasama) elKerjasama.innerText = `Rp ${sisaPiutangKerjasama.toLocaleString('id-ID')}`;
-  if (elTotalPiutang) elTotalPiutang.innerText = `Rp ${grandTotalPiutang.toLocaleString('id-ID')}`;
-  if (elPendapatan) elPendapatan.innerText = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
-}
-  
 </script>
 </body>
 </html>
