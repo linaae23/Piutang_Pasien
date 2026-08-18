@@ -1997,11 +1997,11 @@ function bukaView(viewId) {
 
   // Pemicu panggil data khusus Laporan Gabungan
   if (viewId === 'laporan-gabungan') {
-    muatLaporanGabungan();
+    renderLaporanKonsolidasi();
   }
 }
 
-async function muatLaporanGabungan() {
+async function renderLaporanKonsolidasi() {
   try {
     console.log("🔄 Memulai kalkulasi Laporan Gabungan...");
 
