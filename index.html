@@ -1295,10 +1295,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mapData['RETRIBUSI PELAY.KESEHT. DI RSUD']) {
           mapData['RETRIBUSI PELAY.KESEHT. DI RSUD'][kolom] = parseFloat(mapData['4.1.2.1.1.5.01']?.[kolom]) || 0;
         }
-        if (mapData['4.1.4.16.2.1.01']) {
+        if (mapData['RSUD Dr. MOEWARDI - SEKRETARIAT']) {
           const pLain = parseFloat(mapData['PENDAPATAN LAIN-LAIN (PIHAK-3, DLL)']?.[kolom]) || 0;
           const pSewa = parseFloat(mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)']?.[kolom]) || 0;
-          mapData['4.1.4.16.2.1.01'][kolom] = pLain + pSewa;
+          mapData['RSUD Dr. MOEWARDI - SEKRETARIAT'][kolom] = pLain + pSewa;
         }
         if (mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']) {
           const pGiro = parseFloat(mapData['PENDAPATAN BLUD DR JASA GIRO']?.[kolom]) || 0;
@@ -1316,10 +1316,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mapData['RETRIBUSI JASA UMUM']) {
           mapData['RETRIBUSI JASA UMUM'][kolom] = parseFloat(mapData['RETRIBUSI PELAYANAN KESEHATAN']?.[kolom]) || 0;
         }
-        if (mapData['4.1.4.16']) {
+        if (mapData['PENDAPATAN BLUD']) {
           const pJasa = parseFloat(mapData['PENDAPATAN BLUD DR JASA LAYANAN']?.[kolom]) || 0;
           const pLainLain = parseFloat(mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']?.[kolom]) || 0;
-          mapData['4.1.4.16'][kolom] = pJasa + pLainLain;
+          mapData['PENDAPATAN BLUD'][kolom] = pJasa + pLainLain;
         }
 
         if (mapData['RETRIBUSI DAERAH']) {
