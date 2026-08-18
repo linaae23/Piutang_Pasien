@@ -1,1698 +1,592 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Pendapatan & Piutang RS</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Library untuk Export Excel -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<!-- Library untuk Export PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendapatan & Piutang RS</title>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library Export Excel & PDF -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-slate-100 font-sans antialiased">
+<body class="bg-slate-100 font-sans antialiased text-slate-800">
 
-  <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
+        <!-- ================= SIDEBAR NAVIGASI ================= -->
+        <aside id="sidebar" class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 transition-all duration-300 ease-in-out">
+            <!-- Header Sidebar -->
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg shrink-0">
+                        RS
+                    </div>
+                    <div class="truncate">
+                        <h2 class="font-bold text-white text-sm leading-tight truncate">Sistem Keuangan RS</h2>
+                        <p class="text-[10px] text-slate-400">Pencatatan & Laporan</p>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition" title="Sembunyikan Sidebar">
+                    ◀
+                </button>
+            </div>
 
-    <!-- ================= SIDEBAR ================= -->
-<aside id="sidebar" class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 transition-all duration-300 ease-in-out">
-  <!-- Header Sidebar -->
-  <div class="p-5 border-b border-slate-800 flex items-center justify-between gap-2">
-    <div class="flex items-center gap-3 overflow-hidden">
-      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg shrink-0">
-        RS
-      </div>
-      <div class="truncate">
-        <h2 class="font-bold text-white text-sm leading-tight truncate">Sistem Keuangan RS</h2>
-        <p class="text-[10px] text-slate-400">Pencatatan & Laporan</p>
-      </div>
-    </div>
-    <!-- Tombol Sembunyikan Sidebar -->
-    <button type="button" onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition" title="Sembunyikan Sidebar">
-      ◀
-    </button>
-  </div>
+            <!-- Menu Navigasi -->
+            <nav class="flex-1 p-4 space-y-4 overflow-y-auto text-xs">
+                <!-- KELOMPOK INPUT DATA -->
+                <div>
+                    <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">INPUT DATA</p>
+                    <div class="space-y-1">
+                        <button type="button" onclick="bukaView('input-pasien')" id="btn-input-pasien" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2">
+                            <span>👤</span> Input Piutang Pasien
+                        </button>
+                        <button type="button" onclick="bukaView('input-pendapatan')" id="btn-input-pendapatan" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+                            <span>💰</span> Input Rekap Pendapatan
+                        </button>
+                        <button type="button" onclick="bukaView('input-kerjasama')" id="btn-input-kerjasama" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+                            <span>🏢</span> Input Piutang Kerjasama
+                        </button>
+                    </div>
+                </div>
 
-      <!-- Menu Navigasi -->
-      <nav class="flex-1 p-4 space-y-4 overflow-y-auto text-xs">
-        
-        <!-- KELOMPOK INPUT DATA -->
-        <div>
-          <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">INPUT DATA</p>
-          <div class="space-y-1">
-            <button onclick="bukaView('input-pasien')" id="btn-input-pasien" class="w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2">
-              <span>👤</span> Input Piutang Pasien
+                <hr class="border-slate-800">
+
+                <!-- KELOMPOK LAPORAN -->
+                <div>
+                    <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">LAPORAN</p>
+                    <div class="space-y-1">
+                        <button type="button" onclick="bukaView('laporan-pasien')" id="btn-laporan-pasien" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+                            <span>📋</span> Laporan Piutang Pasien
+                        </button>
+                        <button type="button" onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+                            <span>📊</span> Laporan Pendapatan
+                        </button>
+                        <button type="button" onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
+                            <span>🤝</span> Laporan Piutang Kerjasama
+                        </button>
+                        <button type="button" onclick="bukaView('laporan-gabungan')" id="btn-laporan-gabungan" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-amber-400 hover:bg-amber-950/40 font-semibold transition flex items-center gap-2">
+                            <span>🌐</span> Laporan Konsolidasi
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Footer Sidebar -->
+            <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
+                &copy; 2026 RS Integrated System
+            </div>
+        </aside>
+
+        <!-- ================= KONTEN UTAMA ================= -->
+        <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+            <!-- Tombol Buka Sidebar -->
+            <button id="btn-show-sidebar" type="button" onclick="toggleSidebar()" class="hidden mb-4 px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition flex items-center gap-2 text-xs font-semibold shadow-sm">
+                <span>☰</span> Tampilkan Menu
             </button>
-            <button onclick="bukaView('input-pendapatan')" id="btn-input-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>💰</span> Input Rekap Pendapatan
-            </button>
-            <button onclick="bukaView('input-kerjasama')" id="btn-input-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>🏢</span> Input Piutang Kerjasama
-            </button>
-          </div>
-        </div>
 
-        <hr class="border-slate-800">
-
-        <!-- KELOMPOK LAPORAN -->
-        <div>
-          <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">LAPORAN & </p>
-          <div class="space-y-1">
-            <button onclick="bukaView('laporan-pasien')" id="btn-laporan-pasien" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>📋</span> Laporan Piutang Pasien
-            </button>
-            <button onclick="bukaView('laporan-pendapatan')" id="btn-laporan-pendapatan" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>📊</span> Laporan  Pendapatan
-            </button>
-            <button onclick="bukaView('laporan-kerjasama')" id="btn-laporan-kerjasama" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2">
-              <span>🤝</span> Laporan Piutang Kerjasama
-            </button>
-            <button onclick="bukaView('laporan-gabungan')" id="btn-laporan-gabungan" class="w-full text-left px-3 py-2.5 rounded-lg text-amber-400 hover:bg-amber-950/40 font-semibold transition flex items-center gap-2">
-              <span>🌐</span> Laporan Gabungan (Konsolidasi)
-            </button>
-          </div>
-        </div>
-
-      </nav>
-
-      <!-- Footer Sidebar -->
-      <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
-        &copy; 2026 RS Integrated System
-      </div>
-    </aside>
-
-    <!-- ================= AREA KONTEN UTAMA ================= -->
-<main class="flex-1 overflow-y-auto p-6 bg-slate-50">
-  
-  <!-- Tombol Tampilkan Sidebar (Muncul saat sidebar tersembunyi) -->
-  <button id="btn-show-sidebar" type="button" onclick="toggleSidebar()" class="hidden mb-4 px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition flex items-center gap-2 text-xs font-semibold shadow-sm">
-    <span>☰</span> Tampilkan Menu
-  </button>
-
-      <!-- ================= 1. FORM INPUT PIUTANG PASIEN ================= -->
-      <section id="view-input-pasien" class="modul-view">
-        <div class="mb-6">
-          <h1 class="text-xl font-bold text-slate-800">Form Input Piutang Pasien</h1>
-          <p class="text-xs text-slate-500">Masukkan rincian pelayanan, kelas, jenis perawatan, serta data keuangan pasien secara lengkap.</p>
-        </div>
-
-        <form id="formPiutangPasien" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-xs">
-          <input type="hidden" id="edit_id" value="">
-
-          <!-- BARIS 1: IDENTITAS PASIEN -->
-          <div>
-            <label class="block font-semibold mb-1">Nama Pasien</label>
-            <input type="text" id="nama_pasien" class="w-full border p-2 rounded text-xs" required>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Alamat Pasien</label>
-            <input type="text" id="alamat_pasien" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">No. RM</label>
-            <input type="text" id="no_rm" class="w-full border p-2 rounded text-xs" required>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">No. Transaksi</label>
-            <input type="text" id="no_transaksi" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Tahun Piutang</label>
-            <input type="number" id="tahun_piutang" placeholder="2026" class="w-full border p-2 rounded text-xs">
-          </div>
-
-          <!-- BARIS 2: DATA PERAWATAN -->
-          <div>
-            <label class="block font-semibold mb-1">Tgl Masuk RS</label>
-            <input type="date" id="tgl_masuk_rs" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Tgl Keluar RS</label>
-            <input type="date" id="tgl_keluar_rs" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Bangsal</label>
-            <input type="text" id="bangsal" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Kelas</label>
-            <select id="kelas" class="w-full border p-2 rounded text-xs">
-              <option value="">-- Pilih Kelas --</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="VIP">VIP</option>
-              <option value="VVIP">VVIP</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Jenis Perawatan</label>
-            <select id="jenis_perawatan" class="w-full border p-2 rounded text-xs">
-              <option value="">-- Pilih Jenis --</option>
-              <option value="Rawat Jalan">Rawat Jalan</option>
-              <option value="Rawat Inap">Rawat Inap</option>
-            </select>
-          </div>
-
-          <!-- BARIS 3: KATEGORI & DOKUMEN -->
-          <div>
-            <label class="block font-semibold mb-1">Kategori</label>
-            <select id="kategori" class="w-full border p-2 rounded text-xs">
-              <option value="">-- Pilih Kategori --</option>
-              <option value="Non Paviliun">Non Paviliun</option>
-              <option value="Paviliun">Paviliun</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Kirim KPKNL</label>
-            <select id="kirim_kpknl" class="w-full border p-2 rounded text-xs">
-              <option value="Belum">Belum</option>
-              <option value="Sudah">Sudah</option>
-            </select>
-          </div>
-          <div id="container_tgl_kpknl" class="hidden">
-            <label class="block font-semibold mb-1 text-blue-600">Tgl Kirim KPKNL</label>
-            <input type="date" id="tgl_kirim_kpknl" class="w-full border p-2 rounded text-xs border-blue-400 bg-blue-50">
-          </div>
-          <div class="lg:col-span-2">
-            <label class="block font-semibold mb-1">Link Dokumen (Drive/URL)</label>
-            <input type="url" id="link_dokumen" placeholder="https://..." class="w-full border p-2 rounded text-xs">
-          </div>
-
-          <!-- BARIS 4: PERHITUNGAN KEUANGAN PASIEN -->
-          <div>
-            <label class="block font-semibold mb-1">Jumlah Biaya / Pendapatan (Rp)</label>
-            <input type="number" id="jumlah_biaya" class="w-full border p-2 rounded text-xs" value="0">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Potongan (Rp)</label>
-            <input type="number" id="potongan" class="w-full border p-2 rounded text-xs" value="0">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Pembayaran Awal (Rp)</label>
-            <input type="number" id="pembayaran_awal" class="w-full border p-2 rounded text-xs" value="0">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Jumlah Angsuran (Rp)</label>
-            <input type="number" id="jumlah_angsuran" class="w-full border p-2 rounded text-xs" value="0">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1 text-red-600">Belum Terbayar / Piutang (Otomatis)</label>
-            <input type="number" id="belum_terbayar" class="w-full border p-2 rounded text-xs bg-slate-100 font-bold text-red-600" value="0" readonly>
-          </div>
-
-          <!-- BARIS 5: JADWAL TAGIHAN & AKSI -->
-          <div>
-            <label class="block font-semibold mb-1">Tgl Tagihan 1</label>
-            <input type="date" id="tagihan_1" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Tgl Tagihan 2</label>
-            <input type="date" id="tagihan_2" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Tgl Tagihan 3</label>
-            <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-xs">
-          </div>
-          <div class="lg:col-span-2 flex items-end gap-2">
-            <button type="submit" id="btnSubmitPasien" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
-              + Simpan Data Pasien
-            </button>
-            <button type="button" id="btnBatalPasien" onclick="batalEditPasien()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
-              Batal
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <!-- ================= 2. FORM INPUT REKAP PENDAPATAN ================= -->
-      <section id="view-input-pendapatan" class="modul-view hidden">
-        <div class="mb-6">
-          <h1 class="text-xl font-bold text-slate-800">Form Input Pendapatan</h1>
-          <p class="text-xs text-slate-500">Pencatatan target anggaran dan realisasi bulanan berdasarkan kode rekening.</p>
-        </div>
-
-        <form id="formPendapatan" class="space-y-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div>
-              <label class="block font-semibold mb-1">Kode Rekening</label>
-              <input type="text" id="p_kode_rekening" placeholder="Misal: 4.1.1.01" class="w-full border p-2 rounded" required>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Uraian Rekening</label>
-              <input type="text" id="p_uraian" placeholder="Nama Uraian Rekening" class="w-full border p-2 rounded" required>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Parent Kode (Induk)</label>
-              <input type="text" id="p_parent_kode" placeholder="Misal: 4.1.1 (Kosongkan jika Root)" class="w-full border p-2 rounded">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Jenis Baris</label>
-              <select id="p_is_header" class="w-full border p-2 rounded">
-                <option value="false">Baris Detail (Diisi Realisasinya)</option>
-                <option value="true">Baris Total / Header (Penjumlahan Auto)</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block font-semibold mb-1">Target Anggaran (Rp)</label>
-            <input type="number" id="p_anggaran" value="0" class="w-full md:w-1/3 border p-2 rounded" required>
-          </div>
-
-          <div class="border-t pt-3">
-            <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Januari s/d Desember)</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-              <div><label class="block text-[10px] text-slate-500">Januari</label><input type="number" id="p_jan" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Februari</label><input type="number" id="p_feb" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Maret</label><input type="number" id="p_mar" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">April</label><input type="number" id="p_apr" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Mei</label><input type="number" id="p_mei" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Juni</label><input type="number" id="p_jun" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Juli</label><input type="number" id="p_jul" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Agustus</label><input type="number" id="p_agu" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">September</label><input type="number" id="p_sep" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Oktober</label><input type="number" id="p_okt" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">November</label><input type="number" id="p_nov" value="0" class="w-full border p-1.5 rounded"></div>
-              <div><label class="block text-[10px] text-slate-500">Desember</label><input type="number" id="p_des" value="0" class="w-full border p-1.5 rounded"></div>
-            </div>
-          </div>
-
-          <div>
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">
-              + Simpan Rekap Pendapatan
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <!-- ================= 3. MODUL PIUTANG KERJA SAMA ================= -->
-<section id="view-input-kerjasama" class="modul-view hidden space-y-6">
-  <!-- Header Section -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Form Input Piutang Kerjasama</h1>
-      <p class="text-sm text-gray-500">Masukkan data piutang kerjasama dengan lengkap.</p>
-    </div>
-  </div>
-
-  <!-- Container Form -->
-  <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-    <form id="ksPiutangForm" onsubmit="simpanPiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-      <input type="hidden" id="ks-edit-id">
-
-      <div>
-        <label class="block font-medium mb-1">Tahun Piutang *</label>
-        <input type="number" id="ks_tahun_piutang" required class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Bulan Piutang *</label>
-        <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
-          <option value="">Pilih Bulan</option>
-          <option>Januari</option><option>Februari</option><option>Maret</option>
-          <option>April</option><option>Mei</option><option>Juni</option>
-          <option>Juli</option><option>Agustus</option><option>September</option>
-          <option>Oktober</option><option>November</option><option>Desember</option>
-        </select>
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Nama Perusahaan *</label>
-        <input type="text" id="ks_nama_perusahaan" required class="w-full border p-2 rounded">
-      </div>
-
-      <div>
-        <label class="block font-medium mb-1">Tanggal Surat</label>
-        <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Nomor Surat</label>
-        <input type="text" id="ks_no_surat" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Kota / Keterangan</label>
-        <input type="text" id="ks_kota_keterangan" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Jenis Layanan</label>
-        <select id="ks_jenis" class="w-full border p-2 rounded">
-          <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
-          <option value="Rawat Inap">Rawat Inap</option>
-          <option value="Rawat Jalan">Rawat Jalan</option>
-          <option value="Lab. Patologi Klinik">Lab. Patologi Klinik</option>
-          <option value="Lab. Patologi Anatomi">Lab. Patologi Anatomi</option>
-          <option value="Lab. Mikrobiologi">Lab. Mikrobiologi</option>
-          <option value="Radiologi">Radiologi</option>
-          <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
-          <option value="Obat Rawat Inap">Obat Rawat Inap</option>
-          <option value="BPJS Pelayanan">BPJS Pelayanan</option>
-          <option value="BPJS Pelayanan Susulan">BPJS Pelayanan Susulan</option>
-          <option value="BPJS Obat">BPJS Obat</option>
-          <option value="BPJS Obat Susulan">BPJS Obat Susulan</option>
-          <option value="BPJS Alkes CAPD">BPJS Alkes CAPD</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block font-medium mb-1">Tahun Layanan</label>
-        <input type="number" id="ks_tahun_layanan" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Bulan Layanan</label>
-        <select id="ks_bulan_layanan" class="w-full border p-2 rounded">
-          <option value="">Pilih Bulan</option>
-          <option>Januari</option><option>Februari</option><option>Maret</option>
-          <option>April</option><option>Mei</option><option>Juni</option>
-          <option>Juli</option><option>Agustus</option><option>September</option>
-          <option>Oktober</option><option>November</option><option>Desember</option>
-        </select>
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Jumlah Pasien</label>
-        <input type="number" id="ks_jumlah_pasien" value="0" class="w-full border p-2 rounded">
-      </div>
-
-      <div>
-        <label class="block font-medium mb-1">Nomor Tagihan</label>
-        <input type="text" id="ks_nomor_tagihan" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Saldo Awal (Rp)</label>
-        <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      
-      <div>
-        <label class="block font-medium mb-1">Link Dokumen (URL)</label>
-        <input type="url" id="ks_link_dokumen" placeholder="https://..." class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Tanggal Bayar</label>
-        <input type="date" id="ks_tanggal_bayar" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Bayar (Rp)</label>
-        <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      
-      <div>
-        <label class="block font-medium mb-1">Tambah (Rp)</label>
-        <input type="number" id="ks_tambah" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Koreksi + (Rp)</label>
-        <input type="number" id="ks_koreksi_plus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Koreksi - (Rp)</label>
-        <input type="number" id="ks_koreksi_minus" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      
-      <div>
-        <label class="block font-medium mb-1">Biaya Transfer (Rp)</label>
-        <input type="number" id="ks_biaya_transfer" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded bg-gray-50">
-      </div>
-      <div>
-        <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir (Otomatis)</label>
-        <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
-      </div>
-      <div>
-        <label class="block font-medium mb-1">Status Piutang</label>
-        <input type="text" id="ks_status" readonly placeholder="Otomatis (Belum Lunas / Lunas)" class="w-full border p-2 rounded bg-gray-100 font-semibold">
-      </div>
-      
-      <div class="col-span-1 md:col-span-3">
-        <label class="block font-medium mb-1">Keterangan</label>
-        <textarea id="ks_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
-      </div>
-
-      <div class="col-span-1 md:col-span-3 flex justify-end gap-2 border-t pt-3">
-        <button type="reset" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-    
-      <!-- ================= 4. LAPORAN PIUTANG PASIEN ================= -->
-      <section id="view-laporan-pasien" class="modul-view hidden">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h1 class="text-xl font-bold text-slate-800">📋 Laporan Piutang Pasien Perorangan</h1>
-            <p class="text-xs text-slate-500">Analisis statistik keuangan pasien, filter periode, dan cetak laporan.</p>
-          </div>
-          <button onclick="downloadCSVPasien()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-            📥 Export Laporan Pasien (CSV)
-          </button>
-        </div>
-
-        <!-- STATISTIK PIUTANG PASIEN -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-xs text-slate-500 font-medium">Total Biaya Pasien</p>
-            <p id="stat-total-biaya" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-xs text-slate-500 font-medium">Total Pembayaran Pasien</p>
-            <p id="stat-total-masuk" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-xs text-slate-500 font-medium">Total Sisa Piutang Pasien</p>
-            <p id="stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-xs text-slate-500 font-medium">Total Pasien</p>
-            <p id="stat-total-pasien" class="text-lg font-bold text-blue-600 mt-1">0 Pasien</p>
-          </div>
-        </div>
-
-        <!-- FILTER LAPORAN PASIEN -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">🔍 Filter Laporan Pasien</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Mulai</label>
-              <input type="date" id="filter_tgl_mulai" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Selesai</label>
-              <input type="date" id="filter_tgl_selesai" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tahun Piutang</label>
-              <select id="filter_tahun" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
-                <option value="">Semua Tahun</option>
-                <option value="2026">2026</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis Perawatan</label>
-              <select id="filter_jenis" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
-                <option value="">Semua Jenis</option>
-                <option value="Rawat Jalan">Rawat Jalan</option>
-                <option value="Rawat Inap">Rawat Inap</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Pembayaran</label>
-              <select id="filter_status_piutang" onchange="terapkanFilterPasien()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
-                <option value="">Semua Status</option>
-                <option value="lunas">Lunas (Rp 0)</option>
-                <option value="piutang">Masih Ada Piutang</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pencarian Umum</label>
-              <input type="text" id="inputCariPasien" onkeyup="terapkanFilterPasien()" placeholder="Nama / RM / TRX..." class="w-full border p-1.5 rounded text-xs bg-slate-50">
-            </div>
-          </div>
-        </div>
-
-        <!-- TABEL LAPORAN PASIEN -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                  <th class="p-2.5 border-r">No. RM</th>
-                  <th class="p-2.5 border-r">Nama Pasien</th>
-                  <th class="p-2.5 border-r">No. TRX</th>
-                  <th class="p-2.5 border-r">Bangsal / Kelas</th>
-                  <th class="p-2.5 border-r">Jenis / Kategori</th>
-                  <th class="p-2.5 border-r">Total Biaya</th>
-                  <th class="p-2.5 border-r">Sisa Piutang</th>
-                  <th class="p-2.5 border-r">Status KPKNL</th>
-                  <th class="p-2.5 border-r text-center">Dokumen</th>
-                  <th class="p-2.5 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="tabelPasien" class="divide-y">
-                <tr><td colspan="10" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= 5. LAPORAN REKAP PENDAPATAN ================= -->
-      <section id="view-laporan-pendapatan" class="modul-view hidden">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h1 class="text-xl font-bold text-slate-800">📊 Laporan & Dashboard Rekapitulasi Pendapatan</h1>
-            <p class="text-xs text-slate-500">Monitoring realisasi pendapatan, pencapaian target anggaran, dan ekspor laporan.</p>
-          </div>
-          <button onclick="downloadCSVPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-            📥 Export Pendapatan (CSV)
-          </button>
-          <!-- Tombol Export Excel -->
-  <button onclick="downloadExcelPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
-    <span>📊</span> Export Excel
-  </button>
-
-  <!-- Tombol Export PDF -->
-  <button onclick="downloadPDFPendapatan()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
-    <span>📄</span> Export PDF
-  </button>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Target Anggaran</p>
-            <p id="dash-target" class="text-xl font-bold text-slate-800 mt-1">Rp 0</p>
-            <span class="text-[10px] text-slate-400" id="dash-info-target">Target Keseluruhan</span>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Total Realisasi Pendapatan</p>
-            <p id="dash-realisasi" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
-            <span class="text-[10px] text-emerald-500" id="dash-info-periode">Periode: Jan - Des</span>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Persentase Pencapaian</p>
-            <p id="dash-pencapaian" class="text-xl font-bold text-blue-600 mt-1">0.00%</p>
-            <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
-              <div id="dash-bar-pencapaian" class="bg-blue-600 h-1.5 rounded-full" style="width: 0%"></div>
-            </div>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-slate-500 font-medium">Belum Tercapai (Sisa Target)</p>
-            <p id="dash-sisa" class="text-xl font-bold text-amber-600 mt-1">Rp 0</p>
-            <span class="text-[10px] text-amber-500">Kekurangan Realisasi</span>
-          </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 text-xs">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="font-bold text-slate-700 uppercase tracking-wider">🔍 Filter Laporan Pendapatan</h3>
-            <button onclick="resetFilterPendapatan()" class="text-blue-600 hover:underline font-semibold text-[11px]">
-              🔄 Reset Filter
-            </button>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Dari Bulan</label>
-              <select id="p_filter_bulan_mulai" onchange="terapkanFilterPendapatan()" class="w-full border p-2 rounded bg-slate-50">
-                <option value="0">Januari</option>
-                <option value="1">Februari</option>
-                <option value="2">Maret</option>
-                <option value="3">April</option>
-                <option value="4">Mei</option>
-                <option value="5">Juni</option>
-                <option value="6">Juli</option>
-                <option value="7">Agustus</option>
-                <option value="8">September</option>
-                <option value="9">Oktober</option>
-                <option value="10">November</option>
-                <option value="11">Desember</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Sampai Bulan</label>
-              <select id="p_filter_bulan_selesai" onchange="terapkanFilterPendapatan()" class="w-full border p-2 rounded bg-slate-50">
-                <option value="0">Januari</option>
-                <option value="1">Februari</option>
-                <option value="2">Maret</option>
-                <option value="3">April</option>
-                <option value="4">Mei</option>
-                <option value="5">Juni</option>
-                <option value="6">Juli</option>
-                <option value="7">Agustus</option>
-                <option value="8">September</option>
-                <option value="9">Oktober</option>
-                <option value="10">November</option>
-                <option value="11">Desember</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Pilih Jenis Uraian / Rekening</label>
-              <div id="container-check-uraian" class="border rounded p-2 bg-slate-50 max-h-28 overflow-y-auto space-y-1 text-[11px]">
-                <span class="text-slate-400">Memuat uraian...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto text-xs">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-slate-100 font-bold border-b border-slate-300 text-slate-700">
-              <tr>
-                <th class="p-2.5 border-r">Kode Rekening</th>
-                <th class="p-2.5 border-r">Uraian</th>
-                <th class="p-2.5 border-r text-right">Target Anggaran</th>
-                <th class="p-2.5 border-r text-right" id="th-header-realisasi">Realisasi Periode</th>
-                <th class="p-2.5 border-r text-center">Pencapaian (%)</th>
-                <th class="p-2.5 text-right">Sisa Target (Rp)</th>
-                <th class="p-2.5 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tabelPendapatan" class="divide-y">
-              <tr><td colspan="7" class="p-4 text-center text-slate-500">Memuat data rekapitulasi...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ================= 6. LAPORAN PIUTANG KERJASAMA ================= -->
-<section id="view-laporan-kerjasama" class="modul-view hidden">
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-    <div>
-      <h1 class="text-xl font-bold text-slate-800">🤝 Laporan Piutang Kerjasama Perusahaan / Asuransi</h1>
-      <p class="text-xs text-slate-500">Monitoring piutang perusahaan mitra, status kelunasan, dan ekspor laporan.</p>
-    </div>
-    <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-      📥 Export Laporan Kerjasama (CSV)
-    </button>
-  </div>
-  
-  <!-- STATISTIK RINGKASAN KERJASAMA -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-      <p class="text-slate-500 font-medium">Total Tagihan Piutang</p>
-      <p id="k-stat-total-piutang" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
-    </div>
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-      <p class="text-slate-500 font-medium">Total Terbayar / Angsuran</p>
-      <p id="k-stat-total-bayar" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
-    </div>
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-      <p class="text-slate-500 font-medium">Total Sisa Piutang Kerjasama</p>
-      <p id="k-stat-sisa-piutang" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
-    </div>
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-      <p class="text-slate-500 font-medium">Total Transaksi / Mitra</p>
-      <p id="k-stat-total-mitra" class="text-lg font-bold text-blue-600 mt-1">0 Transaksi</p>
-    </div>
-  </div>
-  
-  <!-- FILTER DATA -->
-  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-    <h2 class="text-base font-semibold text-gray-700">Filter Data Piutang Kerja Sama</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Thn Piutang</label>
-            <input type="number" id="f-ks-tahun-piutang" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Bln Piutang</label>
-            <select id="f-ks-bulan-piutang" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                <option value="">-- Semua Bulan --</option>
-                <option>Januari</option><option>Februari</option><option>Maret</option>
-                <option>April</option><option>Mei</option><option>Juni</option>
-                <option>Juli</option><option>Agustus</option><option>September</option>
-                <option>Oktober</option><option>November</option><option>Desember</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Thn Layanan</label>
-            <input type="number" id="f-ks-tahun-layanan" placeholder="cth: 2026" class="w-full text-sm border-gray-300 rounded-md border p-2">
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Bln Layanan</label>
-            <select id="f-ks-bulan-layanan" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                <option value="">-- Semua Bulan --</option>
-                <option>Januari</option><option>Februari</option><option>Maret</option>
-                <option>April</option><option>Mei</option><option>Juni</option>
-                <option>Juli</option><option>Agustus</option><option>September</option>
-                <option>Oktober</option><option>November</option><option>Desember</option>
-            </select>
-        </div>
-
-        <!-- 1. NAMA PERUSAHAAN DIUBAH MENJADI DROPDOWN AUTOMATIS -->
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perusahaan</label>
-            <select id="f-ks-perusahaan" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                <option value="">-- Semua Perusahaan --</option>
-                <!-- Akan diisi otomatis dari JS -->
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-            <select id="f-ks-status" class="w-full text-sm border-gray-300 rounded-md border p-2">
-                <option value="">-- Semua Status --</option>
-                <option value="Lunas">Lunas</option>
-                <option value="Belum Lunas">Belum Lunas</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Awal)</label>
-            <input type="date" id="f-ks-bayar-start" class="w-full text-sm border-gray-300 rounded-md border p-2">
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Bayar (Akhir)</label>
-            <input type="date" id="f-ks-bayar-end" class="w-full text-sm border-gray-300 rounded-md border p-2">
-        </div>
-
-        <!-- 2. PENAMBAHAN DROPDOWN TAMPILAN DATA (LIMIT) -->
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Tampilkan Data</label>
-            <select id="f-ks-limit" onchange="resetHalamanDanFetch()" class="w-full text-sm border-gray-300 rounded-md border p-2 bg-slate-50 font-semibold text-slate-700">
-                <option value="5">5 Data</option>
-                <option value="10" selected>10 Data</option>
-                <option value="20">20 Data</option>
-                <option value="50">50 Data</option>
-            </select>
-        </div>
-    </div>
-    
-    <div class="flex justify-end gap-2 pt-2">
-        <button onclick="resetFilterKerjasama()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md border">Reset Filter</button>
-        <button onclick="resetHalamanDanFetch()" class="px-4 py-1.5 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-md">Terapkan Filter</button>
-    </div>
-  </div>
-
-  <!-- TABEL DATA -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto mt-4">
-      <table class="w-full text-left text-xs whitespace-nowrap">
-          <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
-              <tr>
-                  <th class="p-3">Periode Piutang</th>
-                  <th class="p-3">Perusahaan</th>
-                  <th class="p-3">Tgl Surat</th>
-                  <th class="p-3">No Surat</th>
-                  <th class="p-3">Kota / Ket</th>
-                  <th class="p-3">Jenis</th>
-                  <th class="p-3">Periode Layanan</th>
-                  <th class="p-3 text-center">Pasien</th>
-                  <th class="p-3">No. Tagihan</th>
-                  <th class="p-3">Dokumen</th>
-                  <th class="p-3 text-right">Saldo Awal</th>
-                  <th class="p-3">Tgl Bayar</th>
-                  <th class="p-3 text-right">Bayar</th>
-                  <th class="p-3 text-right">Tambah</th>
-                  <th class="p-3 text-right">Koreksi (+)</th>
-                  <th class="p-3 text-right">Koreksi (-)</th>
-                  <th class="p-3 text-right">Biaya Trf</th>
-                  <th class="p-3 text-right">Saldo Akhir</th>
-                  <th class="p-3 text-center">Status</th>
-                  <th class="p-3">Aksi</th>
-              </tr>
-          </thead>
-          <tbody id="ks-table-body" class="divide-y divide-gray-100">
-              <!-- Data Dinamis -->
-          </tbody>
-      </table>
-  </div>
-  
-  <!-- 3. PENAMBAHAN BAR NAVIGASI HALAMAN (PAGINATION) -->
-  <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4">
-      <span id="ks-info-halaman" class="text-xs text-slate-600">Menampilkan 0 data</span>
-      <div class="flex gap-2">
-          <button id="ks-btn-prev" onclick="pindahHalamanKerjasama(-1)" class="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
-              &laquo; Sebelumnya
-          </button>
-          <button id="ks-btn-next" onclick="pindahHalamanKerjasama(1)" class="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
-              Selanjutnya &raquo;
-          </button>
-      </div>
-  </div>
-
-</section>
-
-      <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
-      <section id="view-laporan-gabungan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-1">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
-        <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh gabungan Rekap Pendapatan Kerjasama, Piutang Kerjasama, dan Piutang Pasien Perorangan.</p>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-xs">
-          <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl shadow-sm">
-            <p class="font-semibold text-emerald-800">Total Realisasi Pendapatan</p>
-            <p id="sum-pendapatan" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl shadow-sm">
-            <p class="font-semibold text-blue-800">Total Sisa Piutang Kerjasama</p>
-            <p id="sum-piutang-kerjasama" class="text-xl font-bold text-blue-600 mt-1">Rp 0</p>
-          </div>
-          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl shadow-sm">
-            <p class="font-semibold text-purple-800">Total Sisa Piutang Pasien</p>
-            <p id="sum-piutang-pasien" class="text-xl font-bold text-purple-600 mt-1">Rp 0</p>
-          </div>
-        </div>
-
-        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md border border-slate-800">
-          <p class="text-xs text-slate-400 font-medium tracking-wider uppercase">Total Asset Keuangan & Potensi Piutang RS</p>
-          <h2 id="sum-total-keseluruhan" class="text-3xl font-black text-amber-400 mt-2">Rp 0</h2>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- MODAL EDIT PENDAPATAN -->
-  <div id="modal-edit-pendapatan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-        <h3 class="font-bold text-sm">✏️ Edit Data Rekap Pendapatan</h3>
-        <button onclick="tutupModalEditPendapatan()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
-      </div>
-
-      <form id="formEditPendapatan" onsubmit="simpanPerubahanPendapatan(event)" class="p-4 overflow-y-auto space-y-4 text-xs">
-        <input type="hidden" id="edit_id">
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-700 mb-1">Kode Rekening</label>
-            <input type="text" id="edit_kode_rekening" required class="w-full border p-2 rounded bg-slate-100 font-mono" readonly>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-700 mb-1">Parent Kode (Induk)</label>
-            <input type="text" id="edit_parent_kode" class="w-full border p-2 rounded font-mono">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-700 mb-1">Uraian / Nama Rekening</label>
-            <input type="text" id="edit_uraian" required class="w-full border p-2 rounded">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-700 mb-1">Tipe Rekening</label>
-            <select id="edit_is_header" class="w-full border p-2 rounded bg-white">
-              <option value="false">Detail / Non-Header</option>
-              <option value="true">Header / Induk</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Target Anggaran (Rp)</label>
-          <input type="number" id="edit_anggaran" step="any" required class="w-full border p-2 rounded font-mono">
-        </div>
-
-        <div class="border-t pt-3">
-          <p class="font-bold text-slate-700 mb-2">Realisasi Bulanan (Rp):</p>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 font-mono">
-            <div><label>Jan:</label><input type="number" id="edit_jan" class="w-full border p-1.5 rounded"></div>
-            <div><label>Feb:</label><input type="number" id="edit_feb" class="w-full border p-1.5 rounded"></div>
-            <div><label>Mar:</label><input type="number" id="edit_mar" class="w-full border p-1.5 rounded"></div>
-            <div><label>Apr:</label><input type="number" id="edit_apr" class="w-full border p-1.5 rounded"></div>
-            <div><label>Mei:</label><input type="number" id="edit_mei" class="w-full border p-1.5 rounded"></div>
-            <div><label>Jun:</label><input type="number" id="edit_jun" class="w-full border p-1.5 rounded"></div>
-            <div><label>Jul:</label><input type="number" id="edit_jul" class="w-full border p-1.5 rounded"></div>
-            <div><label>Agu:</label><input type="number" id="edit_agu" class="w-full border p-1.5 rounded"></div>
-            <div><label>Sep:</label><input type="number" id="edit_sep" class="w-full border p-1.5 rounded"></div>
-            <div><label>Okt:</label><input type="number" id="edit_okt" class="w-full border p-1.5 rounded"></div>
-            <div><label>Nov:</label><input type="number" id="edit_nov" class="w-full border p-1.5 rounded"></div>
-            <div><label>Des:</label><input type="number" id="edit_des" class="w-full border p-1.5 rounded"></div>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-2 border-t pt-3">
-          <button type="button" onclick="tutupModalEditPendapatan()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded">
-            Batal
-          </button>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
-            💾 Simpan Perubahan
-          </button>
-        </div>
-      </form>
-
-    </div>
-  </div>
-  
-  <!-- MODAL DETAIL PASIEN -->
-  <div id="modalDetail" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Rincian Detail Pasien</h2>
-      <div id="kontenDetail" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
-      <div class="mt-6 flex justify-end">
-        <button onclick="tutupModal()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1.5 px-4 rounded text-xs">
-          Tutup
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // CREDENTIAL SUPABASE
-    const SUPABASE_URL = 'https://sxahdctfykqrwbmdqvmy.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_mGmFjbUxFzTYceGSuGYoDQ_K9yjZuc-';
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    let listDataPasienMaster = [];
-    let listDataPasienFiltered = [];
-
-    // VARIABLE GLOBAL KERJASAMA
-    let listDataKerjasamaMaster = [];
-    let listDataKerjasamaFiltered = [];
-
-    // NAVIGASI VIEW
-    function bukaView(viewName) {
-      document.querySelectorAll('.modul-view').forEach(view => {
-        view.classList.add('hidden');
-      });
-
-      const targetView = document.getElementById(`view-${viewName}`);
-      if (targetView) {
-        targetView.classList.remove('hidden');
-      }
-
-      document.querySelectorAll('aside nav button').forEach(btn => {
-        btn.className = 'w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2';
-      });
-
-      const activeBtn = document.getElementById(`btn-${viewName}`);
-      if (activeBtn) {
-        if (viewName === 'laporan-gabungan') {
-          activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-amber-500 text-white font-semibold shadow-lg shadow-amber-500/30 transition flex items-center gap-2';
-        } else {
-          activeBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30 transition flex items-center gap-2';
-        }
-      }
-
-      if (viewName === 'laporan-gabungan') {
-        if (typeof updateLaporanKonsolidasi === 'function') {
-          updateLaporanKonsolidasi();
-        }
-      }
-    }
-
-    // TOGGLE SIDEBAR
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const btnShow = document.getElementById('btn-show-sidebar');
-
-      if (sidebar && sidebar.classList.contains('-ml-64')) {
-        // Tampilkan Sidebar
-        sidebar.classList.remove('-ml-64');
-        if (btnShow) btnShow.classList.add('hidden');
-      } else if (sidebar) {
-        // Sembunyikan Sidebar
-        sidebar.classList.add('-ml-64');
-        if (btnShow) btnShow.classList.remove('hidden');
-      }
-    }
-
-    // ---------------- PERHITUNGAN PASIEN ----------------
-    function hitungBelumTerbayarPasien() {
-      const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya')?.value) || 0;
-      const potongan = parseFloat(document.getElementById('potongan')?.value) || 0;
-      const pembayaranAwal = parseFloat(document.getElementById('pembayaran_awal')?.value) || 0;
-      const jumlahAngsuran = parseFloat(document.getElementById('jumlah_angsuran')?.value) || 0;
-
-      const sisa = jumlahBiaya - potongan - pembayaranAwal - jumlahAngsuran;
-      const elBelumTerbayar = document.getElementById('belum_terbayar');
-      if (elBelumTerbayar) elBelumTerbayar.value = sisa;
-    }
-
-    ['jumlah_biaya', 'potongan', 'pembayaran_awal', 'jumlah_angsuran'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', hitungBelumTerbayarPasien);
-    });
-
-    const selectKpknl = document.getElementById('kirim_kpknl');
-    const containerTglKpknl = document.getElementById('container_tgl_kpknl');
-    const inputTglKpknl = document.getElementById('tgl_kirim_kpknl');
-
-    if (selectKpknl) {
-      selectKpknl.addEventListener('change', (e) => {
-        if (e.target.value === 'Sudah') {
-          if (containerTglKpknl) containerTglKpknl.classList.remove('hidden');
-        } else {
-          if (containerTglKpknl) containerTglKpknl.classList.add('hidden');
-          if (inputTglKpknl) inputTglKpknl.value = '';
-        }
-      });
-    }
-
-    function batalEditPasien() {
-      const form = document.getElementById('formPiutangPasien');
-      if (form) form.reset();
-      const elEditId = document.getElementById('edit_id');
-      if (elEditId) elEditId.value = '';
-      
-      const elBtnSubmit = document.getElementById('btnSubmitPasien');
-      if (elBtnSubmit) elBtnSubmit.innerText = '+ Simpan Data Pasien';
-
-      const elBtnBatal = document.getElementById('btnBatalPasien');
-      if (elBtnBatal) elBtnBatal.classList.add('hidden');
-
-      if (containerTglKpknl) containerTglKpknl.classList.add('hidden');
-    }
-
-    // ---------------- LOGIKA REKAP PENDAPATAN ----------------
-    let listMasterPendapatan = [];
-    let listFilteredPendapatan = [];
-
-    const NAMA_BULAN = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-
-    const KEY_BULAN = [
-      'realisasi_jan', 'realisasi_feb', 'realisasi_mar', 'realisasi_apr',
-      'realisasi_mei', 'realisasi_jun', 'realisasi_jul', 'realisasi_agu',
-      'realisasi_sep', 'realisasi_okt', 'realisasi_nov', 'realisasi_des'
-    ];
-
-    async function loadDataPendapatan() {
-      const { data, error } = await supabaseClient
-        .from('rekap_pendapatan')
-        .select('*')
-        .order('kode_rekening', { ascending: true });
-
-      if (error) {
-        console.error('Gagal mengambil data rekap_pendapatan:', error.message);
-        return;
-      }
-
-      // PASS DATA KE FUNGSI HITUNG OTOMATIS SEBELUM DIRENDER
-      listMasterPendapatan = hitungOtomatisRekapPendapatan(data || []);
-      renderCheckboxUraian(listMasterPendapatan);
-      resetFilterPendapatan(); 
-    }
-
-    // Fungsi Hitung Rekap Pendapatan Otomatis
-    function hitungOtomatisRekapPendapatan(dataPendapatan) {
-      const kolomAngka = [
-        'anggaran', 'target', 
-        'realisasi_jan', 'realisasi_feb', 'realisasi_mar', 'realisasi_apr', 
-        'realisasi_mei', 'realisasi_jun', 'realisasi_jul', 'realisasi_agu', 
-        'realisasi_sep', 'realisasi_okt', 'realisasi_nov', 'realisasi_des'
-      ];
-
-      const mapData = {};
-      dataPendapatan.forEach(item => {
-        const key = item.kode_rekening || item.uraian?.trim();
-        if (key) mapData[key] = item;
-      });
-
-      const hitungTotal = (daftarBaris, kolom) => 
-        daftarBaris.reduce((acc, row) => acc + (parseFloat(row[kolom]) || 0), 0);
-
-      kolomAngka.forEach(kolom => {
-        // LEVEL 1
-        const detailMoewardiRetribusi = dataPendapatan.filter(item => item.parent_kode === '4.1.2.1.1.5.01');
-        if (mapData['4.1.2.1.1.5.01']) {
-          mapData['4.1.2.1.1.5.01'][kolom] = hitungTotal(detailMoewardiRetribusi, kolom);
-        }
-
-        if (mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)']) {
-          const a = parseFloat(mapData['a. SEWA RUMAH DINAS']?.[kolom]) || 0;
-          const b = parseFloat(mapData['b. SEWA RUANGAN / AULA']?.[kolom]) || 0;
-          const c = parseFloat(mapData['c. SEWA KANTIN']?.[kolom]) || 0;
-          const d = parseFloat(mapData['d. SEWA LAHAN PARKIR']?.[kolom]) || 0;
-          mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)'][kolom] = a + b + c + d;
-        }
-
-        if (mapData['PENDAPATAN BLUD DR JASA GIRO']) {
-          mapData['PENDAPATAN BLUD DR JASA GIRO'][kolom] = parseFloat(mapData['JASA GIRO']?.[kolom]) || 0;
-        }
-        if (mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA']) {
-          mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA'][kolom] = parseFloat(mapData['PENERIMAAN BUNGA']?.[kolom]) || 0;
-        }
-
-        // LEVEL 2
-        if (mapData['RETRIBUSI PELAY.KESEHT. DI RSUD']) {
-          mapData['RETRIBUSI PELAY.KESEHT. DI RSUD'][kolom] = parseFloat(mapData['4.1.2.1.1.5.01']?.[kolom]) || 0;
-        }
-        if (mapData['4.1.4.16.2.1.01']) {
-          const pLain = parseFloat(mapData['PENDAPATAN LAIN-LAIN (PIHAK-3, DLL)']?.[kolom]) || 0;
-          const pSewa = parseFloat(mapData['SEWA/PEMAKAIAN KEKAYAAN DAERAH(PKD)']?.[kolom]) || 0;
-          mapData['4.1.4.16.2.1.01'][kolom] = pLain + pSewa;
-        }
-        if (mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']) {
-          const pGiro = parseFloat(mapData['PENDAPATAN BLUD DR JASA GIRO']?.[kolom]) || 0;
-          const pBunga = parseFloat(mapData['PENDAPATAN BLUD DR PENDAPATAN BUNGA']?.[kolom]) || 0;
-          mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH'][kolom] = pGiro + pBunga;
-        }
-
-        // LEVEL 3
-        if (mapData['RETRIBUSI PELAYANAN KESEHATAN']) {
-          mapData['RETRIBUSI PELAYANAN KESEHATAN'][kolom] = parseFloat(mapData['RETRIBUSI PELAY.KESEHT. DI RSUD']?.[kolom]) || 0;
-        }
-        if (mapData['PENDAPATAN BLUD DR JASA LAYANAN']) {
-          mapData['PENDAPATAN BLUD DR JASA LAYANAN'][kolom] = parseFloat(mapData['4.1.4.16.2.1.01']?.[kolom]) || 0;
-        }
-
-        // LEVEL 4
-        if (mapData['RETRIBUSI JASA UMUM']) {
-          mapData['RETRIBUSI JASA UMUM'][kolom] = parseFloat(mapData['RETRIBUSI PELAYANAN KESEHATAN']?.[kolom]) || 0;
-        }
-        if (mapData['4.1.4.16']) {
-          const pJasa = parseFloat(mapData['PENDAPATAN BLUD DR JASA LAYANAN']?.[kolom]) || 0;
-          const pLainLain = parseFloat(mapData['PENDPT.BLUD DR LAIN2 PENDPT.BLUD YG SAH']?.[kolom]) || 0;
-          mapData['4.1.4.16'][kolom] = pJasa + pLainLain;
-        }
-
-        // LEVEL 5
-        if (mapData['RETRIBUSI DAERAH']) {
-          mapData['RETRIBUSI DAERAH'][kolom] = parseFloat(mapData['RETRIBUSI JASA UMUM']?.[kolom]) || 0;
-        }
-        if (mapData['LAIN-LAIN PAD YANG SAH']) {
-          mapData['LAIN-LAIN PAD YANG SAH'][kolom] = parseFloat(mapData['4.1.4.16']?.[kolom]) || 0;
-        }
-
-        // LEVEL 6 (TOP HEADER)
-        if (mapData['PENDAPATAN ASLI DAERAH (PAD)']) {
-          const retribusi = parseFloat(mapData['RETRIBUSI DAERAH']?.[kolom]) || 0;
-          const lainPAD = parseFloat(mapData['LAIN-LAIN PAD YANG SAH']?.[kolom]) || 0;
-          mapData['PENDAPATAN ASLI DAERAH (PAD)'][kolom] = retribusi + lainPAD;
-        }
-        if (mapData['PENDAPATAN BLUD']) {
-          mapData['PENDAPATAN BLUD'][kolom] = parseFloat(mapData['PENDAPATAN ASLI DAERAH (PAD)']?.[kolom]) || 0;
-        }
-      });
-
-      return dataPendapatan;
-    }
-    
-    function renderCheckboxUraian(data) {
-      const container = document.getElementById('container-check-uraian');
-      if (!container) return;
-
-      if (data.length === 0) {
-        container.innerHTML = `<span class="text-slate-400">Belum ada data.</span>`;
-        return;
-      }
-
-      const uniqueUraian = [...new Set(data.map(i => i.uraian))];
-
-      container.innerHTML = `
-        <label class="flex items-center gap-1.5 font-bold text-blue-700 border-b pb-1 mb-1 cursor-pointer">
-          <input type="checkbox" id="check_uraian_all" checked onchange="toggleSelectAllUraian(this)">
-          <span>Pilih Semua</span>
-        </label>
-      ` + uniqueUraian.map((u) => `
-        <label class="flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 p-0.5 rounded">
-          <input type="checkbox" value="${u}" class="item-check-uraian" checked onchange="terapkanFilterPendapatan()">
-          <span class="truncate">${u}</span>
-        </label>
-      `).join('');
-    }
-
-    function toggleSelectAllUraian(master) {
-      const checkboxes = document.querySelectorAll('.item-check-uraian');
-      checkboxes.forEach(cb => cb.checked = master.checked);
-      terapkanFilterPendapatan();
-    }
-
-    function terapkanFilterPendapatan() {
-      const elBulanMulai = document.getElementById('p_filter_bulan_mulai');
-      const elBulanSelesai = document.getElementById('p_filter_bulan_selesai');
-
-      const bulanMulaiIdx = parseInt(elBulanMulai?.value || "0") || 0;
-      let bulanSelesaiIdx = parseInt(elBulanSelesai?.value || "11");
-      if (isNaN(bulanSelesaiIdx)) bulanSelesaiIdx = 11;
-
-      if (bulanMulaiIdx > bulanSelesaiIdx && elBulanSelesai) {
-        elBulanSelesai.value = bulanMulaiIdx;
-        bulanSelesaiIdx = bulanMulaiIdx;
-      }
-
-      const selectedUraian = Array.from(document.querySelectorAll('.item-check-uraian:checked')).map(cb => cb.value);
-
-      listFilteredPendapatan = listMasterPendapatan.filter(item => {
-        return selectedUraian.includes(item.uraian);
-      });
-
-      renderDashboardPendapatan(listFilteredPendapatan, bulanMulaiIdx, bulanSelesaiIdx);
-      renderTabelPendapatan(listFilteredPendapatan, bulanMulaiIdx, bulanSelesaiIdx);
-    }
-
-    function hitungRealisasiRentang(item, startIdx, endIdx) {
-      let total = 0;
-      for (let i = startIdx; i <= endIdx; i++) {
-        const key = KEY_BULAN[i];
-        total += Number(item[key] || 0);
-      }
-      return total;
-    }
-
-    function renderDashboardPendapatan(data, startIdx, endIdx) {
-      const dataDetail = data.filter(i => i.is_header === false);
-      const targetData = dataDetail.length > 0 ? dataDetail : data;
-
-      let totalTarget = 0;
-      let totalRealisasi = 0;
-
-      targetData.forEach(item => {
-        totalTarget += Number(item.anggaran || 0);
-        totalRealisasi += hitungRealisasiRentang(item, startIdx, endIdx);
-      });
-
-      const persentase = totalTarget > 0 ? ((totalRealisasi / totalTarget) * 100) : 0;
-      const sisaTarget = totalTarget - totalRealisasi;
-
-      const elTarget = document.getElementById('dash-target');
-      const elRealisasi = document.getElementById('dash-realisasi');
-      const elPencapaian = document.getElementById('dash-pencapaian');
-      const elBar = document.getElementById('dash-bar-pencapaian');
-
-      if (elTarget) elTarget.innerText = `Rp ${totalTarget.toLocaleString('id-ID')}`;
-      if (elRealisasi) elRealisasi.innerText = `Rp ${totalRealisasi.toLocaleString('id-ID')}`;
-      if (elPencapaian) elPencapaian.innerText = `${persentase.toFixed(2)}%`;
-      if (elBar) elBar.style.width = `${Math.min(persentase, 100)}%`;
-      
-      const elSisa = document.getElementById('dash-sisa');
-      if (elSisa) {
-        if (sisaTarget < 0) {
-          elSisa.innerText = `+ Rp ${Math.abs(sisaTarget).toLocaleString('id-ID')} (Surplus)`;
-          elSisa.className = "text-xl font-bold text-emerald-600 mt-1";
-        } else {
-          elSisa.innerText = `Rp ${sisaTarget.toLocaleString('id-ID')}`;
-          elSisa.className = "text-xl font-bold text-amber-600 mt-1";
-        }
-      }
-
-      const txtPeriode = (startIdx === endIdx) 
-        ? `Bulan: ${NAMA_BULAN[startIdx]}`
-        : `Periode: ${NAMA_BULAN[startIdx]} - ${NAMA_BULAN[endIdx]}`;
-      
-      const elInfoPeriode = document.getElementById('dash-info-periode');
-      if (elInfoPeriode) elInfoPeriode.innerText = txtPeriode;
-    }
-
-    function renderTabelPendapatan(data, startIdx, endIdx) {
-      const tbody = document.getElementById('tabelPendapatan');
-      const headerRealisasi = document.getElementById('th-header-realisasi');
-
-      if (headerRealisasi) {
-        headerRealisasi.innerText = (startIdx === endIdx) 
-          ? `Realisasi (${NAMA_BULAN[startIdx]})`
-          : `Realisasi (${NAMA_BULAN[startIdx].slice(0,3)} - ${NAMA_BULAN[endIdx].slice(0,3)})`;
-      }
-
-      if (!tbody) return;
-
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Tidak ada data rekap pendapatan yang cocok dengan filter.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = data.map(i => {
-        const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
-        const anggaran = Number(i.anggaran || 0);
-        const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
-        const sisa = anggaran - realisasiPeriode;
-        const isHeaderClass = i.is_header ? 'font-bold bg-slate-50 text-slate-900' : 'hover:bg-slate-50 text-slate-700';
-
-        return `
-          <tr class="${isHeaderClass} font-mono">
-            <td class="p-2.5 border-r font-bold">${i.kode_rekening || '-'}</td>
-            <td class="p-2.5 border-r font-sans">${i.uraian || '-'}</td>
-            <td class="p-2.5 border-r text-right">Rp ${anggaran.toLocaleString('id-ID')}</td>
-            <td class="p-2.5 border-r text-right font-semibold text-emerald-600">Rp ${realisasiPeriode.toLocaleString('id-ID')}</td>
-            <td class="p-2.5 border-r text-center font-bold text-blue-600">${persentase}%</td>
-            <td class="p-2.5 border-r text-right font-semibold ${sisa < 0 ? 'text-emerald-600' : 'text-slate-700'}">
-              Rp ${sisa.toLocaleString('id-ID')}
-            </td>
-            <td class="p-2.5 text-center font-sans">
-              <button type="button" onclick="bukaModalEditPendapatanByKode('${i.kode_rekening}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
-                ✏️ Edit
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function resetFilterPendapatan() {
-      const elMulai = document.getElementById('p_filter_bulan_mulai');
-      const elSelesai = document.getElementById('p_filter_bulan_selesai');
-      if (elMulai) elMulai.value = "0";
-      if (elSelesai) elSelesai.value = "11";
-      
-      const cbAll = document.getElementById('check_uraian_all');
-      if (cbAll) {
-        cbAll.checked = true;
-        toggleSelectAllUraian(cbAll);
-      } else {
-        terapkanFilterPendapatan();
-      }
-    }
-
-    function downloadCSVPendapatan() {
-      if (listFilteredPendapatan.length === 0) {
-        alert('Tidak ada data laporan pendapatan untuk diunduh.');
-        return;
-      }
-
-      const startIdx = parseInt(document.getElementById('p_filter_bulan_mulai')?.value || 0) || 0;
-      const endIdx = parseInt(document.getElementById('p_filter_bulan_selesai')?.value || 11) || 11;
-      const labelPeriode = `${NAMA_BULAN[startIdx]}_s.d_${NAMA_BULAN[endIdx]}`;
-
-      const headers = ["Kode Rekening", "Uraian", "Is Header", "Target Anggaran", `Realisasi (${labelPeriode})`, "Pencapaian (%)", "Sisa Target (Rp)"];
-
-      const rows = listFilteredPendapatan.map(i => {
-        const realisasiPeriode = hitungRealisasiRentang(i, startIdx, endIdx);
-        const anggaran = Number(i.anggaran || 0);
-        const persentase = anggaran > 0 ? ((realisasiPeriode / anggaran) * 100).toFixed(2) : '0.00';
-        const sisa = anggaran - realisasiPeriode;
-
-        return [
-          `"${i.kode_rekening || ''}"`,
-          `"${i.uraian || ''}"`,
-          i.is_header ? 'Ya' : 'Tidak',
-          anggaran,
-          realisasiPeriode,
-          persentase,
-          sisa
-        ];
-      });
-
-      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Laporan_Rekap_Pendapatan_${labelPeriode}_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function bukaModalEditPendapatanByKode(kode) {
-      const item = listMasterPendapatan.find(x => String(x.kode_rekening) === String(kode));
-      if (!item) {
-        alert('Data pendapatan tidak ditemukan!');
-        return;
-      }
-
-      document.getElementById('edit_id').value = item.id || '';
-      document.getElementById('edit_kode_rekening').value = item.kode_rekening || '';
-      document.getElementById('edit_parent_kode').value = item.parent_kode || '';
-      document.getElementById('edit_uraian').value = item.uraian || '';
-      document.getElementById('edit_is_header').value = item.is_header ? 'true' : 'false';
-      document.getElementById('edit_anggaran').value = item.anggaran || 0;
-
-      document.getElementById('edit_jan').value = item.realisasi_jan || 0;
-      document.getElementById('edit_feb').value = item.realisasi_feb || 0;
-      document.getElementById('edit_mar').value = item.realisasi_mar || 0;
-      document.getElementById('edit_apr').value = item.realisasi_apr || 0;
-      document.getElementById('edit_mei').value = item.realisasi_mei || 0;
-      document.getElementById('edit_jun').value = item.realisasi_jun || 0;
-      document.getElementById('edit_jul').value = item.realisasi_jul || 0;
-      document.getElementById('edit_agu').value = item.realisasi_agu || 0;
-      document.getElementById('edit_sep').value = item.realisasi_sep || 0;
-      document.getElementById('edit_okt').value = item.realisasi_okt || 0;
-      document.getElementById('edit_nov').value = item.realisasi_nov || 0;
-      document.getElementById('edit_des').value = item.realisasi_des || 0;
-
-      document.getElementById('modal-edit-pendapatan').classList.remove('hidden');
-    }
-
-    function tutupModalEditPendapatan() {
-      document.getElementById('modal-edit-pendapatan').classList.add('hidden');
-    }
-
-    async function simpanPerubahanPendapatan(e) {
-      e.preventDefault();
-
-      const id = document.getElementById('edit_id').value;
-      const kodeRekening = document.getElementById('edit_kode_rekening').value;
-      const parentInput = document.getElementById('edit_parent_kode').value.trim();
-
-      const payload = {
-        uraian: document.getElementById('edit_uraian').value.trim(),
-        parent_kode: parentInput !== "" ? parentInput : null,
-        is_header: document.getElementById('edit_is_header').value === 'true',
-        anggaran: parseFloat(document.getElementById('edit_anggaran').value) || 0,
-        realisasi_jan: parseFloat(document.getElementById('edit_jan').value) || 0,
-        realisasi_feb: parseFloat(document.getElementById('edit_feb').value) || 0,
-        realisasi_mar: parseFloat(document.getElementById('edit_mar').value) || 0,
-        realisasi_apr: parseFloat(document.getElementById('edit_apr').value) || 0,
-        realisasi_mei: parseFloat(document.getElementById('edit_mei').value) || 0,
-        realisasi_jun: parseFloat(document.getElementById('edit_jun').value) || 0,
-        realisasi_jul: parseFloat(document.getElementById('edit_jul').value) || 0,
-        realisasi_agu: parseFloat(document.getElementById('edit_agu').value) || 0,
-        realisasi_sep: parseFloat(document.getElementById('edit_sep').value) || 0,
-        realisasi_okt: parseFloat(document.getElementById('edit_okt').value) || 0,
-        realisasi_nov: parseFloat(document.getElementById('edit_nov').value) || 0,
-        realisasi_des: parseFloat(document.getElementById('edit_des').value) || 0
-      };
-
-      let query = supabaseClient.from('rekap_pendapatan').update(payload);
-      if (id) {
-        query = query.eq('id', id);
-      } else {
-        query = query.eq('kode_rekening', kodeRekening);
-      }
-
-      const { error } = await query;
-
-      if (error) {
-        alert('Gagal mengedit data: ' + error.message);
-      } else {
-        alert('Data pendapatan berhasil diperbarui!');
-        tutupModalEditPendapatan();
-        loadDataPendapatan();
-      }
-    }
-
-    // Function Export PDF Rekap Pendapatan
-    function downloadPDFPendapatan() {
-      if (!listMasterPendapatan || listMasterPendapatan.length === 0) {
-        alert("Data pendapatan kosong!");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l', 'mm', 'a4');
-
-      doc.setFontSize(14);
-      doc.text("LAPORAN REKAP PENDAPATAN", 14, 15);
-      doc.setFontSize(10);
-      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
-
-      const tableHeaders = [
-        ["Kode", "Uraian", "Target", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
-      ];
-
-      const tableData = listMasterPendapatan.map(item => [
-        item.kode_rekening || "-",
-        item.uraian || "-",
-        (item.anggaran || 0).toLocaleString('id-ID'),
-        (item.realisasi_jan || 0).toLocaleString('id-ID'),
-        (item.realisasi_feb || 0).toLocaleString('id-ID'),
-        (item.realisasi_mar || 0).toLocaleString('id-ID'),
-        (item.realisasi_apr || 0).toLocaleString('id-ID'),
-        (item.realisasi_mei || 0).toLocaleString('id-ID'),
-        (item.realisasi_jun || 0).toLocaleString('id-ID'),
-        (item.realisasi_jul || 0).toLocaleString('id-ID'),
-        (item.realisasi_agu || 0).toLocaleString('id-ID'),
-        (item.realisasi_sep || 0).toLocaleString('id-ID'),
-        (item.realisasi_okt || 0).toLocaleString('id-ID'),
-        (item.realisasi_nov || 0).toLocaleString('id-ID'),
-        (item.realisasi_des || 0).toLocaleString('id-ID')
-      ]);
-
-      doc.autoTable({
-        startY: 26,
-        head: tableHeaders,
-        body: tableData,
-        styles: { fontSize: 7, cellPadding: 1.5 },
-        headStyles: { fillColor: [15, 23, 42] },
-        theme: 'grid'
-      });
-
-      doc.save(`Laporan_Rekap_Pendapatan_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-
-    // ==========================================
-    // LOGIKA PIUTANG KERJA SAMA
-    // ==========================================
-
-    let ksCurrentData = [];
-
-    function fmtKS(num) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
-    }
-
-    function calcSaldoAkhirKerjasama() {
-        const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
-        const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
-        const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
-        const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
-        const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
-        const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
-
-        const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
-        
-        const previewEl = document.getElementById('ks_saldo_akhir_preview');
-        if (previewEl) previewEl.value = fmtKS(saldoAkhir);
-
-        const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
-        const inputStatus = document.getElementById('ks_status');
-        if (inputStatus) {
-            inputStatus.value = statusOtomatis;
-        }
-    }
-
-    async function fetchPiutangKerjasama() {
-        let query = supabaseClient.from('piutang_kerjasama').select('*').order('created_at', { ascending: false });
-
-        const thnPiutang = document.getElementById('f-ks-tahun-piutang')?.value || '';
-        const blnPiutang = document.getElementById('f-ks-bulan-piutang')?.value || '';
-        const thnLayanan = document.getElementById('f-ks-tahun-layanan')?.value || '';
-        const blnLayanan = document.getElementById('f-ks-bulan-layanan')?.value || '';
-        const perusahaan = document.getElementById('f-ks-perusahaan')?.value || '';
-        const status = document.getElementById('f-ks-status')?.value || '';
-        const tglStart = document.getElementById('f-ks-bayar-start')?.value || '';
-        const tglEnd = document.getElementById('f-ks-bayar-end')?.value || '';
-
-        if (thnPiutang) query = query.eq('tahun_piutang', parseInt(thnPiutang));
-        if (blnPiutang) query = query.eq('bulan_piutang', blnPiutang);
-        if (thnLayanan) query = query.eq('tahun_layanan', parseInt(thnLayanan));
-        if (blnLayanan) query = query.eq('bulan_layanan', blnLayanan);
-        if (perusahaan) query = query.ilike('nama_perusahaan', `%${perusahaan}%`);
-        if (status) query = query.eq('status', status);
-        if (tglStart) query = query.gte('tanggal_bayar', tglStart);
-        if (tglEnd) query = query.lte('tanggal_bayar', tglEnd);
-
-        const { data, error } = await query;
-
-        if (error) {
-            console.error('Gagal mengambil data Piutang Kerja Sama:', error.message);
-            return;
-        }
-
-        ksCurrentData = data || [];
-        renderTableKerjasama(ksCurrentData);
-        renderDashboardKerjasama(ksCurrentData);
-    }
-
-    function renderTableKerjasama(data) {
-        const tbody = document.getElementById('ks-table-body');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="19" class="p-4 text-center text-gray-400">Tidak ada data ditemukan.</td></tr>`;
-            return;
-        }
-
-        data.forEach(row => {
-            const linkDoc = row.link_dokumen 
-                ? `<a href="${row.link_dokumen}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:underline">Buka</a>` 
-                : '-';
-
-            const statusBadge = row.status === 'Lunas' 
-                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Lunas</span>` 
-                : `<span class="bg-rose-100 text-rose-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Belum Lunas</span>`;
-
-            const saldoAkhir = row.saldo_akhir !== undefined 
-                ? row.saldo_akhir 
-                : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-gray-50">
-                    <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
-                    <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
-                    <td class="p-3">${row.tanggal_surat || '-'}</td>
-                    <td class="p-3 font-mono">${row.no_surat || '-'}</td>
-                    <td class="p-3">${row.kota_keterangan || '-'}</td>
-                    <td class="p-3">${row.jenis || '-'}</td>
-                    <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
-                    <td class="p-3 text-center">${row.jumlah_pasien || 0}</td>
-                    <td class="p-3 font-mono">${row.nomor_tagihan || '-'}</td>
-                    <td class="p-3 text-center">${linkDoc}</td>
-                    <td class="p-3 text-right">${fmtKS(row.saldo_awal)}</td>
-                    <td class="p-3">${row.tanggal_bayar || '-'}</td>
-                    <td class="p-3 text-right text-blue-600">${fmtKS(row.bayar)}</td>
-                    <td class="p-3 text-right text-emerald-600">+${fmtKS(row.tambah)}</td>
-                    <td class="p-3 text-right text-emerald-600">+${fmtKS(row.koreksi_plus)}</td>
-                    <td class="p-3 text-right text-rose-600">-${fmtKS(row.koreksi_minus)}</td>
-                    <td class="p-3 text-right">${fmtKS(row.biaya_transfer)}</td>
-                    <td class="p-3 text-right font-bold text-gray-900">${fmtKS(saldoAkhir)}</td>
-                    
-                    <td class="p-3 text-center">${statusBadge}</td>
-                    <td class="p-3">
-                        <div class="flex gap-1">
-                            <button onclick="editPiutangKerjasama(${row.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
-                            <button onclick="deletePiutangKerjasama(${row.id})" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
+            <!-- 1. INPUT PIUTANG PASIEN -->
+            <section id="view-input-pasien" class="modul-view">
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold text-slate-800">Form Input Piutang Pasien</h1>
+                    <p class="text-xs text-slate-500">Masukkan rincian pelayanan dan data piutang pasien perorangan.</p>
+                </div>
+                <form id="formPiutangPasien" onsubmit="simpanPasien(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-xs">
+                    <input type="hidden" id="pasien_edit_id">
+                    <div>
+                        <label class="block font-semibold mb-1">Nama Pasien *</label>
+                        <input type="text" id="nama_pasien" required class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">No. RM *</label>
+                        <input type="text" id="no_rm" required class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Tahun Piutang</label>
+                        <input type="number" id="tahun_piutang" value="2026" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Jenis Perawatan</label>
+                        <select id="jenis_perawatan" class="w-full border p-2 rounded">
+                            <option value="Rawat Inap">Rawat Inap</option>
+                            <option value="Rawat Jalan">Rawat Jalan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Total Biaya (Rp)</label>
+                        <input type="number" id="jumlah_biaya" value="0" oninput="hitungPiutangPasien()" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Jumlah Bayar (Rp)</label>
+                        <input type="number" id="pembayaran_awal" value="0" oninput="hitungPiutangPasien()" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1 text-red-600">Sisa Piutang (Otomatis)</label>
+                        <input type="number" id="belum_terbayar" value="0" readonly class="w-full border p-2 rounded bg-slate-100 font-bold text-red-600">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition h-[38px]">
+                            Simpan Pasien
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 2. INPUT REKAP PENDAPATAN -->
+            <section id="view-input-pendapatan" class="modul-view hidden">
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold text-slate-800">Form Input Pendapatan</h1>
+                    <p class="text-xs text-slate-500">Pencatatan target anggaran dan realisasi bulanan pendapatan.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-xs">
+                    <p class="text-slate-600">Fitur input pendapatan aktif.</p>
+                </div>
+            </section>
+
+            <!-- 3. INPUT PIUTANG KERJASAMA -->
+            <section id="view-input-kerjasama" class="modul-view hidden space-y-6">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">Form Input Piutang Kerjasama</h1>
+                    <p class="text-xs text-slate-500">Masukkan data piutang instansi/perusahaan kerjasama.</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <form id="ksPiutangForm" onsubmit="simpanPiutangKerjasama(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <input type="hidden" id="ks_edit_id">
+                        <div>
+                            <label class="block font-medium mb-1">Tahun Piutang *</label>
+                            <input type="number" id="ks_tahun_piutang" value="2026" required class="w-full border p-2 rounded">
                         </div>
+                        <div>
+                            <label class="block font-medium mb-1">Bulan Piutang *</label>
+                            <select id="ks_bulan_piutang" required class="w-full border p-2 rounded">
+                                <option value="">Pilih Bulan</option>
+                                <option>Januari</option><option>Februari</option><option>Maret</option>
+                                <option>April</option><option>Mei</option><option>Juni</option>
+                                <option>Juli</option><option>Agustus</option><option>September</option>
+                                <option>Oktober</option><option>November</option><option>Desember</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Nama Perusahaan / Mitra *</label>
+                            <input type="text" id="ks_nama_perusahaan" placeholder="PT. / Asuransi / Instansi" required class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Nomor Tagihan / Surat</label>
+                            <input type="text" id="ks_no_surat" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Tanggal Tagihan</label>
+                            <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Jenis Layanan</label>
+                            <select id="ks_jenis" class="w-full border p-2 rounded">
+                                <option value="Rawat Inap & Rawat Jalan">Rawat Inap & Rawat Jalan</option>
+                                <option value="BPJS Pelayanan">BPJS Pelayanan</option>
+                                <option value="Asuransi Swasta">Asuransi Swasta</option>
+                                <option value="Kerjasama Perusahaan">Kerjasama Perusahaan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Saldo Awal / Total Tagihan (Rp)</label>
+                            <input type="number" id="ks_saldo_awal" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Realisasi Bayar (Rp)</label>
+                            <input type="number" id="ks_bayar" value="0" oninput="calcSaldoAkhirKerjasama()" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1 text-blue-700">Estimasi Saldo Akhir / Sisa</label>
+                            <input type="text" id="ks_saldo_akhir_preview" readonly value="Rp 0" class="w-full border p-2 rounded bg-blue-50 font-bold text-blue-700">
+                        </div>
+                        <div class="col-span-1 md:col-span-3 flex justify-end gap-2 border-t pt-3">
+                            <button type="reset" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data Kerjasama</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 4. LAPORAN PIUTANG PASIEN -->
+            <section id="view-laporan-pasien" class="modul-view hidden">
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold text-slate-800">📋 Laporan Piutang Pasien Perorangan</h1>
+                    <p class="text-xs text-slate-500">Daftar rincian dan filter status pembayaran pasien.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 text-xs">
+                    <p>Filter & Tabel Laporan Pasien</p>
+                </div>
+            </section>
+
+            <!-- 5. LAPORAN PENDAPATAN -->
+            <section id="view-laporan-pendapatan" class="modul-view hidden">
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold text-slate-800">📊 Laporan Rekapitulasi Pendapatan</h1>
+                </div>
+            </section>
+
+            <!-- ================= 6. LAPORAN PIUTANG KERJASAMA (BAGIAN UTAMA FIX) ================= -->
+            <section id="view-laporan-kerjasama" class="modul-view hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800">🤝 Laporan Piutang Kerjasama / Mitra</h1>
+                        <p class="text-xs text-slate-500">Monitoring realisasi pembayaran dan sisa piutang instansi/asuransi.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="exportKerjasamaExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1 transition shadow-sm">
+                            📊 Export Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARDS STATISTIK -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-slate-500 font-medium">Total Tagihan (Saldo Awal)</p>
+                        <p id="ks-stat-saldo-awal" class="text-lg font-bold text-slate-800 mt-1">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-slate-500 font-medium">Total Pembayaran / Realisasi</p>
+                        <p id="ks-stat-bayar" class="text-lg font-bold text-emerald-600 mt-1">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-slate-500 font-medium">Sisa Piutang Kerjasama</p>
+                        <p id="ks-stat-sisa" class="text-lg font-bold text-red-600 mt-1">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-slate-500 font-medium">Total Mitra / Instansi</p>
+                        <p id="ks-stat-total-mitra" class="text-lg font-bold text-blue-600 mt-1">0 Perusahaan</p>
+                    </div>
+                </div>
+
+                <!-- FILTER DOKUMEN KERJASAMA -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">🔍 Filter Laporan Kerjasama</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Mulai</label>
+                            <input type="date" id="ks_filter_tgl_mulai" onchange="terapkanFilterKerjasama()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode Tgl Selesai</label>
+                            <input type="date" id="ks_filter_tgl_selesai" onchange="terapkanFilterKerjasama()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tahun Piutang</label>
+                            <select id="ks_filter_tahun" onchange="terapkanFilterKerjasama()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                                <option value="">Semua Tahun</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Bulan Piutang</label>
+                            <select id="ks_filter_bulan" onchange="terapkanFilterKerjasama()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                                <option value="">Semua Bulan</option>
+                                <option value="Januari">Januari</option>
+                                <option value="Februari">Februari</option>
+                                <option value="Maret">Maret</option>
+                                <option value="April">April</option>
+                                <option value="Mei">Mei</option>
+                                <option value="Juni">Juni</option>
+                                <option value="Juli">Juli</option>
+                                <option value="Agustus">Agustus</option>
+                                <option value="September">September</option>
+                                <option value="Oktober">Oktober</option>
+                                <option value="November">November</option>
+                                <option value="Desember">Desember</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Pelunasan</label>
+                            <select id="ks_filter_status" onchange="terapkanFilterKerjasama()" class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                                <option value="">Semua Status</option>
+                                <option value="Lunas">Lunas</option>
+                                <option value="Belum Lunas">Belum Lunas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cari Nama Perusahaan</label>
+                            <input type="text" id="ks_filter_perusahaan" onkeyup="terapkanFilterKerjasama()" placeholder="Ketik kata kunci..." class="w-full border p-1.5 rounded text-xs bg-slate-50">
+                        </div>
+                    </div>
+                    <div class="mt-3 flex justify-end gap-2">
+                        <button type="button" onclick="terapkanFilterKerjasama()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-xs font-semibold flex items-center gap-1 shadow-sm">
+                            🔍 Filter Data
+                        </button>
+                        <button type="button" onclick="resetFilterKerjasama()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded text-xs font-semibold">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TABEL DATA PIUTANG KERJASAMA -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-xs text-left text-slate-600">
+                        <thead class="bg-slate-800 text-white uppercase text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Tahun / Bulan</th>
+                                <th class="p-3">Perusahaan / Mitra</th>
+                                <th class="p-3">Jenis Layanan</th>
+                                <th class="p-3 text-right">Saldo Awal (Rp)</th>
+                                <th class="p-3 text-right">Bayar (Rp)</th>
+                                <th class="p-3 text-right">Sisa Piutang (Rp)</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-kerjasama-body" class="divide-y divide-slate-200">
+                            <!-- Data dimuat via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 7. LAPORAN GABUNGAN -->
+            <section id="view-laporan-gabungan" class="modul-view hidden">
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold text-slate-800">🌐 Laporan Konsolidasi & Gabungan</h1>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // Data Dummy / Local Storage State untuk Piutang Kerjasama
+        let dataKerjasama = [
+            {
+                id: 1,
+                tahun: "2026",
+                bulan: "Januari",
+                perusahaan: "PT. Husada Medika",
+                no_surat: "001/HM/2026",
+                tanggal_surat: "2026-01-10",
+                jenis: "Rawat Inap & Rawat Jalan",
+                saldo_awal: 50000000,
+                bayar: 30000000,
+                sisa: 20000000,
+                status: "Belum Lunas"
+            },
+            {
+                id: 2,
+                tahun: "2026",
+                bulan: "Februari",
+                perusahaan: "BPJS Kesehatan Cabang",
+                no_surat: "042/BPJS/2026",
+                tanggal_surat: "2026-02-01",
+                jenis: "BPJS Pelayanan",
+                saldo_awal: 120000000,
+                bayar: 120000000,
+                sisa: 0,
+                status: "Lunas"
+            },
+            {
+                id: 3,
+                tahun: "2025",
+                bulan: "Desember",
+                perusahaan: "Asuransi Prudential Mitra",
+                no_surat: "889/PRU/2025",
+                tanggal_surat: "2025-12-15",
+                jenis: "Asuransi Swasta",
+                saldo_awal: 35000000,
+                bayar: 10000000,
+                sisa: 25000000,
+                status: "Belum Lunas"
+            }
+        ];
+
+        // Format Rupiah Helper
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka || 0);
+        }
+
+        // 1. Tampilkan / Sembunyikan Sidebar
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const btnShow = document.getElementById('btn-show-sidebar');
+            sidebar.classList.toggle('-ml-64');
+            if (btnShow) btnShow.classList.toggle('hidden');
+        };
+
+        // 2. Navigasi Pindah View
+        window.bukaView = function(viewId) {
+            document.querySelectorAll('.modul-view').forEach(el => el.classList.add('hidden'));
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) targetView.classList.remove('hidden');
+
+            // Update status tombol aktif di sidebar
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById('btn-' + viewId);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            // Jika berpindah ke laporan kerjasama, langsung render ulang
+            if (viewId === 'laporan-kerjasama') {
+                terapkanFilterKerjasama();
+            }
+        };
+
+        // 3. Hitung Estimasi Saldo Akhir Form Input Kerjasama
+        window.calcSaldoAkhirKerjasama = function() {
+            const saldoAwal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
+            const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
+            const sisa = saldoAwal - bayar;
+            
+            const preview = document.getElementById('ks_saldo_akhir_preview');
+            if (preview) preview.value = formatRupiah(sisa);
+        };
+
+        // 4. Simpan Data Form Input Kerjasama
+        window.simpanPiutangKerjasama = function(event) {
+            event.preventDefault();
+            const tahun = document.getElementById('ks_tahun_piutang').value;
+            const bulan = document.getElementById('ks_bulan_piutang').value;
+            const perusahaan = document.getElementById('ks_nama_perusahaan').value;
+            const no_surat = document.getElementById('ks_no_surat').value;
+            const tanggal_surat = document.getElementById('ks_tanggal_surat').value;
+            const jenis = document.getElementById('ks_jenis').value;
+            const saldo_awal = parseFloat(document.getElementById('ks_saldo_awal').value) || 0;
+            const bayar = parseFloat(document.getElementById('ks_bayar').value) || 0;
+            const sisa = saldo_awal - bayar;
+            const status = sisa <= 0 ? 'Lunas' : 'Belum Lunas';
+
+            const dataBaru = {
+                id: Date.now(),
+                tahun, bulan, perusahaan, no_surat, tanggal_surat, jenis, saldo_awal, bayar, sisa, status
+            };
+
+            dataKerjasama.unshift(dataBaru);
+            alert('Data Piutang Kerjasama Berhasil Disimpan!');
+            document.getElementById('ksPiutangForm').reset();
+            calcSaldoAkhirKerjasama();
+            bukaView('laporan-kerjasama');
+        };
+
+        // 5. FUNGSI FILTER UTAMA UNTUK LAPORAN PIUTANG KERJASAMA (DIBUAT ROBUST & GLOBAL)
+        window.terapkanFilterKerjasama = function() {
+            const tglMulai = document.getElementById('ks_filter_tgl_mulai')?.value || '';
+            const tglSelesai = document.getElementById('ks_filter_tgl_selesai')?.value || '';
+            const tahun = document.getElementById('ks_filter_tahun')?.value || '';
+            const bulan = document.getElementById('ks_filter_bulan')?.value || '';
+            const status = document.getElementById('ks_filter_status')?.value || '';
+            const perusahaanQuery = (document.getElementById('ks_filter_perusahaan')?.value || '').toLowerCase();
+
+            // Saring Data
+            const hasilFilter = dataKerjasama.filter(item => {
+                const matchTahun = !tahun || item.tahun === tahun;
+                const matchBulan = !bulan || item.bulan === bulan;
+                const matchStatus = !status || item.status.toLowerCase() === status.toLowerCase();
+                const matchPerusahaan = !perusahaanQuery || item.perusahaan.toLowerCase().includes(perusahaanQuery);
+
+                let matchTgl = true;
+                if (tglMulai && item.tanggal_surat) {
+                    matchTgl = matchTgl && item.tanggal_surat >= tglMulai;
+                }
+                if (tglSelesai && item.tanggal_surat) {
+                    matchTgl = matchTgl && item.tanggal_surat <= tglSelesai;
+                }
+
+                return matchTahun && matchBulan && matchStatus && matchPerusahaan && matchTgl;
+            });
+
+            // Render Hasil ke Tabel
+            renderTabelKerjasama(hasilFilter);
+
+            // Update Statistik Card Laporan
+            updateStatistikKerjasama(hasilFilter);
+        };
+
+        // Render Tabel Kerjasama
+        function renderTabelKerjasama(listData) {
+            const tbody = document.getElementById('tabel-kerjasama-body');
+            if (!tbody) return;
+
+            if (listData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="p-6 text-center text-slate-400 italic">
+                            Tidak ditemukan data piutang kerjasama yang sesuai dengan filter.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = listData.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-medium text-slate-500">${idx + 1}</td>
+                    <td class="p-3">${item.bulan} ${item.tahun}</td>
+                    <td class="p-3 font-semibold text-slate-800">${item.perusahaan}</td>
+                    <td class="p-3">${item.jenis}</td>
+                    <td class="p-3 text-right font-medium">${formatRupiah(item.saldo_awal)}</td>
+                    <td class="p-3 text-right text-emerald-600 font-medium">${formatRupiah(item.bayar)}</td>
+                    <td class="p-3 text-right text-red-600 font-bold">${formatRupiah(item.sisa)}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${item.status === 'Lunas' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button type="button" onclick="hapusKerjasama(${item.id})" class="text-red-500 hover:text-red-700 font-bold px-1">Hapus</button>
                     </td>
                 </tr>
-            `;
+            `).join('');
+        }
+
+        // Update Stat Cards
+        function updateStatistikKerjasama(listData) {
+            const totalAwal = listData.reduce((acc, curr) => acc + curr.saldo_awal, 0);
+            const totalBayar = listData.reduce((acc, curr) => acc + curr.bayar, 0);
+            const totalSisa = listData.reduce((acc, curr) => acc + curr.sisa, 0);
+
+            if (document.getElementById('ks-stat-saldo-awal')) document.getElementById('ks-stat-saldo-awal').innerText = formatRupiah(totalAwal);
+            if (document.getElementById('ks-stat-bayar')) document.getElementById('ks-stat-bayar').innerText = formatRupiah(totalBayar);
+            if (document.getElementById('ks-stat-sisa')) document.getElementById('ks-stat-sisa').innerText = formatRupiah(totalSisa);
+            if (document.getElementById('ks-stat-total-mitra')) document.getElementById('ks-stat-total-mitra').innerText = `${listData.length} Data`;
+        }
+
+        // 6. Reset Filter Kerjasama
+        window.resetFilterKerjasama = function() {
+            if (document.getElementById('ks_filter_tgl_mulai')) document.getElementById('ks_filter_tgl_mulai').value = '';
+            if (document.getElementById('ks_filter_tgl_selesai')) document.getElementById('ks_filter_tgl_selesai').value = '';
+            if (document.getElementById('ks_filter_tahun')) document.getElementById('ks_filter_tahun').value = '';
+            if (document.getElementById('ks_filter_bulan')) document.getElementById('ks_filter_bulan').value = '';
+            if (document.getElementById('ks_filter_status')) document.getElementById('ks_filter_status').value = '';
+            if (document.getElementById('ks_filter_perusahaan')) document.getElementById('ks_filter_perusahaan').value = '';
+
+            terapkanFilterKerjasama();
+        };
+
+        // 7. Hapus Data
+        window.hapusKerjasama = function(id) {
+            if (confirm('Yakin ingin menghapus data ini?')) {
+                dataKerjasama = dataKerjasama.filter(d => d.id !== id);
+                terapkanFilterKerjasama();
+            }
+        };
+
+        // 8. Export Excel
+        window.exportKerjasamaExcel = function() {
+            const worksheet = XLSX.utils.json_to_sheet(dataKerjasama);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Piutang Kerjasama");
+            XLSX.writeFile(workbook, "Laporan_Piutang_Kerjasama.xlsx");
+        };
+
+        // Inisialisasi saat Halaman Selesai Dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            terapkanFilterKerjasama();
         });
-    }
-
-    // FUNGSI DIPERBAIKI: Menutup kurung kurawal fungsi dashboard kerjasama yang tadi terpotong
-    function renderDashboardKerjasama(data) {
-        let totalPiutang = 0;
-        let totalBayar = 0;
-        let totalSaldoAkhir = 0;
-
-        data.forEach(row => {
-            const awal = Number(row.saldo_awal) || 0;
-            const tambah = Number(row.tambah) || 0;
-            const kPlus = Number(row.koreksi_plus) || 0;
-            const bayar = Number(row.bayar) || 0;
-            const kMinus = Number(row.koreksi_minus) || 0;
-            const trf = Number(row.biaya_transfer) || 0;
-
-            const saldoAkhir = row.saldo_akhir !== undefined 
-                ? Number(row.saldo_akhir) 
-                : (awal + tambah + kPlus - bayar - kMinus - trf);
-
-            totalPiutang += awal;
-            totalBayar += bayar;
-            totalSaldoAkhir += saldoAkhir;
-        });
-
-        const elTotalPiutang = document.getElementById('dash-ks-total-piutang');
-        const elTotalBayar = document.getElementById('dash-ks-total-bayar');
-        const elTotalSaldo = document.getElementById('dash-ks-total-saldo');
-
-        if (elTotalPiutang) elTotalPiutang.innerText = fmtKS(totalPiutang);
-        if (elTotalBayar) elTotalBayar.innerText = fmtKS(totalBayar);
-        if (elTotalSaldo) elTotalSaldo.innerText = fmtKS(totalSaldoAkhir);
-    }
-    // -------------------------------------------------------------------
-    // 1. OTOMATIS LOAD DATA SAAT HALAMAN SELESAI DIBUKA (DOM READY)
-    // -------------------------------------------------------------------
-    document.addEventListener('DOMContentLoaded', () => {
-      // Panggil data piutang kerja sama saat pertama dibuka
-      if (typeof fetchPiutangKerjasama === 'function') {
-        fetchPiutangKerjasama();
-      }
-      // Panggil data rekap pendapatan
-      if (typeof loadDataPendapatan === 'function') {
-        loadDataPendapatan();
-      }
-    });
-
-    // -------------------------------------------------------------------
-    // 2. FUNGSI EDIT & HAPUS PIUTANG KERJA SAMA (AGAR TIDAK ERROR SAAT DIKLIK)
-    // -------------------------------------------------------------------
-    async function editPiutangKerjasama(id) {
-      const item = ksCurrentData.find(x => x.id === id);
-      if (!item) return alert('Data tidak ditemukan!');
-      
-      // Mengisi form input kerja sama (sesuaikan ID input jika berbeda)
-      if (document.getElementById('ks_id')) document.getElementById('ks_id').value = item.id;
-      if (document.getElementById('ks_nama_perusahaan')) document.getElementById('ks_nama_perusahaan').value = item.nama_perusahaan || '';
-      if (document.getElementById('ks_saldo_awal')) document.getElementById('ks_saldo_awal').value = item.saldo_awal || 0;
-      if (document.getElementById('ks_bayar')) document.getElementById('ks_bayar').value = item.bayar || 0;
-      if (document.getElementById('ks_tambah')) document.getElementById('ks_tambah').value = item.tambah || 0;
-      if (document.getElementById('ks_koreksi_plus')) document.getElementById('ks_koreksi_plus').value = item.koreksi_plus || 0;
-      if (document.getElementById('ks_koreksi_minus')) document.getElementById('ks_koreksi_minus').value = item.koreksi_minus || 0;
-      if (document.getElementById('ks_biaya_transfer')) document.getElementById('ks_biaya_transfer').value = item.biaya_transfer || 0;
-      
-      calcSaldoAkhirKerjasama();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function deletePiutangKerjasama(id) {
-      if (!confirm('Apakah Anda yakin ingin menghapus data piutang kerja sama ini?')) return;
-
-      const { error } = await supabaseClient
-        .from('piutang_kerjasama')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        alert('Gagal menghapus data: ' + error.message);
-      } else {
-        alert('Data berhasil dihapus!');
-        fetchPiutangKerjasama();
-      }
-    }
-</script>
+    </script>
 </body>
 </html>
