@@ -1985,6 +1985,93 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+function bukaView(viewId) {
+  // Sembunyikan semua modul view
+  document.querySelectorAll('.modul-view').forEach(el => el.classList.add('hidden'));
+  
+  // Tampilkan view yang dipilih
+  const targetView = document.getElementById(`view-${viewId}`);
+  if (targetView) {
+    targetView.classList.remove('hidden');
+  }
+
+  // Pemicu panggil data khusus Laporan Gabungan
+  if (viewId === 'laporan-gabungan') {
+    muatLaporanGabungan();
+  }
+}
+
+async function muatLaporanGabungan() {
+  try {
+    // 1. Ambil data dari 3 tabel Supabase
+    const [resPasien, resPendapatan, resKerjasama] = await Promise.all([
+      supabase.from('piutang_pasien').select('*'),
+      supabase.from('rekap_pendapatan').select('*'),
+      supabase.from('piutang_kerjasama').select('*')
+    ]);
+
+    const dataPasien = resPasien.data || [];
+    const dataPendapatan = resPendapatan.data || [];
+    const dataKerjasama = resKerjasama.data || [];
+
+    // 2. Hitung Total Realisasi Pendapatan (Rekap Pendapatan)
+    const kolomBulan = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'agu', 'sep', 'okt', 'nov', 'des'];
+    const totalPendapatan = dataPendapatan.reduce((acc, item) => {
+      // Hitung baris detail saja agar tidak terhitung ganda dengan baris header/total
+      if (!item.is_header) {
+        const sumBulan = kolomBulan.reduce((s, bln) => s + (parseFloat(item[bln]) || 0), 0);
+        return acc + sumBulan;
+      }
+      return acc;
+    }, 0);
+
+    // 3. Hitung Total Sisa Piutang Kerjasama
+    const totalPiutangKerjasama = dataKerjasama.reduce((acc, item) => {
+      const sAwal = parseFloat(item.ks_saldo_awal) || 0;
+      const tambah = parseFloat(item.ks_tambah) || 0;
+      const kPlus = parseFloat(item.ks_koreksi_plus) || 0;
+      const bayar = parseFloat(item.ks_bayar) || 0;
+      const kMinus = parseFloat(item.ks_koreksi_minus) || 0;
+      const tf = parseFloat(item.ks_biaya_transfer) || 0;
+      
+      const sAkhir = (sAwal + tambah + kPlus) - (bayar + kMinus + tf);
+      return acc + sAkhir;
+    }, 0);
+
+    // 4. Hitung Total Sisa Piutang Pasien
+    const totalPiutangPasien = dataPasien.reduce((acc, item) => {
+      return acc + (parseFloat(item.belum_terbayar) || 0);
+    }, 0);
+
+    // 5. Hitung Total Asset Keuangan & Potensi Piutang RS (Keseluruhan)
+    const grandTotal = totalPendapatan + totalPiutangKerjasama + totalPiutangPasien;
+
+    // Helper Format Rupiah
+    const formatRupiah = (val) => new Intl.NumberFormat('id-ID', { 
+      style: 'currency', 
+      currency: 'IDR', 
+      minimumFractionDigits: 0 
+    }).format(val);
+
+    // 6. Injeksi Hasil Perhitungan ke Elemen HTML
+    if (document.getElementById('sum-pendapatan')) {
+      document.getElementById('sum-pendapatan').innerText = formatRupiah(totalPendapatan);
+    }
+    if (document.getElementById('sum-piutang-kerjasama')) {
+      document.getElementById('sum-piutang-kerjasama').innerText = formatRupiah(totalPiutangKerjasama);
+    }
+    if (document.getElementById('sum-piutang-pasien')) {
+      document.getElementById('sum-piutang-pasien').innerText = formatRupiah(totalPiutangPasien);
+    }
+    if (document.getElementById('sum-total-keseluruhan')) {
+      document.getElementById('sum-total-keseluruhan').innerText = formatRupiah(grandTotal);
+    }
+
+  } catch (err) {
+    console.error("Gagal menghitung Laporan Gabungan:", err);
+  }
+}
+  
 </script>
 </body>
 </html>
