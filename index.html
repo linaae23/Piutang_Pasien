@@ -1985,6 +1985,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+async function simpanPiutangKerjasama(e) {
+  e.preventDefault(); // Wajib agar halaman tidak refresh otomatis
+
+  try {
+    const editId = document.getElementById('ks-edit-id').value;
+    const payload = {
+      tahun_piutang: document.getElementById('ks_tahun_piutang').value,
+      bulan_piutang: document.getElementById('ks_bulan_piutang').value,
+      nama_perusahaan: document.getElementById('ks_nama_perusahaan').value,
+      // sesuaikan nama kolom dengan tabel Supabase Anda
+    };
+
+    let result;
+    if (editId) {
+      result = await supabase.from('piutang_kerjasama').update(payload).eq('id', editId);
+    } else {
+      result = await supabase.from('piutang_kerjasama').insert([payload]);
+    }
+
+    if (result.error) throw result.error;
+
+    alert('Data berhasil disimpan!');
+    document.getElementById('ksPiutangForm').reset();
+    
+  } catch (err) {
+    console.error('Error saat menyimpan:', err);
+    alert('Gagal menyimpan data: ' + err.message);
+  }
+}
+  
 function updateLaporanKonsolidasi() {
       const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
       
