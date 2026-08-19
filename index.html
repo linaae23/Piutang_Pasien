@@ -428,7 +428,7 @@
       </div>
 
       <div class="col-span-1 md:col-span-3 flex justify-end gap-2 border-t pt-3">
-        <button type="reset" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
+        <button type="reset" onclick="batalEditKerjasama()" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data</button>
       </div>
     </form>
@@ -1009,7 +1009,7 @@ async function loadDataPasien() {
 
   listDataPasienMaster = data || [];
   terapkanFilterPasien();
-  renderLaporanKonsolidasi(); // <-- Tambahkan baris ini
+  updateLaporanKonsolidasi();
 }
 
   
@@ -1119,6 +1119,109 @@ function renderTabelPasien(data) {
   }).join('');
 }
 
+// 4b. Fungsi Detail / Edit / Hapus / Export Pasien (sebelumnya belum ada, menyebabkan tombol error)
+function tutupModal() {
+  const modal = document.getElementById('modalDetail');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function editPasien(id) {
+  const item = listDataPasienMaster.find(x => String(x.id) === String(id));
+  if (!item) return alert('Data pasien tidak ditemukan!');
+
+  document.getElementById('edit_id').value = item.id;
+  document.getElementById('nama_pasien').value = item.nama_pasien || '';
+  document.getElementById('alamat_pasien').value = item.alamat_pasien || '';
+  document.getElementById('no_rm').value = item.no_rm || '';
+  document.getElementById('no_transaksi').value = item.no_transaksi || '';
+  document.getElementById('tahun_piutang').value = item.tahun_piutang || '';
+  document.getElementById('tgl_masuk_rs').value = item.tgl_masuk_rs || '';
+  document.getElementById('tgl_keluar_rs').value = item.tgl_keluar_rs || '';
+  document.getElementById('bangsal').value = item.bangsal || '';
+  document.getElementById('kelas').value = item.kelas || '';
+  document.getElementById('jenis_perawatan').value = item.jenis_perawatan || '';
+  document.getElementById('kategori').value = item.kategori || '';
+  document.getElementById('kirim_kpknl').value = item.kirim_kpknl || 'Belum';
+  document.getElementById('tgl_kirim_kpknl').value = item.tgl_kirim_kpknl || '';
+  document.getElementById('link_dokumen').value = item.link_dokumen || '';
+  document.getElementById('jumlah_biaya').value = item.jumlah_biaya || 0;
+  document.getElementById('potongan').value = item.potongan || 0;
+  document.getElementById('pembayaran_awal').value = item.pembayaran_awal || 0;
+  document.getElementById('jumlah_angsuran').value = item.jumlah_angsuran || 0;
+  document.getElementById('belum_terbayar').value = item.belum_terbayar || 0;
+  document.getElementById('tagihan_1').value = item.tagihan_1 || '';
+  document.getElementById('tagihan_2').value = item.tagihan_2 || '';
+  document.getElementById('tagihan_3').value = item.tagihan_3 || '';
+
+  if (item.kirim_kpknl === 'Sudah') {
+    document.getElementById('container_tgl_kpknl')?.classList.remove('hidden');
+  } else {
+    document.getElementById('container_tgl_kpknl')?.classList.add('hidden');
+  }
+
+  const elBtnSubmit = document.getElementById('btnSubmitPasien');
+  if (elBtnSubmit) elBtnSubmit.innerText = '💾 Update Data Pasien';
+  const elBtnBatal = document.getElementById('btnBatalPasien');
+  if (elBtnBatal) elBtnBatal.classList.remove('hidden');
+
+  bukaView('input-pasien');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function hapusPasien(id) {
+  if (!confirm('Apakah Anda yakin ingin menghapus data pasien ini?')) return;
+
+  const { error } = await supabaseClient
+    .from('piutang_pasien')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    alert('Gagal menghapus data pasien: ' + error.message);
+  } else {
+    alert('Data pasien berhasil dihapus!');
+    loadDataPasien();
+  }
+}
+
+function downloadCSVPasien() {
+  if (!listDataPasienFiltered || listDataPasienFiltered.length === 0) {
+    alert('Tidak ada data pasien untuk diunduh.');
+    return;
+  }
+
+  const headers = ["No. RM", "Nama Pasien", "No. Transaksi", "Bangsal", "Kelas", "Jenis Perawatan", "Kategori", "Total Biaya", "Potongan", "Pembayaran Awal", "Angsuran", "Sisa Piutang", "Kirim KPKNL"];
+
+  const rows = listDataPasienFiltered.map(i => [
+    `"${i.no_rm || ''}"`,
+    `"${i.nama_pasien || ''}"`,
+    `"${i.no_transaksi || ''}"`,
+    `"${i.bangsal || ''}"`,
+    `"${i.kelas || ''}"`,
+    `"${i.jenis_perawatan || ''}"`,
+    `"${i.kategori || ''}"`,
+    Number(i.jumlah_biaya || 0),
+    Number(i.potongan || 0),
+    Number(i.pembayaran_awal || 0),
+    Number(i.jumlah_angsuran || 0),
+    Number(i.belum_terbayar || 0),
+    `"${i.kirim_kpknl || ''}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Laporan_Piutang_Pasien_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // 5. Handler Simpan Form Input Data Pasien
 const formPasien = document.getElementById('formPiutangPasien');
 if (formPasien) {
@@ -1168,13 +1271,6 @@ if (formPasien) {
   });
 }
 
-// 6. Inisialisasi Otomatis Saat Halaman Dimuat
-document.addEventListener('DOMContentLoaded', () => {
-  loadDataPasien();
-  loadDataPendapatan();
-  fetchPiutangKerjasama();
-});
-  
     // ---------------- PERHITUNGAN PASIEN ----------------
     function hitungBelumTerbayarPasien() {
       const jumlahBiaya = parseFloat(document.getElementById('jumlah_biaya')?.value) || 0;
@@ -1251,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
       listMasterPendapatan = hitungOtomatisRekapPendapatan(data || []);
       renderCheckboxUraian(listMasterPendapatan);
       resetFilterPendapatan();
-      renderLaporanKonsolidasi();
+      updateLaporanKonsolidasi();
     }
 
     function hitungOtomatisRekapPendapatan(dataPendapatan) {
@@ -1673,6 +1769,36 @@ document.addEventListener('DOMContentLoaded', () => {
       doc.save(`Laporan_Rekap_Pendapatan_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
+    function downloadExcelPendapatan() {
+      if (!listMasterPendapatan || listMasterPendapatan.length === 0) {
+        alert("Data pendapatan kosong!");
+        return;
+      }
+
+      const rows = listMasterPendapatan.map(item => ({
+        'Kode Rekening': item.kode_rekening || '-',
+        'Uraian': item.uraian || '-',
+        'Target Anggaran': item.anggaran || 0,
+        'Januari': item.realisasi_jan || 0,
+        'Februari': item.realisasi_feb || 0,
+        'Maret': item.realisasi_mar || 0,
+        'April': item.realisasi_apr || 0,
+        'Mei': item.realisasi_mei || 0,
+        'Juni': item.realisasi_jun || 0,
+        'Juli': item.realisasi_jul || 0,
+        'Agustus': item.realisasi_agu || 0,
+        'September': item.realisasi_sep || 0,
+        'Oktober': item.realisasi_okt || 0,
+        'November': item.realisasi_nov || 0,
+        'Desember': item.realisasi_des || 0
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Rekap Pendapatan");
+      XLSX.writeFile(wb, `Laporan_Rekap_Pendapatan_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
     // ==========================================
     // LOGIKA PIUTANG KERJA SAMA (FIXED & FULL)
     // ==========================================
@@ -1699,6 +1825,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputStatus) {
             inputStatus.value = statusOtomatis;
         }
+
+        return saldoAkhir;
     }
 
     // Populasikan Dropdown Perusahaan dari Data Supabase
@@ -1744,9 +1872,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         ksCurrentData = data || [];
+        listDataKerjasamaMaster = data || [];
         populateDropdownPerusahaan(ksCurrentData);
         renderDashboardKerjasama(ksCurrentData);
         renderTableKerjasamaWithPagination();
+        updateLaporanKonsolidasi();
     }
 
     // 2. FUNGSI TERAPKAN FILTER & RESET HALAMAN
@@ -1825,8 +1955,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Lunas</span>` 
                 : `<span class="bg-rose-100 text-rose-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Belum Lunas</span>`;
 
-            const saldoAkhir = row.saldo_akhir !== undefined 
-                ? row.saldo_akhir 
+            const saldoAkhir = row.saldo_akhir !== undefined && row.saldo_akhir !== null
+                ? Number(row.saldo_akhir) 
                 : ((Number(row.saldo_awal)||0) + (Number(row.tambah)||0) + (Number(row.koreksi_plus)||0) - (Number(row.bayar)||0) - (Number(row.koreksi_minus)||0) - (Number(row.biaya_transfer)||0));
 
             tbody.innerHTML += `
@@ -1834,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
                     <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
                     <td class="p-3">${row.tanggal_surat || '-'}</td>
-                    <td class="p-3 font-mono">${row.no_surat || '-'}</td>
+                    <td class="p-3 font-mono">${row.no_surat || row.nomor_surat || '-'}</td>
                     <td class="p-3">${row.kota_keterangan || '-'}</td>
                     <td class="p-3">${row.jenis || '-'}</td>
                     <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
@@ -1853,8 +1983,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-3 text-center">${statusBadge}</td>
                     <td class="p-3">
                         <div class="flex gap-1">
-                            <button onclick="editPiutangKerjasama(${row.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
-                            <button onclick="deletePiutangKerjasama(${row.id})" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
+                            <button onclick="editPiutangKerjasama('${row.id}')" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
+                            <button onclick="deletePiutangKerjasama('${row.id}')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
                         </div>
                     </td>
                 </tr>
@@ -1876,7 +2006,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const kMinus = Number(row.koreksi_minus) || 0;
             const trf = Number(row.biaya_transfer) || 0;
 
-            const saldoAkhir = row.saldo_akhir !== undefined 
+            const saldoAkhir = row.saldo_akhir !== undefined && row.saldo_akhir !== null
                 ? Number(row.saldo_akhir) 
                 : (awal + tambah + kPlus - bayar - kMinus - trf);
 
@@ -1911,7 +2041,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `"${r.bulan_piutang || ''}"`,
             `"${r.nama_perusahaan || ''}"`,
             `"${r.tanggal_surat || ''}"`,
-            `"${r.no_surat || ''}"`,
+            `"${r.no_surat || r.nomor_surat || ''}"`,
             `"${r.kota_keterangan || ''}"`,
             `"${r.jenis || ''}"`,
             `"${r.tahun_layanan || ''}"`,
@@ -1940,32 +2070,44 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     }
 
-    // 8. OTOMATIS LOAD DATA SAAT HALAMAN SELESAI DIBUKA (DOM READY)
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof fetchPiutangKerjasama === 'function') {
-        fetchPiutangKerjasama();
-      }
-      if (typeof loadDataPendapatan === 'function') {
-        loadDataPendapatan();
-      }
-    });
-
     // 9. FUNGSI EDIT & HAPUS PIUTANG KERJA SAMA
-    async function editPiutangKerjasama(id) {
-      const item = ksCurrentData.find(x => x.id === id);
+    function editPiutangKerjasama(id) {
+      const item = ksCurrentData.find(x => String(x.id) === String(id));
       if (!item) return alert('Data tidak ditemukan!');
-      
-      if (document.getElementById('ks_id')) document.getElementById('ks_id').value = item.id;
-      if (document.getElementById('ks_nama_perusahaan')) document.getElementById('ks_nama_perusahaan').value = item.nama_perusahaan || '';
-      if (document.getElementById('ks_saldo_awal')) document.getElementById('ks_saldo_awal').value = item.saldo_awal || 0;
-      if (document.getElementById('ks_bayar')) document.getElementById('ks_bayar').value = item.bayar || 0;
-      if (document.getElementById('ks_tambah')) document.getElementById('ks_tambah').value = item.tambah || 0;
-      if (document.getElementById('ks_koreksi_plus')) document.getElementById('ks_koreksi_plus').value = item.koreksi_plus || 0;
-      if (document.getElementById('ks_koreksi_minus')) document.getElementById('ks_koreksi_minus').value = item.koreksi_minus || 0;
-      if (document.getElementById('ks_biaya_transfer')) document.getElementById('ks_biaya_transfer').value = item.biaya_transfer || 0;
-      
+
+      document.getElementById('ks-edit-id').value = item.id;
+      document.getElementById('ks_tahun_piutang').value = item.tahun_piutang || '';
+      document.getElementById('ks_bulan_piutang').value = item.bulan_piutang || '';
+      document.getElementById('ks_nama_perusahaan').value = item.nama_perusahaan || '';
+      document.getElementById('ks_tanggal_surat').value = item.tanggal_surat || '';
+      document.getElementById('ks_no_surat').value = item.no_surat || item.nomor_surat || '';
+      document.getElementById('ks_kota_keterangan').value = item.kota_keterangan || '';
+      document.getElementById('ks_jenis').value = item.jenis || 'Rawat Inap & Rawat Jalan';
+      document.getElementById('ks_tahun_layanan').value = item.tahun_layanan || '';
+      document.getElementById('ks_bulan_layanan').value = item.bulan_layanan || '';
+      document.getElementById('ks_jumlah_pasien').value = item.jumlah_pasien || 0;
+      document.getElementById('ks_nomor_tagihan').value = item.nomor_tagihan || '';
+      document.getElementById('ks_link_dokumen').value = item.link_dokumen || '';
+      document.getElementById('ks_tanggal_bayar').value = item.tanggal_bayar || '';
+      document.getElementById('ks_saldo_awal').value = item.saldo_awal || 0;
+      document.getElementById('ks_bayar').value = item.bayar || 0;
+      document.getElementById('ks_tambah').value = item.tambah || 0;
+      document.getElementById('ks_koreksi_plus').value = item.koreksi_plus || 0;
+      document.getElementById('ks_koreksi_minus').value = item.koreksi_minus || 0;
+      document.getElementById('ks_biaya_transfer').value = item.biaya_transfer || 0;
+      document.getElementById('ks_keterangan').value = item.keterangan || '';
+
       calcSaldoAkhirKerjasama();
+
+      bukaView('input-kerjasama');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function batalEditKerjasama() {
+      setTimeout(() => {
+        document.getElementById('ks-edit-id').value = '';
+        calcSaldoAkhirKerjasama();
+      }, 0);
     }
 
     async function deletePiutangKerjasama(id) {
@@ -1984,63 +2126,65 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-async function simpanPiutangKerjasama(e) {
-  e.preventDefault(); // Wajib agar halaman tidak refresh otomatis
+    async function simpanPiutangKerjasama(e) {
+      e.preventDefault(); // Wajib agar halaman tidak refresh otomatis
 
-  try {
-    const editId = document.getElementById('ks-edit-id').value;
-    const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
-        const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
-        const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
-        const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
-        const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
-        const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
+      const editId = document.getElementById('ks-edit-id').value;
 
-        const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
-        const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+      const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
+      const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
+      const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
+      const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
+      const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
+      const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
 
-        const payload = {
-            tahun_piutang: parseInt(document.getElementById('ks_tahun_piutang')?.value) || null,
-            bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
-            nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
-            tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
-            nomor_surat: document.getElementById('ks_no_surat')?.value || '',
-            kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
-            jenis: document.getElementById('ks_jenis')?.value || '',
-            tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
-            bulan_layanan: document.getElementById('ks_bulan_layanan')?.value || '',
-            jumlah_pasien: parseInt(document.getElementById('ks_jumlah_pasien')?.value) || 0,
-            nomor_tagihan: document.getElementById('ks_nomor_tagihan')?.value || '',
-            link_dokumen: document.getElementById('ks_link_dokumen')?.value || '',
-            saldo_awal: awal,
-            tambah: tambah,
-            koreksi_plus: kPlus,
-            bayar: bayar,
-            koreksi_minus: kMinus,
-            biaya_transfer: trf,
-            tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
-            status: statusOtomatis,
-            keterangan: document.getElementById('ks_keterangan')?.value || ''
-        };
+      const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
+      const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
 
-        let error;
-        if (id) {
-            ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', id));
-        } else {
-            ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
-        }
+      const payload = {
+          tahun_piutang: parseInt(document.getElementById('ks_tahun_piutang')?.value) || null,
+          bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
+          nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
+          tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
+          nomor_surat: document.getElementById('ks_no_surat')?.value || '',
+          kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
+          jenis: document.getElementById('ks_jenis')?.value || '',
+          tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
+          bulan_layanan: document.getElementById('ks_bulan_layanan')?.value || '',
+          jumlah_pasien: parseInt(document.getElementById('ks_jumlah_pasien')?.value) || 0,
+          nomor_tagihan: document.getElementById('ks_nomor_tagihan')?.value || '',
+          link_dokumen: document.getElementById('ks_link_dokumen')?.value || '',
+          saldo_awal: awal,
+          tambah: tambah,
+          koreksi_plus: kPlus,
+          bayar: bayar,
+          koreksi_minus: kMinus,
+          biaya_transfer: trf,
+          saldo_akhir: saldoAkhir,
+          tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
+          status: statusOtomatis,
+          keterangan: document.getElementById('ks_keterangan')?.value || ''
+      };
 
-        if (error) {
-            alert('Gagal menyimpan data: ' + error.message);
-        } else {
-            alert('Data Piutang Kerja Sama berhasil disimpan!');
-            closeModalKerjasama();
-            fetchPiutangKerjasama();
-            loadSemuaLaporan();
-        }
+      let error;
+      if (editId) {
+          ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', editId));
+      } else {
+          ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
+      }
+
+      if (error) {
+          alert('Gagal menyimpan data: ' + error.message);
+      } else {
+          alert('Data Piutang Kerja Sama berhasil disimpan!');
+          document.getElementById('ksPiutangForm').reset();
+          document.getElementById('ks-edit-id').value = '';
+          calcSaldoAkhirKerjasama();
+          fetchPiutangKerjasama();
+      }
     }
-  
-function updateLaporanKonsolidasi() {
+
+    function updateLaporanKonsolidasi() {
       const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
       
       const dataDetailPendapatan = (typeof listMasterPendapatan !== 'undefined' && Array.isArray(listMasterPendapatan)) 
@@ -2054,14 +2198,16 @@ function updateLaporanKonsolidasi() {
       }, 0);
 
       const dataKerjasama = (typeof listDataKerjasamaMaster !== 'undefined' && Array.isArray(listDataKerjasamaMaster)) ? listDataKerjasamaMaster : [];
-      const nilK = dataKerjasama.reduce((acc, curr) => {
-        const awal = Number(ks_saldo_awal) || 0;
-        const tambah = Number(ks_tambah) || 0;
-        const kPlus = Number(ks_koreksi_plus) || 0;
-        const bayar = Number(ks_bayar) || 0;
-        const kMinus = Number(ks_koreksi_minus) || 0;
-        const trf = Number(ks_biaya_transfer) || 0;
-        const sisa = ks_saldo_akhir !== undefined ? Number(ks_saldo_akhir) : (awal + tambah + kPlus - bayar - kMinus - trf);
+      const nilK = dataKerjasama.reduce((acc, row) => {
+        const awal = Number(row.saldo_awal) || 0;
+        const tambah = Number(row.tambah) || 0;
+        const kPlus = Number(row.koreksi_plus) || 0;
+        const bayar = Number(row.bayar) || 0;
+        const kMinus = Number(row.koreksi_minus) || 0;
+        const trf = Number(row.biaya_transfer) || 0;
+        const sisa = (row.saldo_akhir !== undefined && row.saldo_akhir !== null)
+          ? Number(row.saldo_akhir)
+          : (awal + tambah + kPlus - bayar - kMinus - trf);
         return acc + sisa;
       }, 0);
 
@@ -2078,7 +2224,8 @@ function updateLaporanKonsolidasi() {
       if (elPiutangPasien) elPiutangPasien.innerText = `Rp ${totalSisaPasien.toLocaleString('id-ID')}`;
       if (elTotalKeseluruhan) elTotalKeseluruhan.innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
     }
-// ---------------- FETCH SEMUA DATA LAPORAN ----------------
+
+    // ---------------- FETCH SEMUA DATA LAPORAN ----------------
     async function loadSemuaLaporan() {
       // 1. Load Data Pasien
       const { data: dataPasien, error: errPasien } = await supabaseClient
@@ -2096,6 +2243,8 @@ function updateLaporanKonsolidasi() {
 
       // 3. Load Data Kerjasama
       await fetchPiutangKerjasama();
+
+      updateLaporanKonsolidasi();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
