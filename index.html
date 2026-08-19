@@ -1747,7 +1747,6 @@ document.addEventListener('DOMContentLoaded', () => {
         populateDropdownPerusahaan(ksCurrentData);
         renderDashboardKerjasama(ksCurrentData);
         renderTableKerjasamaWithPagination();
-        renderLaporanKonsolidasi();
     }
 
     // 2. FUNGSI TERAPKAN FILTER & RESET HALAMAN
@@ -1990,30 +1989,56 @@ async function simpanPiutangKerjasama(e) {
 
   try {
     const editId = document.getElementById('ks-edit-id').value;
-    const payload = {
-      tahun_piutang: document.getElementById('ks_tahun_piutang').value,
-      bulan_piutang: document.getElementById('ks_bulan_piutang').value,
-      nama_perusahaan: document.getElementById('ks_nama_perusahaan').value,
-      // sesuaikan nama kolom dengan tabel Supabase Anda
-    };
+    const awal = parseFloat(document.getElementById('ks_saldo_awal')?.value) || 0;
+        const tambah = parseFloat(document.getElementById('ks_tambah')?.value) || 0;
+        const kPlus = parseFloat(document.getElementById('ks_koreksi_plus')?.value) || 0;
+        const bayar = parseFloat(document.getElementById('ks_bayar')?.value) || 0;
+        const kMinus = parseFloat(document.getElementById('ks_koreksi_minus')?.value) || 0;
+        const trf = parseFloat(document.getElementById('ks_biaya_transfer')?.value) || 0;
 
-    let result;
-    if (editId) {
-      result = await supabase.from('piutang_kerjasama').update(payload).eq('id', editId);
-    } else {
-      result = await supabase.from('piutang_kerjasama').insert([payload]);
+        const saldoAkhir = awal + tambah + kPlus - bayar - kMinus - trf;
+        const statusOtomatis = (saldoAkhir > 0) ? 'Belum Lunas' : 'Lunas';
+
+        const payload = {
+            tahun_piutang: parseInt(document.getElementById('ks_tahun_piutang')?.value) || null,
+            bulan_piutang: document.getElementById('ks_bulan_piutang')?.value || '',
+            nama_perusahaan: document.getElementById('ks_nama_perusahaan')?.value || '',
+            tanggal_surat: document.getElementById('ks_tanggal_surat')?.value || null,
+            nomor_surat: document.getElementById('ks_no_surat')?.value || '',
+            kota_keterangan: document.getElementById('ks_kota_keterangan')?.value || '',
+            jenis: document.getElementById('ks_jenis')?.value || '',
+            tahun_layanan: parseInt(document.getElementById('ks_tahun_layanan')?.value) || null,
+            bulan_layanan: document.getElementById('ks_bulan_layanan')?.value || '',
+            jumlah_pasien: parseInt(document.getElementById('ks_jumlah_pasien')?.value) || 0,
+            nomor_tagihan: document.getElementById('ks_nomor_tagihan')?.value || '',
+            link_dokumen: document.getElementById('ks_link_dokumen')?.value || '',
+            saldo_awal: awal,
+            tambah: tambah,
+            koreksi_plus: kPlus,
+            bayar: bayar,
+            koreksi_minus: kMinus,
+            biaya_transfer: trf,
+            tanggal_bayar: document.getElementById('ks_tanggal_bayar')?.value || null,
+            status: statusOtomatis,
+            keterangan: document.getElementById('ks_keterangan')?.value || ''
+        };
+
+        let error;
+        if (id) {
+            ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', id));
+        } else {
+            ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
+        }
+
+        if (error) {
+            alert('Gagal menyimpan data: ' + error.message);
+        } else {
+            alert('Data Piutang Kerja Sama berhasil disimpan!');
+            closeModalKerjasama();
+            fetchPiutangKerjasama();
+            loadSemuaLaporan();
+        }
     }
-
-    if (result.error) throw result.error;
-
-    alert('Data berhasil disimpan!');
-    document.getElementById('ksPiutangForm').reset();
-    
-  } catch (err) {
-    console.error('Error saat menyimpan:', err);
-    alert('Gagal menyimpan data: ' + err.message);
-  }
-}
   
 function updateLaporanKonsolidasi() {
       const dataPasien = (typeof listDataPasienMaster !== 'undefined' && Array.isArray(listDataPasienMaster)) ? listDataPasienMaster : [];
