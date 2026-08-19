@@ -324,8 +324,8 @@
       </div>
 
       <div>
-        <label class="block font-medium mb-1">Tanggal </label>
-        <input type="date" id="ks_tanggal_" class="w-full border p-2 rounded">
+        <label class="block font-medium mb-1">Tanggal Surat</label>
+        <input type="date" id="ks_tanggal_surat" class="w-full border p-2 rounded">
       </div>
       <div>
         <label class="block font-medium mb-1">Nomor Surat</label>
@@ -1964,7 +1964,7 @@ if (formPasien) {
                     <td class="p-3">${row.bulan_piutang || ''} ${row.tahun_piutang || ''}</td>
                     <td class="p-3 font-medium text-gray-900">${row.nama_perusahaan || '-'}</td>
                     <td class="p-3">${row.tanggal_surat || '-'}</td>
-                    <td class="p-3 font-mono">${row.no_surat || '-'}</td>
+                    <td class="p-3 font-mono">${row.no_surat || row.nomor_surat || '-'}</td>
                     <td class="p-3">${row.kota_keterangan || '-'}</td>
                     <td class="p-3">${row.jenis || '-'}</td>
                     <td class="p-3">${row.bulan_layanan || ''} ${row.tahun_layanan || ''}</td>
@@ -2041,7 +2041,7 @@ if (formPasien) {
             `"${r.bulan_piutang || ''}"`,
             `"${r.nama_perusahaan || ''}"`,
             `"${r.tanggal_surat || ''}"`,
-            `"${r.no_surat || ''}"`,
+            `"${r.no_surat || r.nomor_surat || ''}"`,
             `"${r.kota_keterangan || ''}"`,
             `"${r.jenis || ''}"`,
             `"${r.tahun_layanan || ''}"`,
@@ -2080,7 +2080,7 @@ if (formPasien) {
       document.getElementById('ks_bulan_piutang').value = item.bulan_piutang || '';
       document.getElementById('ks_nama_perusahaan').value = item.nama_perusahaan || '';
       document.getElementById('ks_tanggal_surat').value = item.tanggal_surat || '';
-      document.getElementById('ks_no_surat').value = item.no_surat || '';
+      document.getElementById('ks_no_surat').value = item.no_surat || item.nomor_surat || '';
       document.getElementById('ks_kota_keterangan').value = item.kota_keterangan || '';
       document.getElementById('ks_jenis').value = item.jenis || 'Rawat Inap & Rawat Jalan';
       document.getElementById('ks_tahun_layanan').value = item.tahun_layanan || '';
