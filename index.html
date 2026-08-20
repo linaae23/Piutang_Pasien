@@ -2252,6 +2252,64 @@ if (formPasien) {
 
       loadSemuaLaporan();
     });
+
+// Logika Simpan Transaksi & Riwayat (JavaScript) //
+  // Contoh Fungsi Catat Cicilan Pasien
+async function catatCicilanPasien(pasienId, nominalBayar, jenis, ket) {
+  // 1. Ambil data pasien saat ini
+  const { data: pasien } = await supabaseClient
+    .from('piutang_pasien')
+    .select('jumlah_angsuran, belum_terbayar')
+    .eq('id', pasienId)
+    .single();
+
+  const angsuranBaru = (parseFloat(pasien.jumlah_angsuran) || 0) + parseFloat(nominalBayar);
+  const belumTerbayarBaru = Math.max(0, (parseFloat(pasien.belum_terbayar) || 0) - parseFloat(nominalBayar));
+
+  // 2. Update akumulasi di tabel utama
+  await supabaseClient
+    .from('piutang_pasien')
+    .update({ 
+      jumlah_angsuran: angsuranBaru, 
+      belum_terbayar: belumTerbayarBaru 
+    })
+    .eq('id', pasienId);
+
+  // 3. Catat entri ke tabel riwayat
+  await supabaseClient
+    .from('riwayat_piutang_pasien')
+    .insert([{
+      pasien_id: pasienId,
+      jenis_transaksi: jenis, // e.g. 'ANGSURAN'
+      nominal: nominalBayar,
+      keterangan: ket
+    }]);
+
+  alert("Cicilan berhasil dicatat!");
+}
+
+// Tampilan Modal Riwayat (HTML & JS) //
+  // Fungsi Membuka Modal & Mengambil Histori Pasien
+async function lihatRiwayatPasien(pasienId, namaPasien) {
+  const { data: listRiwayat } = await supabaseClient
+    .from('riwayat_piutang_pasien')
+    .select('*')
+    .eq('pasien_id', pasienId)
+    .order('created_at', { ascending: false });
+
+  let htmlRows = listRiwayat.map(item => `
+    <tr class="border-b text-xs">
+      <td class="p-2">${item.tanggal}</td>
+      <td class="p-2 font-semibold text-blue-600">${item.jenis_transaksi}</td>
+      <td class="p-2 text-right font-bold">Rp ${Number(item.nominal).toLocaleString('id-ID')}</td>
+      <td class="p-2">${item.keterangan || '-'}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('modal-title').innerText = `Histori Pembayaran: ${namaPasien}`;
+  document.getElementById('modal-body-riwayat').innerHTML = htmlRows;
+  document.getElementById('modal-riwayat').classList.remove('hidden');
+}
   
   
 </script>
