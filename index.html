@@ -770,7 +770,9 @@
           <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
               <tr>
                   <th class="p-3">Periode Piutang</th>
-                  <th class="p-3">Perusahaan</th>
+                  <th class="p-3 cursor-pointer select-none hover:bg-gray-100" onclick="sortKerjasamaByPerusahaan()">
+  Perusahaan <span id="ks-sort-icon-perusahaan">↕️</span>
+</th>
                   <th class="p-3">Tgl Surat</th>
                   <th class="p-3">No Surat</th>
                   <th class="p-3">Kota / Ket</th>
@@ -2087,6 +2089,27 @@ if (formPasien) {
 
         renderTableKerjasama(pageData);
 
+        //sort nama perusahaan//
+let ksSortPerusahaanAsc = true;
+
+function sortKerjasamaByPerusahaan() {
+  ksSortPerusahaanAsc = !ksSortPerusahaanAsc;
+
+  ksCurrentData.sort((a, b) => {
+    const na = (a.nama_perusahaan || '').toLowerCase();
+    const nb = (b.nama_perusahaan || '').toLowerCase();
+    if (na < nb) return ksSortPerusahaanAsc ? -1 : 1;
+    if (na > nb) return ksSortPerusahaanAsc ? 1 : -1;
+    return 0;
+  });
+
+  const icon = document.getElementById('ks-sort-icon-perusahaan');
+  if (icon) icon.innerText = ksSortPerusahaanAsc ? '▲ A-Z' : '▼ Z-A';
+
+  ksCurrentPage = 1;
+  renderTableKerjasamaWithPagination();
+}
+      
         // Update Info Halaman
         const infoEl = document.getElementById('ks-info-halaman');
         if (infoEl) {
