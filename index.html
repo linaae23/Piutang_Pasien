@@ -2075,23 +2075,7 @@ if (formPasien) {
 
         resetHalamanDanFetch();
     }
-
-    // 4. RENDER TABEL & NAVIGASI PAGINATION
-    function renderTableKerjasamaWithPagination() {
-        const limit = parseInt(document.getElementById('f-ks-limit')?.value || 10);
-        const totalData = ksCurrentData.length;
-        const totalPages = Math.ceil(totalData / limit) || 1;
-
-        if (ksCurrentPage < 1) ksCurrentPage = 1;
-        if (ksCurrentPage > totalPages) ksCurrentPage = totalPages;
-
-        const startIdx = (ksCurrentPage - 1) * limit;
-        const endIdx = startIdx + limit;
-        const pageData = ksCurrentData.slice(startIdx, endIdx);
-
-        renderTableKerjasama(pageData);
-
-        //sort nama perusahaan//
+//sort nama perusahaan//
 let ksSortPerusahaanAsc = true;
 
 function sortKerjasamaByPerusahaan() {
@@ -2111,6 +2095,24 @@ function sortKerjasamaByPerusahaan() {
   ksCurrentPage = 1;
   renderTableKerjasamaWithPagination();
 }
+
+  
+    // 4. RENDER TABEL & NAVIGASI PAGINATION
+    function renderTableKerjasamaWithPagination() {
+        const limit = parseInt(document.getElementById('f-ks-limit')?.value || 10);
+        const totalData = ksCurrentData.length;
+        const totalPages = Math.ceil(totalData / limit) || 1;
+
+        if (ksCurrentPage < 1) ksCurrentPage = 1;
+        if (ksCurrentPage > totalPages) ksCurrentPage = totalPages;
+
+        const startIdx = (ksCurrentPage - 1) * limit;
+        const endIdx = startIdx + limit;
+        const pageData = ksCurrentData.slice(startIdx, endIdx);
+
+        renderTableKerjasama(pageData);
+
+    
       
         // Update Info Halaman
         const infoEl = document.getElementById('ks-info-halaman');
