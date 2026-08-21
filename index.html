@@ -926,6 +926,36 @@
     </div>
   </div>
 
+  <!-- MODAL RIWAYAT TRANSAKSI (PASIEN & KERJASAMA) -->
+  <div id="modalRiwayat" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
+        <h3 id="riwayat-modal-title" class="font-bold text-sm">🕒 Riwayat Transaksi</h3>
+        <button onclick="tutupModalRiwayat()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+      </div>
+      <div class="p-4 overflow-y-auto text-xs">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <th class="p-2 border-r">Tanggal</th>
+              <th class="p-2 border-r">Jenis Transaksi</th>
+              <th class="p-2 border-r text-right">Nominal</th>
+              <th class="p-2">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="riwayat-table-body" class="divide-y">
+            <tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat riwayat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 border-t flex justify-end shrink-0">
+        <button onclick="tutupModalRiwayat()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1.5 px-4 rounded text-xs">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT LOGIC ================= -->
 <script>
     // CREDENTIAL SUPABASE
@@ -941,6 +971,10 @@
     let listDataKerjasamaMaster = [];
     let ksCurrentData = [];
     let ksCurrentPage = 1;
+
+    // Menyimpan snapshot data lama saat mode edit (untuk hitung selisih riwayat transaksi)
+    let pasienDataLama = null;
+    let ksDataLama = null;
 
     // NAVIGASI VIEW
     function bukaView(viewName) {
@@ -1110,6 +1144,7 @@ function renderTabelPasien(data) {
         <td class="p-2.5 border-r text-center font-sans">${linkDoc}</td>
         <td class="p-2.5 text-center font-sans">
           <div class="flex items-center justify-center gap-1">
+            <button onclick="bukaRiwayatPasien('${item.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-2 py-1 rounded">Riwayat</button>
             <button onclick="editPasien('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-1 rounded">Edit</button>
             <button onclick="hapusPasien('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">Hapus</button>
           </div>
@@ -1128,9 +1163,75 @@ function tutupModal() {
   }
 }
 
+// Modal Riwayat Transaksi (dipakai bersama Piutang Pasien & Piutang Kerjasama)
+function bukaModalRiwayat() {
+  const modal = document.getElementById('modalRiwayat');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function tutupModalRiwayat() {
+  const modal = document.getElementById('modalRiwayat');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+// Menentukan warna tampilan nominal berdasarkan jenis transaksi
+function warnaJenisRiwayat(jenis) {
+  const menambahPiutang = ['PENAMBAHAN', 'TAMBAH', 'KOREKSI_PLUS'];
+  return menambahPiutang.includes(jenis) ? 'text-red-600' : 'text-emerald-600';
+}
+
+function labelJenisRiwayat(jenis) {
+  const label = {
+    'PEMBAYARAN_AWAL': 'Pembayaran Awal',
+    'ANGSURAN': 'Angsuran / Cicilan',
+    'KOREKSI': 'Koreksi / Potongan',
+    'PENAMBAHAN': 'Penambahan Biaya',
+    'BAYAR': 'Bayar',
+    'TAMBAH': 'Tambah Tagihan',
+    'KOREKSI_PLUS': 'Koreksi (+)',
+    'KOREKSI_MINUS': 'Koreksi (-)',
+    'TRANSFER': 'Biaya Transfer'
+  };
+  return label[jenis] || jenis || '-';
+}
+
+function renderTabelRiwayat(data) {
+  const tbody = document.getElementById('riwayat-table-body');
+  if (!tbody) return;
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Belum ada riwayat transaksi.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(r => {
+    const nominal = Number(r.nominal || 0);
+    return `
+      <tr class="hover:bg-slate-50">
+        <td class="p-2 border-r whitespace-nowrap">${r.tanggal || '-'}</td>
+        <td class="p-2 border-r">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${labelJenisRiwayat(r.jenis_transaksi)}</span>
+        </td>
+        <td class="p-2 border-r text-right font-semibold whitespace-nowrap ${warnaJenisRiwayat(r.jenis_transaksi)}">
+          Rp ${Math.abs(nominal).toLocaleString('id-ID')}
+        </td>
+        <td class="p-2">${r.keterangan || '-'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
 function editPasien(id) {
   const item = listDataPasienMaster.find(x => String(x.id) === String(id));
   if (!item) return alert('Data pasien tidak ditemukan!');
+
+  pasienDataLama = { ...item };
 
   document.getElementById('edit_id').value = item.id;
   document.getElementById('nama_pasien').value = item.nama_pasien || '';
@@ -1222,6 +1323,74 @@ function downloadCSVPasien() {
   document.body.removeChild(link);
 }
 
+// 4c. RIWAYAT TRANSAKSI PIUTANG PASIEN (Cicilan/Angsuran)
+async function catatRiwayatPasien(pasienId, jenisTransaksi, nominal, keterangan) {
+  if (!pasienId || !nominal || nominal === 0) return;
+  const { error } = await supabaseClient.from('riwayat_piutang_pasien').insert([{
+    pasien_id: pasienId,
+    tanggal: new Date().toISOString().slice(0, 10),
+    jenis_transaksi: jenisTransaksi,
+    nominal: nominal,
+    keterangan: keterangan
+  }]);
+  if (error) console.error('Gagal mencatat riwayat pasien:', error.message);
+}
+
+// Bandingkan data lama vs baru, lalu catat selisihnya sebagai riwayat transaksi
+async function prosesRiwayatPasien(pasienId, dataLama, dataBaru) {
+  if (!pasienId) return;
+
+  const namaPasien = dataBaru.nama_pasien || '-';
+  const lama = dataLama || { pembayaran_awal: 0, jumlah_angsuran: 0, potongan: 0, jumlah_biaya: 0, belum_terbayar: 0 };
+
+  const diffAwal = Number(dataBaru.pembayaran_awal || 0) - Number(lama.pembayaran_awal || 0);
+  const diffAngsuran = Number(dataBaru.jumlah_angsuran || 0) - Number(lama.jumlah_angsuran || 0);
+  const diffPotongan = Number(dataBaru.potongan || 0) - Number(lama.potongan || 0);
+  const diffBiaya = dataLama ? (Number(dataBaru.jumlah_biaya || 0) - Number(lama.jumlah_biaya || 0)) : 0;
+
+  const sisaLama = Number(lama.belum_terbayar || 0);
+  const sisaBaru = Number(dataBaru.belum_terbayar || 0);
+  const infoSaldo = `Sisa piutang: Rp ${sisaLama.toLocaleString('id-ID')} → Rp ${sisaBaru.toLocaleString('id-ID')}`;
+
+  if (diffAwal !== 0) {
+    await catatRiwayatPasien(pasienId, 'PEMBAYARAN_AWAL', diffAwal, `${namaPasien} - Pembayaran awal Rp ${Math.abs(diffAwal).toLocaleString('id-ID')} (${infoSaldo})`);
+  }
+  if (diffAngsuran !== 0) {
+    await catatRiwayatPasien(pasienId, 'ANGSURAN', diffAngsuran, `${namaPasien} - Angsuran/cicilan Rp ${Math.abs(diffAngsuran).toLocaleString('id-ID')} (${infoSaldo})`);
+  }
+  if (diffPotongan !== 0) {
+    await catatRiwayatPasien(pasienId, 'KOREKSI', diffPotongan, `${namaPasien} - Potongan/koreksi Rp ${Math.abs(diffPotongan).toLocaleString('id-ID')} (${infoSaldo})`);
+  }
+  if (diffBiaya !== 0) {
+    await catatRiwayatPasien(pasienId, 'PENAMBAHAN', diffBiaya, `${namaPasien} - Penambahan/koreksi biaya Rp ${Math.abs(diffBiaya).toLocaleString('id-ID')} (${infoSaldo})`);
+  }
+}
+
+// Tampilkan modal riwayat transaksi pasien
+async function bukaRiwayatPasien(id) {
+  const item = listDataPasienMaster.find(x => String(x.id) === String(id));
+  const nama = item ? (item.nama_pasien || '-') : '-';
+
+  document.getElementById('riwayat-modal-title').innerText = `🕒 Riwayat Transaksi - ${nama}`;
+  const tbody = document.getElementById('riwayat-table-body');
+  tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat riwayat...</td></tr>`;
+  bukaModalRiwayat();
+
+  const { data, error } = await supabaseClient
+    .from('riwayat_piutang_pasien')
+    .select('*')
+    .eq('pasien_id', id)
+    .order('tanggal', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Gagal memuat riwayat: ${error.message}</td></tr>`;
+    return;
+  }
+
+  renderTabelRiwayat(data || []);
+}
+
 // 5. Handler Simpan Form Input Data Pasien
 const formPasien = document.getElementById('formPiutangPasien');
 if (formPasien) {
@@ -1256,14 +1425,16 @@ if (formPasien) {
 
     let result;
     if (id) {
-      result = await supabaseClient.from('piutang_pasien').update(payload).eq('id', id);
+      result = await supabaseClient.from('piutang_pasien').update(payload).eq('id', id).select();
     } else {
-      result = await supabaseClient.from('piutang_pasien').insert([payload]);
+      result = await supabaseClient.from('piutang_pasien').insert([payload]).select();
     }
 
     if (result.error) {
       alert('Gagal menyimpan data pasien: ' + result.error.message);
     } else {
+      const savedId = id || (result.data && result.data[0] && result.data[0].id);
+      await prosesRiwayatPasien(savedId, id ? pasienDataLama : null, payload);
       alert('Data pasien berhasil disimpan!');
       batalEditPasien();
       loadDataPasien();
@@ -1308,6 +1479,7 @@ if (formPasien) {
       if (form) form.reset();
       const elEditId = document.getElementById('edit_id');
       if (elEditId) elEditId.value = '';
+      pasienDataLama = null;
       
       const elBtnSubmit = document.getElementById('btnSubmitPasien');
       if (elBtnSubmit) elBtnSubmit.innerText = '+ Simpan Data Pasien';
@@ -1983,6 +2155,7 @@ if (formPasien) {
                     <td class="p-3 text-center">${statusBadge}</td>
                     <td class="p-3">
                         <div class="flex gap-1">
+                            <button onclick="bukaRiwayatKerjasama('${row.id}')" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px]">Riwayat</button>
                             <button onclick="editPiutangKerjasama('${row.id}')" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px]">Edit</button>
                             <button onclick="deletePiutangKerjasama('${row.id}')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
                         </div>
@@ -2075,6 +2248,8 @@ if (formPasien) {
       const item = ksCurrentData.find(x => String(x.id) === String(id));
       if (!item) return alert('Data tidak ditemukan!');
 
+      ksDataLama = { ...item };
+
       document.getElementById('ks-edit-id').value = item.id;
       document.getElementById('ks_tahun_piutang').value = item.tahun_piutang || '';
       document.getElementById('ks_bulan_piutang').value = item.bulan_piutang || '';
@@ -2106,6 +2281,7 @@ if (formPasien) {
     function batalEditKerjasama() {
       setTimeout(() => {
         document.getElementById('ks-edit-id').value = '';
+        ksDataLama = null;
         calcSaldoAkhirKerjasama();
       }, 0);
     }
@@ -2165,22 +2341,104 @@ if (formPasien) {
           keterangan: document.getElementById('ks_keterangan')?.value || ''
       };
 
-      let error;
+      let error, data;
       if (editId) {
-          ({ error } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', editId));
+          ({ error, data } = await supabaseClient.from('piutang_kerjasama').update(payload).eq('id', editId).select());
       } else {
-          ({ error } = await supabaseClient.from('piutang_kerjasama').insert([payload]));
+          ({ error, data } = await supabaseClient.from('piutang_kerjasama').insert([payload]).select());
       }
 
       if (error) {
           alert('Gagal menyimpan data: ' + error.message);
       } else {
+          const savedId = editId || (data && data[0] && data[0].id);
+          await prosesRiwayatKerjasama(savedId, editId ? ksDataLama : null, payload, saldoAkhir);
           alert('Data Piutang Kerja Sama berhasil disimpan!');
           document.getElementById('ksPiutangForm').reset();
           document.getElementById('ks-edit-id').value = '';
+          ksDataLama = null;
           calcSaldoAkhirKerjasama();
           fetchPiutangKerjasama();
       }
+    }
+
+    // RIWAYAT TRANSAKSI PIUTANG KERJASAMA (Bayar/Tambah/Koreksi/Transfer)
+    function hitungSaldoAkhirKS(row) {
+      const awal = Number(row.saldo_awal) || 0;
+      const tambah = Number(row.tambah) || 0;
+      const kPlus = Number(row.koreksi_plus) || 0;
+      const bayar = Number(row.bayar) || 0;
+      const kMinus = Number(row.koreksi_minus) || 0;
+      const trf = Number(row.biaya_transfer) || 0;
+      return awal + tambah + kPlus - bayar - kMinus - trf;
+    }
+
+    async function catatRiwayatKerjasama(kerjasamaId, jenisTransaksi, nominal, keterangan) {
+      if (!kerjasamaId || !nominal || nominal === 0) return;
+      const { error } = await supabaseClient.from('riwayat_piutang_kerjasama').insert([{
+        kerjasama_id: kerjasamaId,
+        tanggal: new Date().toISOString().slice(0, 10),
+        jenis_transaksi: jenisTransaksi,
+        nominal: nominal,
+        keterangan: keterangan
+      }]);
+      if (error) console.error('Gagal mencatat riwayat kerjasama:', error.message);
+    }
+
+    async function prosesRiwayatKerjasama(kerjasamaId, dataLama, dataBaru, saldoAkhirBaru) {
+      if (!kerjasamaId) return;
+
+      const namaPerusahaan = dataBaru.nama_perusahaan || '-';
+      const lama = dataLama || { bayar: 0, tambah: 0, koreksi_plus: 0, koreksi_minus: 0, biaya_transfer: 0, saldo_awal: dataBaru.saldo_awal };
+
+      const diffBayar = Number(dataBaru.bayar || 0) - Number(lama.bayar || 0);
+      const diffTambah = Number(dataBaru.tambah || 0) - Number(lama.tambah || 0);
+      const diffKoreksiPlus = Number(dataBaru.koreksi_plus || 0) - Number(lama.koreksi_plus || 0);
+      const diffKoreksiMinus = Number(dataBaru.koreksi_minus || 0) - Number(lama.koreksi_minus || 0);
+      const diffTransfer = Number(dataBaru.biaya_transfer || 0) - Number(lama.biaya_transfer || 0);
+
+      const saldoLama = dataLama ? hitungSaldoAkhirKS(lama) : Number(dataBaru.saldo_awal || 0);
+      const infoSaldo = `Saldo: Rp ${saldoLama.toLocaleString('id-ID')} → Rp ${saldoAkhirBaru.toLocaleString('id-ID')}`;
+
+      if (diffBayar !== 0) {
+        await catatRiwayatKerjasama(kerjasamaId, 'BAYAR', diffBayar, `${namaPerusahaan} - Pembayaran Rp ${Math.abs(diffBayar).toLocaleString('id-ID')} (${infoSaldo})`);
+      }
+      if (diffTambah !== 0) {
+        await catatRiwayatKerjasama(kerjasamaId, 'TAMBAH', diffTambah, `${namaPerusahaan} - Penambahan tagihan Rp ${Math.abs(diffTambah).toLocaleString('id-ID')} (${infoSaldo})`);
+      }
+      if (diffKoreksiPlus !== 0) {
+        await catatRiwayatKerjasama(kerjasamaId, 'KOREKSI_PLUS', diffKoreksiPlus, `${namaPerusahaan} - Koreksi tambah Rp ${Math.abs(diffKoreksiPlus).toLocaleString('id-ID')} (${infoSaldo})`);
+      }
+      if (diffKoreksiMinus !== 0) {
+        await catatRiwayatKerjasama(kerjasamaId, 'KOREKSI_MINUS', diffKoreksiMinus, `${namaPerusahaan} - Koreksi kurang Rp ${Math.abs(diffKoreksiMinus).toLocaleString('id-ID')} (${infoSaldo})`);
+      }
+      if (diffTransfer !== 0) {
+        await catatRiwayatKerjasama(kerjasamaId, 'TRANSFER', diffTransfer, `${namaPerusahaan} - Biaya transfer Rp ${Math.abs(diffTransfer).toLocaleString('id-ID')} (${infoSaldo})`);
+      }
+    }
+
+    async function bukaRiwayatKerjasama(id) {
+      const item = ksCurrentData.find(x => String(x.id) === String(id));
+      const nama = item ? (item.nama_perusahaan || '-') : '-';
+
+      document.getElementById('riwayat-modal-title').innerText = `🕒 Riwayat Transaksi - ${nama}`;
+      const tbody = document.getElementById('riwayat-table-body');
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat riwayat...</td></tr>`;
+      bukaModalRiwayat();
+
+      const { data, error } = await supabaseClient
+        .from('riwayat_piutang_kerjasama')
+        .select('*')
+        .eq('kerjasama_id', id)
+        .order('tanggal', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Gagal memuat riwayat: ${error.message}</td></tr>`;
+        return;
+      }
+
+      renderTabelRiwayat(data || []);
     }
 
     function updateLaporanKonsolidasi() {
@@ -2252,64 +2510,6 @@ if (formPasien) {
 
       loadSemuaLaporan();
     });
-
-// Logika Simpan Transaksi & Riwayat (JavaScript) //
-  // Contoh Fungsi Catat Cicilan Pasien
-async function catatCicilanPasien(pasienId, nominalBayar, jenis, ket) {
-  // 1. Ambil data pasien saat ini
-  const { data: pasien } = await supabaseClient
-    .from('piutang_pasien')
-    .select('jumlah_angsuran, belum_terbayar')
-    .eq('id', pasienId)
-    .single();
-
-  const angsuranBaru = (parseFloat(pasien.jumlah_angsuran) || 0) + parseFloat(nominalBayar);
-  const belumTerbayarBaru = Math.max(0, (parseFloat(pasien.belum_terbayar) || 0) - parseFloat(nominalBayar));
-
-  // 2. Update akumulasi di tabel utama
-  await supabaseClient
-    .from('piutang_pasien')
-    .update({ 
-      jumlah_angsuran: angsuranBaru, 
-      belum_terbayar: belumTerbayarBaru 
-    })
-    .eq('id', pasienId);
-
-  // 3. Catat entri ke tabel riwayat
-  await supabaseClient
-    .from('riwayat_piutang_pasien')
-    .insert([{
-      pasien_id: pasienId,
-      jenis_transaksi: jenis, // e.g. 'ANGSURAN'
-      nominal: nominalBayar,
-      keterangan: ket
-    }]);
-
-  alert("Cicilan berhasil dicatat!");
-}
-
-// Tampilan Modal Riwayat (HTML & JS) //
-  // Fungsi Membuka Modal & Mengambil Histori Pasien
-async function lihatRiwayatPasien(pasienId, namaPasien) {
-  const { data: listRiwayat } = await supabaseClient
-    .from('riwayat_piutang_pasien')
-    .select('*')
-    .eq('pasien_id', pasienId)
-    .order('created_at', { ascending: false });
-
-  let htmlRows = listRiwayat.map(item => `
-    <tr class="border-b text-xs">
-      <td class="p-2">${item.tanggal}</td>
-      <td class="p-2 font-semibold text-blue-600">${item.jenis_transaksi}</td>
-      <td class="p-2 text-right font-bold">Rp ${Number(item.nominal).toLocaleString('id-ID')}</td>
-      <td class="p-2">${item.keterangan || '-'}</td>
-    </tr>
-  `).join('');
-
-  document.getElementById('modal-title').innerText = `Histori Pembayaran: ${namaPasien}`;
-  document.getElementById('modal-body-riwayat').innerHTML = htmlRows;
-  document.getElementById('modal-riwayat').classList.remove('hidden');
-}
   
   
 </script>
