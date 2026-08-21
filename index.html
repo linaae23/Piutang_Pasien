@@ -770,8 +770,10 @@
           <thead class="bg-gray-50 border-b text-gray-600 font-semibold uppercase">
               <tr>
                   <th class="p-3">Periode Piutang</th>
-                  <th class="p-3 cursor-pointer select-none hover:bg-gray-100" onclick="sortKerjasamaByPerusahaan()">
-  Perusahaan <span id="ks-sort-icon-perusahaan">↕️</span>
+                  <th class="p-3 cursor-pointer select-none hover:bg-gray-100 relative z-10" onclick="sortKerjasamaByPerusahaan()">
+  <span onclick="sortKerjasamaByPerusahaan()" class="pointer-events-auto">
+    Perusahaan <span id="ks-sort-icon-perusahaan">↕️</span>
+  </span>
 </th>
                   <th class="p-3">Tgl Surat</th>
                   <th class="p-3">No Surat</th>
